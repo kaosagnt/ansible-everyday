@@ -61,9 +61,9 @@ A lot of these Ansible Playbooks ARE interactive as they are used by myself
 almost on a daily basis. Therefore you will have to fill out some information
 rather than to continually rewrite playbooks for very common tasks. These
 playbooks are not a substitute for writing Ansbile Playbooks in the traditional
-sense using roles and the like. You will still need to write those if your
-deploying 100 new servers and the like. These scripts/playbooks allow you to
-get those everyday administration tasks completed.
+sense using roles and the like. You will still need to write those if you are
+deploying 100 new servers. These scripts/playbooks allow you to get those
+everyday administration tasks completed.
 
 A lot of the playbooks are designed for RHEL (or it's derivatives eg Centos/Fedora)
 but many are not and will work on other Operating Systems.
