@@ -1,4 +1,4 @@
-# Kaosagnt's Ansible Everyday utils #
+# Kaosagnt's Ansible Everyday Utils #
 
 This project contains many of the Ansible playbooks that I use daily
 as a Systems Administrator in the persute of easy server task automation.
