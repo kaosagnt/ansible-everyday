@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Slurp an Ansible server fact file in json format and print a
+# few facts in human readable form.
+
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Slurp;
+use JSON::XS;
+
+# Debug
+use Data::Dumper;
+
+my $json_file = shift(@ARGV) || '';
+
+if ($json_file eq '') {
+
+	print 'usage: '
+			. basename($0)
+			. " name_of_fact_file\n\n";
+	exit(1);
+}
+
+my $json_text = read_file(
+	dirname($0)
+	. '/../facts/server-facts/'
+	. $json_file
+);
+
+# Debug
+#print Dumper($json_text). "\n\n";
+
+my $json_object = new JSON::XS;
+
+my $ansible_data = $json_object->decode($json_text);
+
+# Debug
+#print Dumper($ansible_data) . "\n\n";
+
+print 'FQDN: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_fqdn'}
+		. "\n"
+
+		. 'Distribution: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_distribution'}
+		. "\n"
+
+		. 'Major Version: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_distribution_major_version'}
+		. "\n"
+
+		. 'Release: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_distribution_release'}
+		. "\n"
+
+		. 'Version: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_distribution_version'}
+		. "\n"
+
+		. 'Kernel: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_kernel'}
+		. "\n"
+
+		. 'IPv4 default: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_default_ipv4'}->{'address'}
+		. "\n"
+
+		. 'Processor Cores: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_processor_cores'}
+        . "\n"
+
+		. 'Processor Count: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_processor_count'}
+        . "\n"
+
+		. 'Processsor VCPUs: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_processor_vcpus'}
+        . "\n"
+
+		. 'Total Memory: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_memtotal_mb'}
+        . "MB\n"
+
+		. 'Host Type: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_env'}->{'HOSTTYPE'}
+		. "\n"
+
+		. 'System: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_system'}
+		. "\n"
+
+		. 'Virtualization Type: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_virtualization_type'}
+		. "\n"
+
+		. 'Vendor: '
+		. $ansible_data->{'ansible_facts'}->{'ansible_system_vendor'}
+		. "\n\n";
+
+exit(0);

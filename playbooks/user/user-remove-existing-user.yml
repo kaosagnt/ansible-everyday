@@ -1,0 +1,61 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Remove an existing user on remote node.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Remove an existing user"
+  become: yes
+
+  vars_prompt:
+    - name: "existing_username"
+      prompt: "Enter a username to remove"
+      private: no
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../common/common_information.yml
+
+#    - name: Debug
+#      local_action: command printf " {{ existing_username.find(':') }} "
+#      changed_when: false
+
+    - name: Invalid User name
+      local_action: command printf "Invalid username."
+      when: existing_username.find(':') >= 0
+            or
+            existing_username.find(' ') >= 0
+            or
+            existing_username|length >= 32
+            or
+            existing_username == ""
+      failed_when: true
+      changed_when: false
+
+    - name: Remove existing user on remote node.
+      user:
+           name: "{{ existing_username }}"
+           state: absent
+           remove: yes
+      register: existing_user
+
+#    - name: Debug exisiting_user
+#      local_action: command printf "{{ existing_user }}"
+#      changed_when: false

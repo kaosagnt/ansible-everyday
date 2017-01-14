@@ -1,0 +1,50 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Get the ACL(s) of the file / directory specified.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Get the ACL(s) of the file / directory specified"
+  become: yes
+
+  vars_prompt:
+    - name: "file_directory_name"
+      prompt: "Enter the file / directory name"
+      private: no
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../common/common_information.yml
+
+    - name: Invalid file / directory name
+      local_action: command printf "Invalid file or directory name."
+      when: file_directory_name == ""
+      failed_when: true
+
+    - name: Get the ACL
+      acl:
+            name: "{{ file_directory_name }}"
+            state: query
+      register: acl_data
+#      changed_when: false
+
+    - name: Print ACL data
+      local_action: command printf "{{ acl_data.acl }}"
+      changed_when: false

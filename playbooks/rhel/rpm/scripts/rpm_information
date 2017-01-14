@@ -1,0 +1,155 @@
+#!/bin/sh
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to query the information of an RPM package or
+# search for an RPM package.
+#
+# Returns: JSON string:
+# { 
+#	"found": true/false ,
+#	"rpm_information": "String of RPM information"
+# }
+
+
+PACKAGE_MANAGER=yum
+DISABLE_REPO=""
+ENABLE_REPO=""
+DIRECTIVE=info
+RPM_PACKAGE=""
+
+if [ ! -z ${1} ]; then
+	if [ X"${1}" = X"dnf" ]; then
+		PACKAGE_MANAGER=dnf
+	fi
+
+	shift
+fi
+
+for ARGUMENT in "$@"; do
+
+	case ${ARGUMENT} in
+
+		-r=*|--rpmpackage=*)	RPMPACKAGE_TEMP="${ARGUMENT#*=}"
+								shift
+								;;
+
+		-d=*|--disable=*)		DISABLE_TEMP="${ARGUMENT#*=}"
+								shift
+								;;
+
+		-e=*|--enable=*)		ENABLE_TEMP="${ARGUMENT#*=}"
+								shift
+								;;
+
+		-s=*|--search=*)		DIRECTIVE_TEMP="${ARGUMENT#*=}"
+								shift
+								;;
+
+		*)						# unknown option
+								;;
+	esac
+done
+
+if [ ! -z ${DISABLE_TEMP} ]; then
+	# Use a 'here string <<<' for the while loop so we can modify the
+	# DISABLE_REPO variable otherwise the while loop will execute in a
+	# sub shell and we will loose all DISABLE_REPO changes.
+	while read REPO_NAME; do
+		DISABLE_REPO+="--disablerepo ${REPO_NAME} "
+	done <<< "$(echo "${DISABLE_TEMP}" | sed -n 1'p' | tr ',' '\n')"
+fi
+
+# Debug
+#printf "\nDISABLE_REPO=${DISABLE_REPO}\n\n"
+
+if [ ! -z ${ENABLE_TEMP} ]; then
+	# Use a 'here string <<<' for the while loop so we can modify the
+	# ENABLE_REPO variable otherwise the while loop will execute in a
+	# sub shell and we will loose all ENABLE_REPO changes.
+	while read REPO_NAME; do
+		ENABLE_REPO+="--enablerepo ${REPO_NAME} "
+	done <<< "$(echo "${ENABLE_TEMP}" | sed -n 1'p' | tr ',' '\n')"
+fi
+
+# Debug
+#printf "\nENABLE_REPO=${ENABLE_REPO}\n\n"
+
+if [ ! -z ${RPMPACKAGE_TEMP} ]; then
+
+	# Replace comma chars with space.
+	RPM_PACKAGE=${RPMPACKAGE_TEMP//[,]/ }
+fi
+
+if [ ! -z ${DIRECTIVE_TEMP} ]; then
+    if [ X"${DIRECTIVE_TEMP}" = X"search" ]; then
+        DIRECTIVE=search
+    fi
+fi
+
+TEMP_FILE=$(mktemp --tmpdir ansible_rpm_info.XXXXXXXXX)
+
+if [ ! -z "${RPM_PACKAGE}" ]; then
+
+	${PACKAGE_MANAGER} ${DISABLE_REPO} ${ENABLE_REPO} \
+		${DIRECTIVE} ${RPM_PACKAGE} >& ${TEMP_FILE}
+fi
+
+ERROR_MSG=$(cat ${TEMP_FILE} | egrep -i -e "(error:|errno)\s")
+
+# Debug
+#printf "\nERR_MSG = ${ERROR_MSG}\n\n"
+#printf "\nTEMP_FILE = $TEMP_FILE\n\n"
+
+if [[ ! -z "${ERROR_MSG}" ]]; then
+
+	printf '{ "found": false , "rpm_information": "%s" }' \
+		"${ERROR_MSG}"
+
+else
+
+	RPM_INFORMATION=$(cat ${TEMP_FILE})
+
+	# Escape any quote chars as this will be placed into
+	# a json data structure.
+	SINGLE_QUOTE="\'"
+	DOUBLE_QUOTE='\"'
+	BACK_SLASH='\\'
+	#RPM_INFORMATION=${RPM_INFORMATION//\'/${SINGLE_QUOTE}}
+	RPM_INFORMATION=${RPM_INFORMATION//\/${BACK_SLASH}}
+	#RPM_INFORMATION=${RPM_INFORMATION//'"'/${DOUBLE_QUOTE}}
+	RPM_INFORMATION=${RPM_INFORMATION//'"'/\'}
+
+	# Remove any newline chars from the name and replace with %%.
+	# %% will be later substituded in the output display.
+	RPM_INFORMATION=${RPM_INFORMATION//$'\n'/%%}
+
+	# Cut the last char off the end of the string.
+	#RPM_NAMES=${RPM_INFORMATION%?}
+
+	# Debug
+	#echo ${RPM_INFORMATION}
+
+	printf '{ "found": true  , "rpm_information": "%s" }' \
+			 "${RPM_INFORMATION}"
+
+fi
+
+# Remove temp file
+unlink ${TEMP_FILE}

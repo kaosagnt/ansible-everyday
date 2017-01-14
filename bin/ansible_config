@@ -1,0 +1,6 @@
+# Config file. Point to where your ansible config files are located.
+ANSIBLE_CONF_PATH=${ANSIBLE_BASE_PATH}/conf
+ANSIBLE_HOSTS_PATH=${ANSIBLE_CONF_PATH}
+ANSIBLE_VERSION_OVERIDE=yes
+
+printf "\n%s\n\n" ${ANSIBLE_BASE_PATH}

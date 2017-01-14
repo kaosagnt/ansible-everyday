@@ -1,0 +1,156 @@
+#!/bin/sh
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to yum/dnf check-updates.
+#
+# Returns: JSON string:
+# { 
+#	"found": true/false ,
+#	"update_count": "Count of number of RPM packages" ,
+#	"update_list": "String of RPM package filenames" ,
+#	"error_msg": "Error Message string if an error occurred"
+# }
+
+PACKAGE_MANAGER=yum
+DISABLE_REPO=""
+ENABLE_REPO=""
+
+if [ ! -z ${1} ]; then
+	if [ X"${1}" = X"dnf" ]; then
+		PACKAGE_MANAGER=dnf
+	fi
+
+	shift
+fi
+
+for ARGUMENT in "$@"; do
+
+	case ${ARGUMENT} in
+		-d=*|--disable=*)	DISABLE_TEMP="${ARGUMENT#*=}"
+							shift
+							;;
+
+		-e=*|--enable=*)	ENABLE_TEMP="${ARGUMENT#*=}"
+							shift
+							;;
+
+		*)					# unknown option
+							;;
+	esac
+done
+
+if [ ! -z ${DISABLE_TEMP} ]; then
+	# Use a 'here string <<<' for the while loop so we can modify the
+	# DISABLE_REPO variable otherwise the while loop will execute in a
+	# sub shell and we will loose all DISABLE_REPO changes.
+	while read REPO_NAME; do
+		DISABLE_REPO+="--disablerepo ${REPO_NAME} "
+	done <<< "$(echo "${DISABLE_TEMP}" | sed -n 1'p' | tr ',' '\n')"
+fi
+
+# Debug
+#printf "\nDISABLE_REPO=${DISABLE_REPO}\n\n"
+
+if [ ! -z ${ENABLE_TEMP} ]; then
+    # Use a 'here string <<<' for the while loop so we can modify the
+    # ENABLE_REPO variable otherwise the while loop will execute in a
+    # sub shell and we will loose all ENABLE_REPO changes.
+    while read REPO_NAME; do
+        ENABLE_REPO+="--enablerepo ${REPO_NAME} "
+    done <<< "$(echo "${ENABLE_TEMP}" | sed -n 1'p' | tr ',' '\n')"
+fi
+
+# Debug
+#printf "\nENABLE_REPO=${ENABLE_REPO}\n\n"
+
+TEMP_FILE=$(mktemp --tmpdir ansible_yum_dnf_tmp.XXXXXXXXX)
+
+# Debug
+#printf "Temp Filename = ${TEMP_FILE}\n\n"
+
+# Clean the yum / dnf caches
+${PACKAGE_MANAGER} -q clean all
+
+# Check for updates.
+
+${PACKAGE_MANAGER} ${DISABLE_REPO} ${ENABLE_REPO} \
+	check-update >& ${TEMP_FILE}
+
+ERROR_MSG=$(cat ${TEMP_FILE} | egrep -i -e "(error:|errno)\s")
+# Escape any quote chars as this will be placed into
+# a json data structure.
+SINGLE_QUOTE="\'"
+DOUBLE_QUOTE='\"'
+BACK_SLASH='\\'
+#ERROR_MSG=${ERROR_MSG//\'/${SINGLE_QUOTE}}
+ERROR_MSG=${ERROR_MSG//\/${BACK_SLASH}}
+ERROR_MSG=${ERROR_MSG//'"'/${DOUBLE_QUOTE}}
+
+UPDATE_COUNT=0
+FOUND="false"
+
+# Debug
+#printf "\nERR_MSG = ${ERROR_MSG}\n\n"
+
+if [ ! -z "${ERROR_MSG}" ]; then
+
+	# Remove any newline chars from the name and replace with %%.
+    # %% will be later substituded in the output display.
+    ERROR_MSG=${ERROR_MSG//$'\n'/%%}
+
+	printf '{ "found": false , %s , %s "%s" }' \
+			'"update_count": "0" , "update_list": ""' \
+			'"error_msg":' \
+			"${ERROR_MSG}"
+
+else
+
+	UPDATE_COUNT=$(cat ${TEMP_FILE} \
+					| egrep '(.i386|.i686|.x86_64|.noarch|.src)' | wc -l)
+
+	UPDATE_LIST=$(cat ${TEMP_FILE} \
+					| egrep '(.i386|.i686|.x86_64|.noarch|.src)')
+
+	# Remove any newline chars from the name and replace with %%.
+	# %% will be later substituded in the output display.
+	UPDATE_LIST=${UPDATE_LIST//$'\n'/%%}
+
+	# Cut the last char off the end of the string.
+	#UPDATE_LIST=${UPDATE_LIST%?}
+
+	# Debug
+	#printf "${UPDATE_LIST}\n"
+
+	if [ ${UPDATE_COUNT} -gt 0 ]; then
+
+		FOUND="true"
+	fi 
+
+	printf '{ %s %s , %s "%s" , %s "%s" , "error_msg": "" }' \
+		'"found":' \
+		"${FOUND}" \
+		'"update_count":' \
+		"${UPDATE_COUNT}" \
+		'"update_list":' \
+		"${UPDATE_LIST}"
+fi
+
+# Remove temp file
+unlink ${TEMP_FILE}

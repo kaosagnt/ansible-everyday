@@ -1,0 +1,75 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Find out the status of a service on RHEL/CENTOS hosts
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Find out the status of a service on RHEL/CENTOS hosts"
+  become: yes
+
+  vars_prompt:
+    - name: "service_name"
+      prompt: "Enter the of the service to query"
+      private: no
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../../common/common_information.yml
+
+    - name: Invalid service name
+      local_action: command printf "Invalid service name."
+      when: service_name == ""
+      failed_when: true
+
+    - name: Check service status
+      script: scripts/check_service_status  "{{ service_name | quote }}"
+      register: service_info
+      when: (ansible_os_family == 'RedHat')
+            and
+            (ansible_lsb.major_release|int <= 6)
+      changed_when: false
+      failed_when: service_info.rc > 0
+
+    - name: Check service status
+      script: scripts/check_service_status  "{{ service_name | quote }}" systemd
+      register: service_info_systemd
+      when: (ansible_os_family == 'RedHat')
+            and
+            (ansible_lsb.major_release|int >= 7)
+      changed_when: false
+      failed_when: service_info_systemd.rc > 0
+
+    - name: Print service results
+      local_action: command echo "{{ service_name }} returned - {{ (service_info.stdout|from_json).message.replace('%%', '\n') }}"
+      when: service_info.stdout is defined
+            and
+            (ansible_os_family == 'RedHat')
+            and
+            (ansible_lsb.major_release|int <= 6)
+      changed_when: false
+
+    - name: Print systemd results
+      local_action: command echo "{{ service_name }} returned - {{ (service_info_systemd.stdout|from_json).message.replace('%%', '\n') }}"
+      when: service_info_systemd is defined
+            and
+            (ansible_os_family == 'RedHat')
+            and
+            (ansible_lsb.major_release|int >= 7)
+      changed_when: false

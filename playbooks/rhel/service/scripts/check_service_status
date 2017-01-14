@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to Check service status as the ansible service module
+# lacks the functionality.
+#
+# Returns: JSON string:
+# { 
+#	"status": "string" ,
+#	"message": "string containg the return string from the service command"
+# }
+
+SYSTEMD=false
+
+if [ ! -z "${2}" ]; then
+	if [ X"${2}" = X"systemd" ]; then
+		SYSTEMD=true
+	fi
+fi
+
+TEMP_FILE=$(mktemp --tmpdir ansible_service_tmp.XXXXXXXXX)
+
+# Debug
+#printf "Temp Filename = ${TEMP_FILE}\n\n"
+
+if [ X"${SYSTEMD}" = X"true" ]; then
+	systemctl is-active "${1}" >& ${TEMP_FILE}
+else
+	service "${1}" status >& ${TEMP_FILE}
+fi
+
+SERVICE_MESSAGE=$(cat ${TEMP_FILE})
+
+# Remove any newline chars from the name and replace with %%.
+# %% will be later substituded in the output display.
+SERVICE_MESSAGE=${SERVICE_MESSAGE//$'\n'/%%}
+
+if [ X"${SYSTEMD}" = X"true" ]; then
+	SERVICE_RUNNING=$(cat ${TEMP_FILE} | egrep 'active' \
+						| awk '{printf("%s", $1)}')
+	SERVICE_STOPPED=$(cat ${TEMP_FILE} | egrep 'inactive' \
+						| awk '{printf("%s", $1)}')
+else
+	SERVICE_RUNNING=$(cat ${TEMP_FILE} | egrep 'running' \
+					| awk '{printf("%s", $5)}')
+	SERVICE_STOPPED=$(cat ${TEMP_FILE} | egrep 'stopped' \
+					| awk '{printf("%s", $3)}')
+fi
+
+# Debug
+#printf "SRUN: ${SERVICE_RUNNING}\n\n"
+#printf "SSTOP: ${SERVICE_STOPPED}\n\n"
+
+if [ X"${SERVICE_RUNNING}" == X"running..."  ] || [ X"${SERVICE_RUNNING}" == X"active" ]; then
+
+	SERVICE_STATUS="running" 
+
+
+elif [ X"${SERVICE_STOPPED}" == X"stopped" ] || [ X"${SERVICE_STOPPED}" == X"inactive" ]; then
+
+	SERVICE_STATUS="stopped"
+
+else
+
+	SERVICE_STATUS="unknown"
+fi
+
+printf '{ "status": "%s" , "message": "%s" }' \
+		"${SERVICE_STATUS}" \
+		"${SERVICE_MESSAGE}"
+
+# Remove temp file
+rm -f ${TEMP_FILE}

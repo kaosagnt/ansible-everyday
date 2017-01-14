@@ -1,0 +1,63 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Open a network port in iptables. Common checks.
+
+#   - name: Debug
+#     local_action: command printf "Port number - {{ item|int }}."
+#     changed_when: false
+#     with_items:
+#       - "{{ port_numbers.split(',') }}"
+
+    - name: Protocol
+      set_fact:
+               protocol_s: "upd"
+      when: protocol != "" and protocol == "udp"
+      changed_when: false
+
+    - name: Invalid Protocol
+      local_action: command printf "Invalid Protocol - {{ protocol }}."
+      when:
+         - protocol_s not in ["tcp", "upd"]
+      changed_when: false
+      failed_when: true
+
+    - name: Source IP
+      set_fact:
+               source_ip_s: " -s {{ source_ip }} "
+      when: source_ip != ""
+      changed_when: false
+
+    - name: Invalid source address
+      local_action: command printf "Invalid source address - {{ source_ip }}."
+      when: 'source_ip != "" and "{{ source_ip|ipv4 }}" == "False"'
+      changed_when: false
+      failed_when: true
+
+#    - name: Debug
+#      local_action: command printf "Source IP - {{ source_ip_s }}."
+      #local_action: command printf "Source IPv4 - {{ source_ip|ipv4 }}."
+#      changed_when: false
+
+    - name: Invalid port numbers
+      local_action: command printf "Invalid port number - {{ item }}."
+      when: '"{{ item }}" == "" or "{{ item|int }}" == "0"'
+      failed_when: true
+      with_items:
+        - "{{ port_numbers.split(' ') }}"

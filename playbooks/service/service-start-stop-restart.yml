@@ -1,0 +1,81 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Start / Stop / Restart a service on RHEL/CENTOS hosts
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Start / Stop / Restart a service"
+  become: yes
+
+  vars_prompt:
+    - name: "service_name"
+      prompt: 'Enter the name of the service(s) (multiple seperated by a comma. NOTE: the same action will be applied to ALL services listed.)'
+      private: no
+
+    - name: "service_action"
+      prompt: 'Service action (start, stop, restart, reload)'
+      private: no
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../common/common_information.yml
+
+    - name: Invalid service name
+      local_action: command printf "Invalid service name."
+      when: service_name == ""
+      failed_when: true
+
+    - name: Invalid service action
+      local_action: command printf "Invalid service action."
+      when: service_action not in ['start', 'stop', 'restart']
+      failed_when: true
+
+    - name: Is service action start?
+      set_fact:
+          service_action: "started"
+      when: service_action == "start"
+      failed_when: false
+      changed_when: false
+
+    - name: Is service action stop?
+      set_fact:
+          service_action: "stopped"
+      when: service_action == "stop"
+      failed_when: false
+      changed_when: false
+
+    - name: Is service action restart?
+      set_fact:
+          service_action: "restarted"
+      when: service_action == "restart"
+      failed_when: false
+      changed_when: false
+
+    - name: Is service action reload?
+      set_fact:
+          service_action: "reloaded"
+      when: service_action == "reload"
+      failed_when: false
+      changed_when: false
+
+    - name: Service Action
+      service: name="{{ item }}" state="{{ service_action }}"
+      with_items:
+        - "{{ service_name.split(',') }}"

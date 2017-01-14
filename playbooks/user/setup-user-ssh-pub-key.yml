@@ -1,0 +1,60 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Add a users public ssh key to the authorized_keys file on a remote host.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Add a users public ssh key to the authorized_keys file"
+  become: yes
+
+  vars_prompt:
+    - name: "user_name"
+      prompt: "Enter the user name of the account to add key to"
+      private: no
+
+    - name: "user_key"
+      prompt: "Paste the public SSH key (eg id_rsa.pub contents)"
+      private: no
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../common/common_information.yml
+
+    - name: Invalid user name
+      local_action: command printf "Invalid user name."
+      when: user_name == ''
+      failed_when: true
+
+    - name: Invalid user key
+      local_action: command printf "Invalid user public key."
+      when: user_key.find('ssh-') != 0
+      failed_when: true
+
+    - name: Adding public SSH key to user account
+      authorized_key:
+                     user: "{{ user_name }}"
+                     key: "{{ user_key }}"
+                     manage_dir: yes
+                     state: present
+      register: authkey_result
+
+    #- name: debug
+    #  local_action: command printf "{{ authkey_result }}\n\n"
+    #  changed_when: false

@@ -1,0 +1,129 @@
+#!/bin/sh
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to find files in the directory given.
+#
+# Returns: JSON string:
+# { 
+#	"found": true/false ,
+#	"found_count": "Count of number of files" ,
+#	"found_file": "file name of temp file for ansible to upload" ,
+#	"found_list": "String of filenames"
+# }
+#
+#	found_file: When the count of number of found files is > 50 then
+#				the file name is returned instead of the found_list.
+#				Ansible to upload this file.
+
+SEARCH_DIR=${1}
+REGEX_TO_SEARCH=${2}
+
+remove_temp_file() {
+
+	local _file_to_remove="${1}"
+	# Remove temp file
+	rm -f ${_file_to_remove}
+}
+
+usage() {
+    echo "usage: ${0##*/} search_directory 'filename_to_search' [regex]"
+    exit 1
+}
+
+[ $# -gt 1 ] || usage
+
+TEMP_FILE=$(mktemp --tmpdir ansible_find_files_tmp.XXXXXXXXX)
+
+# Debug
+#set -x
+#printf "Temp Filename = ${TEMP_FILE}\n\n"
+#printf "Search Directory: ${SEARCH_DIR}\n\n"
+#printf "Regex: ${REGEX_TO_SEARCH}\n\n"
+
+# Find files in the ${SEARCH_DIRECTORY} using regex
+# eg '.*\.\(rpmnew\|rpmsave\)'
+
+if [ -z "${3}" ]; then
+
+	find ${SEARCH_DIR} -type f -iname ${REGEX_TO_SEARCH} \
+		-print | sort >& ${TEMP_FILE}
+
+		#-printf "%P%%%%" | sort >& ${TEMP_FILE}
+
+else
+
+	find ${SEARCH_DIR} -type f -regex ${REGEX_TO_SEARCH} \
+		-print | sort >& ${TEMP_FILE}
+
+fi
+
+FOUND_COUNT=$(cat ${TEMP_FILE} | wc -l)
+
+if [ ${FOUND_COUNT} -eq 0 ]; then
+
+	printf '{ "found": false , %s , %s }' \
+			'"found_count": "0" , "found_file": ""' \
+			'"found_list": ""'
+
+	# Remove temp file
+	remove_temp_file ${TEMP_FILE}
+
+elif [ ${FOUND_COUNT} -gt 50 ]; then
+
+	# We don't want to remove temp file as we will
+	# have ansible upload it as there are too many
+	# filenames to display and the file list may be too
+	# big to pass back in the datastructure.
+
+    printf '{ %s %s , %s "%s" , %s "%s" , %s "" }' \
+        '"found":' \
+        "true" \
+		'"found_count":' \
+        "${FOUND_COUNT}" \
+        '"found_file":' \
+        "${TEMP_FILE}" \
+        '"found_list":'
+
+else
+
+	FOUND_LIST=$(cat ${TEMP_FILE} | sort)
+
+	# Remove any newline chars from the name and replace with %%.
+	# %% will be later substituded in the output display.
+	FOUND_LIST=${FOUND_LIST//$'\n'/%%}
+
+	# Cut the last char off the end of the string.
+	#FOUND_LIST=${FOUND_LIST%?}
+
+	# Debug
+	#printf "${FOUND_LIST}\n"
+
+	printf '{ %s %s , %s "%s" , %s "" , %s "%s" }' \
+		'"found":' \
+		"true" \
+		'"found_count":' \
+		"${FOUND_COUNT}" \
+		'"found_file":' \
+		'"found_list":' \
+		"${FOUND_LIST}"
+
+	# Remove temp file
+	remove_temp_file ${TEMP_FILE}
+fi

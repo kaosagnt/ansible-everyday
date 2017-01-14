@@ -1,0 +1,76 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Find out RPM information installed on RHEL/CENTOS hosts
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Find out RPM information installed on RHEL/CENTOS hosts"
+  become: yes
+
+  vars_prompt:
+    - name: "directive"
+      prompt: "Search for an RPM or Query RPM information(s/q)"
+      private: no
+
+    - name: "rpm_package"
+      prompt: "\nEnter the RPM package name(s)\n(seperated by a comma for multiple)"
+      private: no
+
+    - name: "disable_repo"
+      prompt: "\nEnter the list of REPO ID(s) to disable\n(seperated by a comma for multiple, leave blank for none)"
+      private: no
+
+    - name: "enable_repo"
+      prompt: "\nEnter the list of REPO ID(s) to enable\n(seperated by a comma for multiple, leave blank for none)"
+      private: no
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../../common/common_information.yml
+
+    - name: Invalid directive
+      local_action: command printf "Invalid directive - {{ directive }}."
+      when: directive not in ['s', 'q']
+      failed_when: true
+
+    - name: Invalid RPM package name
+      local_action: command printf "Invalid RPM package name."
+      when: rpm_package == ""
+      failed_when: true
+
+    - name: Set directive search
+      set_fact:
+               directive: "{{ (directive == 's') | ternary('search','info') }}"
+      changed_when: false
+
+    - name: Include Yum rpm-info
+      include: yum-rpm-info.yml
+      when: (ansible_os_family == 'RedHat')
+            and
+            (ansible_lsb.major_release|int >= 5 or
+             ansible_lsb.major_release|int <= 7)
+      changed_when: false
+
+    - name: Include DNF rpm-info
+      include: dnf-rpm-info.yml
+      when: ((ansible_os_family == 'RedHat')
+            and
+            (ansible_lsb.major_release|int >= 8))
+      changed_when: false

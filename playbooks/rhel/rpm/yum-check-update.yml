@@ -1,0 +1,47 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Execute yum check-update on RHEL/CENTOS <= 7 hosts
+
+    - name: Yum check-update
+      script: scripts/check_yum_dnf_updates yum -d="{{ disable_repo }}" -e="{{ enable_repo }}"
+      when: (ansible_os_family == 'RedHat')
+            and
+            (ansible_lsb.major_release|int >= 5 and
+             ansible_lsb.major_release|int <= 7)
+      register: yum_info
+      changed_when: false
+      failed_when: yum_info.rc > 0
+
+    # Yum reporting
+    - name: Print Yum updates found
+      local_action: command printf "Approximately {{ (yum_info.stdout|from_json).update_count }} update(s) found - \n\n{{ (yum_info.stdout|from_json).update_list.replace('%%', '\n') }}\n\n"
+      when: yum_info is defined and (yum_info.stdout|from_json).found == true
+      changed_when: false
+
+    - name: Print no Yum updates found
+      local_action: command printf "No updates found."
+      when: yum_info is defined and (yum_info.stdout|from_json).found == false
+      changed_when: false
+
+    - name: Print Yum error
+      local_action: command printf "An error occurred\n {{ (yum_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
+      when: yum_info is defined and (yum_info.stdout|from_json).error_msg != ""
+      changed_when: false
+      failed_when: true
