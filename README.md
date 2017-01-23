@@ -99,7 +99,7 @@ but many are not and will work on other Operating Systems.
 
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 
-    ansible_service-enable-at-boot - enable a service to start up at boot time
+    ansible_service-enable-disable-at-boot - enable / disable services to start up at boot time
     ansible_service-rhel-check-status - check the status of a service eg stopped / running
     ansible_service-start-stop-restart - start / stop / restart a service
 

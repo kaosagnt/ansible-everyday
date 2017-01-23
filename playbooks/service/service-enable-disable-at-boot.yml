@@ -17,14 +17,18 @@
 #
 # %END_COPYRIGHT%
 
-# Enable a service at boot time on RHEL/CENTOS hosts
+# Enable / Disable services at boot time on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
-  name: "Enable a service at boot time"
+  name: "Enable / Disable services at boot time"
   become: yes
 
   vars_prompt:
     - name: "service_name"
       prompt: 'Enter the name of the service (multiple seperated by a comma)'
+      private: no
+
+    - name: "service_enable"
+      prompt: "(E)nable or (D)isable the service (e / d)\nNOTE: this will appy to all services listed above"
       private: no
 
 #  vars:
@@ -38,7 +42,19 @@
       when: service_name == ""
       failed_when: true
 
-    - name: Service enable at boot
-      service: name="{{ service_name }}" enabled=yes
+    - name: "Invalid service enable / disable"
+      local_action: command printf "Invalid service enable / disable selection."
+      when: service_enable not in ['e', 'd']
+      failed_when: true
+
+    - name: "Set Service enabled"
+      set_fact:
+               service_enabled: "{{ (service_enable == 'e') | ternary('yes','no') }}"
+      changed_when: false
+
+    - name: Service enable / disable at boot
+      service:
+              name: "{{ item }}"
+              enabled: "{{ service_enabled }}"
       with_items:
         - "{{ service_name.split(',') }}"
