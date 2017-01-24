@@ -18,7 +18,7 @@
 # %END_COPYRIGHT%
 
 # Open a network port in iptables / firewalld.
-- hosts: "{{ hosts | default('ianm') }}"
+- hosts: "{{ hosts | default('localhost') }}"
   name: "Open a network port in iptables/firewalld"
   become: yes
 
