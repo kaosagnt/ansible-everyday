@@ -6,7 +6,7 @@ as a Systems Administrator in the pursuit of easy server task automation.
 ## Installation ##
 
 You will need to setup and install Ansible like you normally would before
-using what is proesented here. Hint: it uses ansible. https://www.ansible.com
+using what is presented here. Hint: it uses ansible. https://www.ansible.com
 
 Optional:
 Create an ansible-everyday/bin/ansible_config file with the following content:
@@ -54,7 +54,7 @@ if you use a shell with name completion, it will make life easier for you.
 ## Available Commands / Playbooks ##
 
 Contained in the ansible-everyday/bin/ directory are shell scripts that invoke
-the ansible-playbook and corresponding Playbook files in the
+ansible-playbook and corresponding Playbook files in the
 ansbile-everyday/playbook/ directory.
 
 A lot of these Ansible Playbooks ARE interactive as they are used by myself
@@ -82,8 +82,8 @@ but many are not and will work on other Operating Systems.
 
     ansible_gather-facts - gather facts about remote hosts and save to the facts/ directory
 
-    ansible_net-close-network-port - close a network port on the remote host
-    ansible_net-open-network-port - open a network port on the remote host
+    ansible_net-close-network-port - close network port(s) on remote hosts IPTables / Firewalld
+    ansible_net-open-network-port - open network port(s) remote hosts. IPTables / Firewalld
 
     ansible_ping-hosts - use ansible to ping remote hosts. This is not a traditional ping command.
 
