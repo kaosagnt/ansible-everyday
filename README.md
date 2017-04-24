@@ -78,7 +78,7 @@ but many are not and will work on other Operating Systems.
     ansible_decode-facts - produce some human readable facts from the Ansible json fact files.
 
     ansible_find-etc-opt-rmpnew-files - find leftover rpmnew / rpmsave files in the /etc and /opt directories
-    ansible_find-files - find files or directories. if the list of files are large then the list of files are uploaded instead of being displayed.
+    ansible_find-files - find files or directories. If the list of files are large then the list of files are uploaded instead of being displayed.
 
     ansible_gather-facts - gather facts about remote hosts and save to the facts/ directory
 
@@ -96,6 +96,8 @@ but many are not and will work on other Operating Systems.
 
     ansible_rpm-yum-dnf-check-update - check for RPM package updates
     ansible_rpm-yum-dnf-update-rpm - update / install RPM packages
+
+	ansible_scl-info - List any installed Software Collections using scl -l. Lists all collections or query by name.
 
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
 											Based upon CVE-2017-6074-1.sh from RedHat.
