@@ -95,13 +95,14 @@ but many are not and will work on other Operating Systems.
     ansible_rpm-setup-shells - install a shell RPM eg tcsh and profile files.
 
     ansible_rpm-yum-dnf-check-update - check for RPM package updates
+    ansible_rpm-yum-dnf-repolist - execute repolist all on RHEL hosts to show yum / dnf repository information.
     ansible_rpm-yum-dnf-update-rpm - update / install RPM packages
 
-	ansible_scl-info - List any installed Software Collections using scl -l. Lists all collections or query by name.
+	ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name.
 
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
-											Based upon CVE-2017-6074-1.sh from RedHat.
-											https://access.redhat.com/security/vulnerabilities/2934281
+		Based upon CVE-2017-6074-1.sh from RedHat.
+		https://access.redhat.com/security/vulnerabilities/2934281
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 
     ansible_service-enable-disable-at-boot - enable / disable services to start up at boot time
