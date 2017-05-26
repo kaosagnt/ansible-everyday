@@ -60,6 +60,8 @@
                directive: "{{ (directive == 's') | ternary('search','info') }}"
       changed_when: false
 
+    - include: ../common/common_rpm_fix_vars.yml
+
     - name: Include Yum rpm-info
       include: yum-rpm-info.yml
       when: (ansible_os_family == 'RedHat')

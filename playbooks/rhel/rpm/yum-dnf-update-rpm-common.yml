@@ -48,6 +48,8 @@
       when: rpm_package == ""
       failed_when: true
 
+    - include: ../common/common_rpm_fix_vars.yml
+
     - name: Include Yum update RPM
       include: yum-update-rpm.yml
       when: (ansible_os_family == 'RedHat') 

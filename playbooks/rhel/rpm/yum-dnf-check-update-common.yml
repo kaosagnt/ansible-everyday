@@ -37,6 +37,8 @@
   tasks:
     - include: ../../common/common_information.yml
 
+    - include: ../common/common_rpm_fix_vars.yml
+
     - name: Include Yum check-update
       include: yum-check-update.yml
       when: (ansible_os_family == 'RedHat')
