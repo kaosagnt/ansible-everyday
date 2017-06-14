@@ -46,18 +46,18 @@
 
     - name: Invalid source address
       local_action: command printf "Invalid source address - {{ source_ip }}."
-      when: 'source_ip != "" and "{{ source_ip|ipv4 }}" == "False"'
+      when: source_ip != "" and source_ip|ipv4 == False
       changed_when: false
       failed_when: true
 
 #    - name: Debug
 #      local_action: command printf "Source IP - {{ source_ip_s }}."
-      #local_action: command printf "Source IPv4 - {{ source_ip|ipv4 }}."
+#      local_action: command printf "Source IPv4 - {{ source_ip|ipv4 }}."
 #      changed_when: false
 
     - name: Invalid port numbers
       local_action: command printf "Invalid port number - {{ item }}."
-      when: '"{{ item }}" == "" or "{{ item|int }}" == "0"'
+      when: item == "" or item|int == 0
       failed_when: true
       with_items:
-        - "{{ port_numbers.split(' ') }}"
+        - "{{ port_numbers.split(',') }}"
