@@ -103,6 +103,8 @@ but many are not and will work on other Operating Systems.
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
 		Based upon CVE-2017-6074-1.sh from RedHat.
 		https://access.redhat.com/security/vulnerabilities/2934281
+	ansible_security-rhel-cve-2017-1000366 - Check for Stack Guard Page Circumvention Affecting Multiple Packages CVE-2017-1000366
+		https://access.redhat.com/security/vulnerabilities/stackguard
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 
     ansible_service-enable-disable-at-boot - enable / disable services to start up at boot time
