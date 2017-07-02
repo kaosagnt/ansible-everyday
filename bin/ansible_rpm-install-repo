@@ -28,7 +28,7 @@ usage() {
 			"usage: ${0##*/} repo_name [-e]" \
 			"	repo_name: name of repository to install. eg. epel" \
 			"	-e hosts={comma seperated list of hostnames to override the default}" \
-			"Valid repository names: epel ius percona remi repoforge"
+			"Valid repository names: cert epel ius percona remi repoforge"
 	exit 1
 }
 

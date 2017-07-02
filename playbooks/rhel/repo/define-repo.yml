@@ -24,7 +24,7 @@
 
     - name: Repo not Defined?
       local_action: command printf "Unknown Repository selected.\n\n"
-      when: repo_name not in ['epel', 'ius', 'remi', 'repoforge', 'percona']
+      when: repo_name not in ['cert', 'epel', 'ius', 'remi', 'repoforge', 'percona']
       failed_when: true
       changed_when: false
 
@@ -56,6 +56,18 @@
       set_fact:
           repo_url: "https://www.percona.com/redir/downloads/percona-release/redhat/percona-release-0.1-3.noarch.rpm"
       when: repo_name == 'percona'
+      changed_when: false
+
+    - name: Are we Cert Forensics EL release?
+      set_fact:
+          repo_url: "https://forensics.cert.org/cert-forensics-tools-release-el{{ ansible_distribution_major_version }}.rpm"
+      when: repo_name == 'cert' and ansible_distribution != 'Fedora'
+      changed_when: false
+
+    - name: Are we Cert Forensics Fedora release?
+      set_fact:
+          repo_url: "https://forensics.cert.org/cert-forensics-tools-release-{{ ansible_distribution_major_version }}.rpm"
+      when: repo_name == 'cert' and ansible_distribution == 'Fedora'
       changed_when: false
 
     - name: Print repository URL we are installing
