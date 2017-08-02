@@ -34,7 +34,7 @@ ENABLE_REPO=""
 
 if [ ! -z ${1} ]; then
 	if [ X"${1}" = X"dnf" ]; then
-		PACKAGE_MANAGER=dnf
+		PACKAGE_MANAGER="dnf -q"
 	fi
 
 	shift
