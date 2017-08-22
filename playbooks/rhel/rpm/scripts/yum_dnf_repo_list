@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# %BEGIN_COPYRIGHT%
+# 
 # Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -28,13 +30,19 @@ if [ ! -z ${1} ]; then
 	shift
 fi
 
+REPO_TYPE="all"
+
+if [ ! -z ${1} ]; then
+	REPO_TYPE="${1}"
+fi
+
 TEMP_FILE=$(mktemp --tmpdir ansible_yum_dnf_repo_tmp.XXXXXXXXX)
 
 # Debug
 #printf "Temp Filename = ${TEMP_FILE}\n\n"
 
 # Grab the Repo list.
-${PACKAGE_MANAGER} repolist all >& ${TEMP_FILE}
+${PACKAGE_MANAGER} repolist ${REPO_TYPE} >& ${TEMP_FILE}
 
 REPO_LIST=$(cat ${TEMP_FILE})
 

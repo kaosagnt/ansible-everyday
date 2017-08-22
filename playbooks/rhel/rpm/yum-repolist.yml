@@ -20,7 +20,7 @@
 # Execute yum repolist on RHEL/CENTOS <= 7 hosts
 
     - name: Yum repolist
-      script: scripts/yum_dnf_repo_list yum
+      script: scripts/yum_dnf_repo_list yum "{{ repo_type }}"
       when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5 and
