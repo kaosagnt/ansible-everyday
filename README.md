@@ -48,7 +48,7 @@ modules to be installed on your local ansible machine:
     File::Slurp;
     JSON::XS;
 
-Where you have place the ansible/bin/ directory add it to your path. Therefore
+Where you have place the ansible/bin/ directory add it to your path. Therefore,
 if you use a shell with name completion, it will make life easier for you.
 
 ## Available Commands / Playbooks ##
@@ -103,6 +103,8 @@ but many are not and will work on other Operating Systems.
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
 		Based upon CVE-2017-6074-1.sh from RedHat.
 		https://access.redhat.com/security/vulnerabilities/2934281
+	ansible_security-rhel-cve-2017-1000251 - Check for Blueborne - Linux Kernel Remote Denial of Service in Bluetooth subsystem - CVE-2017-1000251
+		https://access.redhat.com/security/vulnerabilities/CVE-2017-1000251
 	ansible_security-rhel-cve-2017-1000366 - Check for Stack Guard Page Circumvention Affecting Multiple Packages CVE-2017-1000366
 		https://access.redhat.com/security/vulnerabilities/stackguard
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
