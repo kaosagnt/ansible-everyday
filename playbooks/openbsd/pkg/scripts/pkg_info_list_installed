@@ -1,0 +1,93 @@
+#!/bin/sh
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to list installed OpenBSD packages via pkg_info.
+#
+# Returns: JSON string:
+# { 
+#	"found": true/false ,
+#	"pkg_count": "Count of number of packages" ,
+#	"pkg_list": "String of package filenames" ,
+#	"error_msg": "Error Message string if an error occurred"
+# }
+
+PACKAGE_MANAGER=pkg_info
+
+TEMP_FILE=$(mktemp -t ansible_pkg_info_tmp.XXXXXXXXX)
+
+# Debug
+#printf "Temp Filename = ${TEMP_FILE}\n\n"
+
+# List installed packages.
+#${PACKAGE_MANAGER} >& ${TEMP_FILE}
+${PACKAGE_MANAGER} > ${TEMP_FILE}
+
+if [ $? -ne 0 ]; then
+
+	ERROR_MSG="Something went wrong. Error code: $?"
+
+	# Remove any newline chars from the name and replace with %%.
+    # %% will be later substituded in the output display.
+    ERROR_MSG=$(echo -n ${ERROR_MSG} | awk -v ORS="%%" '1')
+fi
+
+PKG_COUNT=0
+FOUND="false"
+
+# Debug
+#printf "\nERR_MSG = ${ERROR_MSG}\n\n"
+
+if [ ! -z "${ERROR_MSG}" ]; then
+
+	printf '{ "found": false , %s , %s "%s" }' \
+			'"pkg_count": "0" , "pkg_list": ""' \
+			'"error_msg":' \
+			"${ERROR_MSG}"
+
+else
+
+	PKG_COUNT=$(cat ${TEMP_FILE} | wc -l)
+
+	# Strip whitespace
+	PKG_COUNT=$(echo ${PKG_COUNT} | sed 's/\/s+//g')
+
+	# Remove any newline chars from the name and replace with %%.
+	# %% will be later substituded in the output display.
+	PKG_LIST=$(awk -v ORS="%%" '1' ${TEMP_FILE})
+
+	# Debug
+	#printf "${PKG_LIST}\n"
+
+	if [ ${PKG_COUNT} -gt 0 ]; then
+
+		FOUND="true"
+	fi 
+
+	printf '{ %s %s , %s "%s" , %s "%s" , "error_msg": "" }' \
+		'"found":' \
+		"${FOUND}" \
+		'"pkg_count":' \
+		"${PKG_COUNT}" \
+		'"pkg_list":' \
+		"${PKG_LIST}"
+fi
+
+# Remove temp file
+rm -f ${TEMP_FILE}

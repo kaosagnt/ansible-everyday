@@ -1,0 +1,99 @@
+#!/bin/sh
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to query the existance of a OpenBSD package information.
+#
+# Returns: JSON string:
+# { 
+#   "found": true/false ,
+#   "found_count": "Count of number of files" ,
+#   "found_file": "file name of temp file for ansible to upload" ,
+#   "found_list": "String of package file names"
+# }
+
+PACKAGE_NAME=${1}
+PACKAGE_FILES=""
+
+remove_temp_file() {
+
+    local _file_to_remove="${1}"
+    # Remove temp file
+    rm -f ${_file_to_remove}
+}
+
+TEMP_FILE=$(mktemp -t ansible_pkg_info_files_tmp.XXXXXXXXX)
+
+if [ ! -z ${PACKAGE_NAME} ]; then
+
+	#pkg_info -L ${PACKAGE_NAME} >& ${TEMP_FILE}
+	pkg_info -L ${PACKAGE_NAME} > ${TEMP_FILE}
+fi
+
+FOUND_COUNT=$(cat ${TEMP_FILE} | wc -l)
+
+# Strip whitespace
+FOUND_COUNT=$(echo ${FOUND_COUNT} | sed 's/\/s+//g')
+
+if [ ${FOUND_COUNT} -eq 0 ]; then
+
+	printf '{ "found": false , %s , %s }' \
+			'"found_count": "0" , "found_file": ""' \
+			'"found_list": ""'
+
+	# Remove temp file
+	remove_temp_file ${TEMP_FILE}
+
+elif [ ${FOUND_COUNT} -gt 50 ]; then
+
+	# We don't want to remove temp file as we will
+	# have ansible upload it as there are too many
+	# filenames to display and the file list may be too
+	# big to pass back in the datastructure.
+
+	printf '{ %s %s , %s "%s" , %s "%s" , %s "" }' \
+		'"found":' \
+		"true" \
+		'"found_count":' \
+		"${FOUND_COUNT}" \
+		'"found_file":' \
+		"${TEMP_FILE}" \
+		'"found_list":'
+
+else
+
+    # Remove any newline chars from the name and replace with %%.
+    # %% will be later substituded in the output display.
+    PACKAGE_FILES=$(awk -v ORS="%%" '1' ${TEMP_FILE})
+
+	# Debug
+	#printf "${PACKAGE_FILES}\n"
+
+	printf '{ %s %s , %s "%s" , %s "" , %s "%s" }' \
+		'"found":' \
+		"true" \
+		'"found_count":' \
+		"${FOUND_COUNT}" \
+		'"found_file":' \
+		'"found_list":' \
+		"${PACKAGE_FILES}"
+
+	# Remove temp file
+	remove_temp_file ${TEMP_FILE}
+fi

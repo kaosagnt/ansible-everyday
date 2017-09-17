@@ -1,0 +1,71 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2017 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Update packages to the latest release on OpenBSD hosts
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Update / Install packages to the latest release on OpenBSD hosts"
+  become: yes
+
+  vars_prompt:
+    - name: "package_name"
+      prompt: "\nEnter the package name(s) \n(seperated by a comma for multiple or '*' to install all updates)"
+      private: no
+
+  vars:
+       print_information: true
+
+  tasks:
+    - include: ../../common/common_information.yml
+
+    - name: "Invalid package name"
+      local_action: command printf "Invalid package name."
+      when: package_name == ""
+      failed_when: true
+
+    - name: "Fix package name variable"
+      set_fact:
+          package_name: "{{ package_name | replace(' ','') }}"
+      when: package_name is defined
+
+    - name: "Update OpenBSD packages"
+      openbsd_pkg:
+                  name: "{{ item }}"
+                  state: latest
+      register: pkg_info
+      with_items:
+        - "{{ package_name.split(',') }}"
+      when: ansible_os_family == 'OpenBSD'
+
+    - name: "Assign variables v1"
+      set_fact:
+               print_pkg_update: "{{ pkg_info }}"
+      when: ansible_version.major|int == 1
+      changed_when: false
+
+    - name: "Assign variables v2"
+      set_fact:
+               print_pkg_update: "{{ pkg_info.results[0] }}"
+      when: ansible_version.major|int == 2
+      changed_when: false
+
+    - include: ../common/common_pkg_tasks.yml
+
+#    - name: "debug"
+#      local_action: command printf "{{ pkg_info }}"
+#      changed_when: false

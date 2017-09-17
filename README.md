@@ -84,6 +84,10 @@ but many are not and will work on other Operating Systems.
 
     ansible_net-close-network-port - close network port(s) on remote hosts IPTables / Firewalld
     ansible_net-open-network-port - open network port(s) remote hosts. IPTables / Firewalld
+	
+	ansible_openbsd-pkg-add-update-package - add or update packages on an OpenBSD system
+	ansible_openbsd-pkg-info-list-files - list the files of an installed OpenBSD package
+	ansible_openbsd-pkg-info-list-installed-packages - obtain a list of packages installed on an OpenBSD system
 
     ansible_ping-hosts - use ansible to ping remote hosts. This is not a traditional ping command.
 
