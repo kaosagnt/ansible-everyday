@@ -40,7 +40,12 @@
       changed_when: false
 
     - name: Print DNF error
-      local_action: command printf "An error occurred\n {{ (dnf_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
+      local_action: command printf "An error occurred\n{{ (dnf_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
       when: dnf_info is defined and (dnf_info.stdout|from_json).error_msg != ""
       changed_when: false
-      failed_when: true
+      failed_when:
+          ((dnf_info.stdout|from_json).error_msg != ""
+          and
+          (dnf_info.stdout|from_json).found == false
+          and
+          (dnf_info.stdout|from_json).update_count == 0)

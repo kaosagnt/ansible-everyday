@@ -41,7 +41,12 @@
       changed_when: false
 
     - name: Print Yum error
-      local_action: command printf "An error occurred\n {{ (yum_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
+      local_action: command printf "An error occurred\n{{ (yum_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
       when: yum_info is defined and (yum_info.stdout|from_json).error_msg != ""
       changed_when: false
-      failed_when: true
+      failed_when:
+          ((yum_info.stdout|from_json).error_msg != ""
+       	  and
+       	  (yum_info.stdout|from_json).found == false
+       	  and 
+       	  (yum_info.stdout|from_json).update_count == 0)

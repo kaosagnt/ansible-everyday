@@ -31,6 +31,7 @@
 PACKAGE_MANAGER=yum
 DISABLE_REPO=""
 ENABLE_REPO=""
+PKG_MAN_ERR=0
 
 if [ ! -z ${1} ]; then
 	if [ X"${1}" = X"dnf" ]; then
@@ -93,15 +94,24 @@ ${PACKAGE_MANAGER} -q clean all
 ${PACKAGE_MANAGER} ${DISABLE_REPO} ${ENABLE_REPO} \
 	check-update >& ${TEMP_FILE}
 
-ERROR_MSG=$(cat ${TEMP_FILE} | egrep -i -e "(error:|errno)\s")
-# Escape any quote chars as this will be placed into
-# a json data structure.
-SINGLE_QUOTE="\'"
-DOUBLE_QUOTE='\"'
-BACK_SLASH='\\'
-#ERROR_MSG=${ERROR_MSG//\'/${SINGLE_QUOTE}}
-ERROR_MSG=${ERROR_MSG//\/${BACK_SLASH}}
-ERROR_MSG=${ERROR_MSG//'"'/${DOUBLE_QUOTE}}
+PKG_MAN_ERR=$?
+
+if [ ! ${PKG_MAN_ERR} -eq 0 ] && [ ${PKG_MAN_ERR} -ne 100 ]; then
+
+	ERROR_MSG="Something went wrong. ${PACKAGE_MANAGER} exited with: ${PKG_MAN_ERR}\n"
+
+else
+
+	ERROR_MSG=$(cat ${TEMP_FILE} | egrep -i -e "(error:|errno)\s")
+	# Escape any quote chars as this will be placed into
+	# a json data structure.
+	SINGLE_QUOTE="\'"
+	DOUBLE_QUOTE='\"'
+	BACK_SLASH='\\'
+	#ERROR_MSG=${ERROR_MSG//\'/${SINGLE_QUOTE}}
+	ERROR_MSG=${ERROR_MSG//\/${BACK_SLASH}}
+	ERROR_MSG=${ERROR_MSG//'"'/${DOUBLE_QUOTE}}
+fi
 
 UPDATE_COUNT=0
 FOUND="false"
@@ -109,11 +119,11 @@ FOUND="false"
 # Debug
 #printf "\nERR_MSG = ${ERROR_MSG}\n\n"
 
-if [ ! -z "${ERROR_MSG}" ]; then
+# Remove any newline chars from the name and replace with %%.
+# %% will be later substituded in the output display.
+ERROR_MSG=${ERROR_MSG//$'\n'/%%}
 
-	# Remove any newline chars from the name and replace with %%.
-    # %% will be later substituded in the output display.
-    ERROR_MSG=${ERROR_MSG//$'\n'/%%}
+if [ ! ${PKG_MAN_ERR} -eq 0 ] && [ ${PKG_MAN_ERR} -ne 100 ]; then
 
 	printf '{ "found": false , %s , %s "%s" }' \
 			'"update_count": "0" , "update_list": ""' \
@@ -123,10 +133,10 @@ if [ ! -z "${ERROR_MSG}" ]; then
 else
 
 	UPDATE_COUNT=$(cat ${TEMP_FILE} \
-					| egrep '(.i386|.i686|.x86_64|.noarch|.src)' | wc -l)
+					| egrep '(\.i386|\.i686|\.x86_64|\.noarch|\.src)' | wc -l)
 
 	UPDATE_LIST=$(cat ${TEMP_FILE} \
-					| egrep '(.i386|.i686|.x86_64|.noarch|.src)')
+					| egrep '(\.i386|\.i686|\.x86_64|\.noarch|\.src)')
 
 	# Remove any newline chars from the name and replace with %%.
 	# %% will be later substituded in the output display.
@@ -143,13 +153,15 @@ else
 		FOUND="true"
 	fi 
 
-	printf '{ %s %s , %s "%s" , %s "%s" , "error_msg": "" }' \
+	printf '{ %s %s , %s "%s" , %s "%s" , %s "%s" }' \
 		'"found":' \
 		"${FOUND}" \
 		'"update_count":' \
 		"${UPDATE_COUNT}" \
 		'"update_list":' \
-		"${UPDATE_LIST}"
+		"${UPDATE_LIST}" \
+		'"error_msg":' \
+		"${ERROR_MSG}"
 fi
 
 # Remove temp file
