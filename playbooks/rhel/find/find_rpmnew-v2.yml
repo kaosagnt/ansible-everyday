@@ -24,36 +24,28 @@
   become: yes
 
 #  vars:
-#       print_information: true
+#	print_information: true
 
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Set variables
-      set_fact:
-               directory_name: "/etc/"
-      changed_when: false
-
     # The ansible find module ships >= 2.0.0. Convert this
     # to use the find module when Centos 6 ansible >= 2.0.0
-    # find: paths="/etc/" patterns="^.*?\.(?:rpmnew|rpmsave)$" use_regex=true
-    - name: Find rpmnew | rpmsave files in the /etc/ directory
-      script: ../../find/scripts/find_files "{{ directory_name | quote }}" "'.*\.\(rpmnew\|rpmsave\)'" "regex"
+    # find: paths="/etc/" patterns="^.*?.(?:rpmnew|rpmsave)$" use_regex=true
+    - name: "Find rpmnew | rpmsave files in the /etc/ and /opt/rh/ directories"
+      find:
+           paths: "{{ item }}"
+           patterns: "^.*?.(?:rpmnew|rpmsave)$"
+           use_regex: true
+           recurse: yes
       register: file_info
       changed_when: false
-      failed_when: file_info.rc > 0
+      with_items:
+                 - "/etc/"
+                 - "/opt/rh/"
 
-    - include: ../../common/common_find_files.yml
+    - debug: var=file_info
 
-    - name: Set variables
-      set_fact:
-               directory_name: "/opt/rh/"
+    - name: "Files found /etc/ and /opt/rh/ directories"
+      local_action: command printf "{{ file_info|json_query('results[*].files[*].path') }}\n"
       changed_when: false
-
-    - name: Find rpmnew | rpmsave files in the /opt/rh/ directory
-      script: ../../find/scripts/find_files "{{ directory_name | quote }}" "'.*\.\(rpmnew\|rpmsave\)'" "regex"
-      register: file_info
-      changed_when: false
-      failed_when: file_info.rc > 0
-
-    - include: ../../common/common_find_files.yml
