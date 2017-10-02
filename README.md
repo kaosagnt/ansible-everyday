@@ -109,6 +109,8 @@ but many are not and will work on other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/2934281
 	ansible_security-rhel-cve-2017-1000251 - Check for Blueborne - Linux Kernel Remote Denial of Service in Bluetooth subsystem - CVE-2017-1000251
 		https://access.redhat.com/security/vulnerabilities/CVE-2017-1000251
+	ansible_security-rhel-cve-2017-1000251 - Check for Linux Kernel load_elf_binary does not allocate sufficient space - CVE-2017-1000253
+		https://access.redhat.com/security/vulnerabilities/CVE-2017-1000253
 	ansible_security-rhel-cve-2017-1000366 - Check for Stack Guard Page Circumvention Affecting Multiple Packages CVE-2017-1000366
 		https://access.redhat.com/security/vulnerabilities/stackguard
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
