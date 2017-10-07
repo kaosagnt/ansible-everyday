@@ -105,8 +105,9 @@ but many are not and will work on other Operating Systems.
 	ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name.
 
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
-		Based upon CVE-2017-6074-1.sh from RedHat.
 		https://access.redhat.com/security/vulnerabilities/2934281
+	ansible_security-rhel-cve-2017-14491- check for dnsmasq: Multiple Critical and Important vulnerabilities - CVE-2017-14491
+		https://access.redhat.com/security/vulnerabilities/3199382
 	ansible_security-rhel-cve-2017-1000251 - Check for Blueborne - Linux Kernel Remote Denial of Service in Bluetooth subsystem - CVE-2017-1000251
 		https://access.redhat.com/security/vulnerabilities/CVE-2017-1000251
 	ansible_security-rhel-cve-2017-1000251 - Check for Linux Kernel load_elf_binary does not allocate sufficient space - CVE-2017-1000253
