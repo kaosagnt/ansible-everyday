@@ -33,7 +33,9 @@
                            major_release: "{{ ansible_distribution_major_version }}"
                            release: "{{ ansible_distribution_version }}"
                            description: "{{ ansible_distribution_release }}"
-      when: ansible_lsb is not defined
+      when: (ansible_lsb is not defined
+            or
+            ansible_lsb.major_release is not defined)
 
     # Print ansible fact information
     - name: Ansible fact information
