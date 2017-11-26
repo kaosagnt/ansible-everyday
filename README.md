@@ -23,6 +23,7 @@ Requires the following Python modules to be installed locally on the machine
 you use:
 
     python-netaddr
+    python-passlib
 
 Install the callback plugin(s) if you want human readability:
 
@@ -73,12 +74,12 @@ but many are not and will work on other Operating Systems.
     ansible_acl-set - set an ACL on a file / directory
     ansible_acl-xattr-get - get the Extended Attributes of a file / directory
 
-    ansible_boot-rhel-recreate-rescue-boot-image - recreate with rescue boot image for RHEL >=7 and Fedora Systems.
+    ansible_boot-rhel-recreate-rescue-boot-image - recreate with rescue boot image for RHEL >=7 and Fedora Systems
 
-    ansible_decode-facts - produce some human readable facts from the Ansible json fact files.
+    ansible_decode-facts - produce some human readable facts from the Ansible json fact files
 
     ansible_find-etc-opt-rmpnew-files - find leftover rpmnew / rpmsave files in the /etc and /opt directories
-    ansible_find-files - find files or directories. If the list of files are large then the list of files are uploaded instead of being displayed.
+    ansible_find-files - find files or directories. If the list of files are large then the list of files are uploaded instead of being displayed
 
     ansible_gather-facts - gather facts about remote hosts and save to the facts/ directory
 
@@ -89,7 +90,7 @@ but many are not and will work on other Operating Systems.
 	ansible_openbsd-pkg-info-list-files - list the files of an installed OpenBSD package
 	ansible_openbsd-pkg-info-list-installed-packages - obtain a list of packages installed on an OpenBSD system
 
-    ansible_ping-hosts - use ansible to ping remote hosts. This is not a traditional ping command.
+    ansible_ping-hosts - use ansible to ping remote hosts. This is not a traditional ping command
 
     ansible_rpm-info - obtain information about a particular RPM package
     ansible_rpm-install-repo - install a 3rd party RPM repository
@@ -102,7 +103,7 @@ but many are not and will work on other Operating Systems.
     ansible_rpm-yum-dnf-repolist - execute repolist all on RHEL hosts to show yum / dnf repository information.
     ansible_rpm-yum-dnf-update-rpm - update / install RPM packages
 
-	ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name.
+	ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name
 
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
 		https://access.redhat.com/security/vulnerabilities/2934281
@@ -122,6 +123,8 @@ but many are not and will work on other Operating Systems.
 
     ansible_user-create-new-user - create a new user. no default password.
     ansible_user-disable-user-login - disable a user login
+    ansible_user-htpasswd-add-user - create / add a new user to an Apache htpasswd file
+    ansible_user-htpasswd-remove-user - remove a user from an Apache htpasswd file
     ansible_user-remove-existing-user - delete a user account
     ansible_user-remove-ssh-public-key - remove a ssh public key from a user account
     ansible_user-renable-user-login - renable a disabled user account
