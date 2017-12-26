@@ -72,6 +72,7 @@ but many are not and will work on other Operating Systems.
     ansible_acl-get - retrive the ACL of a file / directory
     ansible_acl-remove - remove an ACL on a file / directory 
     ansible_acl-set - set an ACL on a file / directory
+    ansible_acl-stat-file - get the information of a file / directory specified using stat
     ansible_acl-xattr-get - get the Extended Attributes of a file / directory
 
     ansible_boot-rhel-recreate-rescue-boot-image - recreate with rescue boot image for RHEL >=7 and Fedora Systems
