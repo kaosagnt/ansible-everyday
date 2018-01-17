@@ -110,13 +110,15 @@ but many are not and will work on other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/2934281
 	ansible_security-rhel-cve-2017-14491- check for dnsmasq: Multiple Critical and Important vulnerabilities - CVE-2017-14491
 		https://access.redhat.com/security/vulnerabilities/3199382
-	ansible_security-rhel-cve-2017-1000251 - Check for Blueborne - Linux Kernel Remote Denial of Service in Bluetooth subsystem - CVE-2017-1000251
+	ansible_security-rhel-cve-2017-1000251 - check for Blueborne - Linux Kernel Remote Denial of Service in Bluetooth subsystem - CVE-2017-1000251
 		https://access.redhat.com/security/vulnerabilities/CVE-2017-1000251
-	ansible_security-rhel-cve-2017-1000251 - Check for Linux Kernel load_elf_binary does not allocate sufficient space - CVE-2017-1000253
+	ansible_security-rhel-cve-2017-1000251 - check for Linux Kernel load_elf_binary does not allocate sufficient space - CVE-2017-1000253
 		https://access.redhat.com/security/vulnerabilities/CVE-2017-1000253
-	ansible_security-rhel-cve-2017-1000366 - Check for Stack Guard Page Circumvention Affecting Multiple Packages CVE-2017-1000366
+	ansible_security-rhel-cve-2017-1000366 - check for Stack Guard Page Circumvention Affecting Multiple Packages CVE-2017-1000366
 		https://access.redhat.com/security/vulnerabilities/stackguard
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
+	ansible_security-spectre-meltdown - check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
+		https://access.redhat.com/security/vulnerabilities/speculativeexecution
 
     ansible_service-enable-disable-at-boot - enable / disable services to start up at boot time
     ansible_service-rhel-check-status - check the status of a service eg stopped / running
