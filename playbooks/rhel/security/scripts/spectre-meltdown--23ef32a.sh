@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Version: 2.0
+# Version: 2.1
 
 # Warning! Be sure to download the latest version of this script from its primary source:
 # https://access.redhat.com/security/vulnerabilities/speculativeexecution
@@ -94,8 +94,7 @@ check_supported_kernel() {
 
     # Check supported platform
     if [[ "$running_kernel" != *".el"[5-7]* ]]; then
-        echo -e "${RED}This script is meant to be used only on Red Hat Enterprise"
-        echo -e "Linux 5, 6 and 7.${RESET}"
+        echo "This script is meant to be used only on Red Hat Enterprise Linux 5, 6 and 7."
         exit 1
     fi
 }
@@ -192,13 +191,11 @@ gather_info() {
         dmesg_wrapped=1
     fi
 
-    # These two will not appear if disabled from commandline
-    if dmesg | grep --quiet 'x86/pti: Unmapping kernel while in userspace'; then
-        new_kernel=1
-        pti_dmesg=1
-    fi
-
-    if dmesg | grep --quiet 'x86/pti: Xen PV detected, disabling'; then
+    # These will not appear if disabled from commandline
+    if dmesg | grep --quiet -e 'x86/pti: Unmapping kernel while in userspace' \
+                            -e 'x86/pti: Kernel page table isolation enabled' \
+                            -e 'x86/pti: Xen PV detected, disabling' \
+                            -e 'x86/pti: Xen PV detected, disabling PTI protection'; then
         new_kernel=1
         pti_dmesg=1
     fi
@@ -210,6 +207,8 @@ gather_info() {
         if ! grep --quiet 'Not Present' <<< "$line"; then
             ibrs_dmesg=1
             hw_support=1
+        else
+            not_ibrs_dmesg=1
         fi
     fi
 
@@ -219,6 +218,8 @@ gather_info() {
         if ! grep --quiet 'Not Present' <<< "$line"; then
             ibpb_dmesg=1
             hw_support=1
+        else
+            not_ibpb_dmesg=1
         fi
     fi
 
@@ -294,14 +295,17 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     check_supported_kernel "$running_kernel"
 
     rhel=$( get_rhel "$running_kernel" )
-    if [[ "$rhel" == "5" ]]; then
+    if (( rhel == 5 )); then
         export PATH='/sbin':$PATH
+
+        echo "RHEL5 is not supported by the script at the moment."
+        exit 1
     fi
 
     vendor=$( check_cpu_vendor )
     if (( $? == 1 )); then
-        echo -e "${RED}Your CPU vendor is not supported by the script at the moment.${RESET}"
-        echo -e "Only Intel and AMD are supported for now."
+        echo "Your CPU vendor is not supported by the script at the moment."
+        echo "Only Intel and AMD are supported for now."
         exit 1
     fi
 
@@ -316,10 +320,12 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     pti_dmesg=0
     ibrs_dmesg=0
     ibpb_dmesg=0
+    not_ibrs_dmesg=0
+    not_ibpb_dmesg=0
     new_kernel=0
-    nopti_cmd=0
-    noibrs_cmd=0
-    noibpb_cmd=0
+    nopti=0
+    noibrs=0
+    noibpb=0
     hw_support=0
 
     variant_1="Vulnerable"
@@ -346,10 +352,12 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         echo "pti_dmesg = *$pti_dmesg*"
         echo "ibrs_dmesg = *$ibrs_dmesg*"
         echo "ibpb_dmesg = *$ibpb_dmesg*"
+        echo "not_ibrs_dmesg = *$not_ibrs_dmesg*"
+        echo "not_ibpb_dmesg = *$not_ibpb_dmesg*"
         echo "new_kernel = *$new_kernel*"
-        echo "nopti_cmd = *$nopti_cmd*"
-        echo "noibrs_cmd = *$noibrs_cmd*"
-        echo "noibpb_cmd = *$noibpb_cmd*"
+        echo "nopti = *$nopti*"
+        echo "noibrs = *$noibrs*"
+        echo "noibpb = *$noibpb*"
         echo "hw_support = *$hw_support*"
         echo "variant_1 = *$variant_1*"
         echo "variant_2 = *$variant_2*"
@@ -472,7 +480,7 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         if (( ! hw_support )); then
             echo -e "* Ask your HW vendor for CPU microcode update."
         fi
-        if (( noibrs || noibpb || nopti_cmd )); then
+        if (( noibrs || noibpb || nopti )); then
             echo -e "* Remove kernel commandline options as noted above."
         fi
         echo
