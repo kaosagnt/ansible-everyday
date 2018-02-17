@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Version: 2.1
+# Version: 2.3
 
 # Warning! Be sure to download the latest version of this script from its primary source:
 # https://access.redhat.com/security/vulnerabilities/speculativeexecution
@@ -174,16 +174,28 @@ gather_info() {
     fi
 
     # Are all debug files accessible?
-    if [[ -r "${debug_x86}/pti_enabled" && -r "${debug_x86}/ibpb_enabled" && -r "${debug_x86}/ibrs_enabled" ]]; then
-        all_debug_files=1
+    if (( rhel == 5 )); then
+        # RHEL5 has only pti_enabled implemented yet
+        if [[ -r "${debug_x86}/pti_enabled" ]]; then
+            all_debug_files=1
+        fi
+    else
+        if [[ -r "${debug_x86}/pti_enabled" && -r "${debug_x86}/ibpb_enabled" && -r "${debug_x86}/ibrs_enabled" ]]; then
+            all_debug_files=1
+        fi
     fi
 
     # Read features from debugfs
     if (( all_debug_files )); then
         new_kernel=1
-        pti_debugfs=$( <"${debug_x86}/pti_enabled" )
-        ibpb_debugfs=$( <"${debug_x86}/ibpb_enabled" )
-        ibrs_debugfs=$( <"${debug_x86}/ibrs_enabled" )
+        if (( rhel == 5 )); then
+            # RHEL5 has only pti_enabled implemented yet
+            pti_debugfs=$( <"${debug_x86}/pti_enabled" )
+        else
+            pti_debugfs=$( <"${debug_x86}/pti_enabled" )
+            ibpb_debugfs=$( <"${debug_x86}/ibpb_enabled" )
+            ibrs_debugfs=$( <"${debug_x86}/ibrs_enabled" )
+        fi
     fi
 
     # Read features from dmesg
@@ -201,7 +213,7 @@ gather_info() {
     fi
 
     # These will appear if disabled from commandline
-    line=$( dmesg | tac | grep --max-count 1 'FEATURE SPEC_CTRL' )  # Check last
+    line=$( dmesg | grep 'FEATURE SPEC_CTRL' | tail -n 1 )  # Check last
     if [[ "$line" ]]; then
         new_kernel=1
         if ! grep --quiet 'Not Present' <<< "$line"; then
@@ -212,7 +224,7 @@ gather_info() {
         fi
     fi
 
-    line=$( dmesg | tac | grep --max-count 1 'FEATURE IBPB_SUPPORT' )   # Check last
+    line=$( dmesg | grep 'FEATURE IBPB_SUPPORT' | tail -n 1 )   # Check last
     if [[ "$line" ]]; then
         new_kernel=1
         if ! grep --quiet 'Not Present' <<< "$line"; then
@@ -297,9 +309,6 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     rhel=$( get_rhel "$running_kernel" )
     if (( rhel == 5 )); then
         export PATH='/sbin':$PATH
-
-        echo "RHEL5 is not supported by the script at the moment."
-        exit 1
     fi
 
     vendor=$( check_cpu_vendor )
@@ -422,9 +431,61 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     echo
 
     # Warnings
+    if (( dmesg_wrapped )); then
+        echo -e "${YELLOW}It seems that dmesg circular buffer already wrapped,${RESET}"
+        echo -e "${YELLOW}the results may be inaccurate.${RESET}"
+        echo
+    fi
+
+    # Variants
+    echo -e "Variant #1 (Spectre): $variant_1"
+    echo -e "CVE-2017-5753 - speculative execution bounds-check bypass"
+    echo -e "   - Kernel with mitigation patches: $kernel_with_patches"
+    echo
+
+    echo -e "Variant #2 (Spectre): $variant_2"
+    echo -e "CVE-2017-5715 - speculative execution branch target injection"
+    if (( rhel == 5 )); then
+        echo -e "   - Kernel with mitigation patches: ${RED}NO${RESET}"
+        echo -e "   - HW support / updated microcode: ${YELLOW}Cannot detect without updated kernel${RESET}"
+    else
+        echo -e "   - Kernel with mitigation patches: $kernel_with_patches"
+        echo -e "   - HW support / updated microcode: $hw"
+    fi
+    echo -e "   - IBRS: $ibrs"
+    echo -e "   - IBPB: $ibpb"
+    echo
+
+    echo -e "Variant #3 (Meltdown): $variant_3"
+    echo -e "CVE-2017-5754 - speculative execution permission faults handling"
+    if [[ "$vendor" == "AMD" ]]; then
+        echo -e "   - AMD CPU: ${GREEN}OK${RESET}"
+    else
+        echo -e "   - Kernel with mitigation patches: $kernel_with_patches"
+        echo -e "   - PTI: $pti"
+    fi
+    echo
+
+    if (( result == 4 && rhel == 5 )); then
+        echo -e "${YELLOW}Mitigation for Variant #2 is not available for RHEL5 yet.${RESET}"
+        echo
+    elif (( result != 0 )); then
+        echo "Red Hat recommends that you:"
+        if (( ! new_kernel )); then
+            echo -e "* Update your kernel and reboot the system."
+        fi
+        if (( ! hw_support )); then
+            echo -e "* Ask your HW vendor for CPU microcode update."
+        fi
+        if (( noibrs || noibpb || nopti )); then
+            echo -e "* Remove kernel commandline options as noted above."
+        fi
+        echo
+    fi
+
     if (( fallback_needed )); then
-        echo -e "${YELLOW}Fallback non-runtime heuristics check is used (reading dmesg messages)${RESET},"
-        echo -e "because debugfs could not be read."
+        echo -e "${YELLOW}Fallback non-runtime heuristics check is used (reading dmesg messages),"
+        echo -e "because debugfs could not be read.${RESET}"
         echo
         echo "To improve mitigation detection:"
         if (( ! mounted_debugfs )); then
@@ -442,51 +503,17 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         echo
     fi
 
-    if (( dmesg_wrapped )); then
-        echo -e "${YELLOW}It seems that dmesg circular buffer already wrapped,${RESET}"
-        echo -e "${YELLOW}the results may be inaccurate.${RESET}"
-        echo
-    fi
-
-    # Variants
-    echo -e "Variant #1 (Spectre): $variant_1"
-    echo -e "CVE-2017-5753 - speculative execution bounds-check bypass"
-    echo -e "   - Kernel with mitigation patches: $kernel_with_patches"
+    echo -e "${BOLD}Note about virtualization${RESET}"
+    echo -e "In virtualized environment, there are more steps to mitigate the issue, including:"
+    echo -e "* Host needs to have updated kernel and CPU microcode"
+    echo -e "* Host needs to have updated virtualization software"
+    echo -e "* Guest needs to have updated kernel"
+    echo -e "* Hypervisor needs to propagate new CPU features correctly"
+    echo -e "For more details about mitigations in virtualized environment see:"
+    echo -e "https://access.redhat.com/articles/3331571"
     echo
 
-    echo -e "Variant #2 (Spectre): $variant_2"
-    echo -e "CVE-2017-5715 - speculative execution branch target injection"
-    echo -e "   - Kernel with mitigation patches: $kernel_with_patches"
-    echo -e "   - HW support / updated microcode: $hw"
-    echo -e "   - IBRS: $ibrs"
-    echo -e "   - IBPB: $ibpb"
-    echo
-
-    echo -e "Variant #3 (Meltdown): $variant_3"
-    echo -e "CVE-2017-5754 - speculative execution permission faults handling"
-    if [[ "$vendor" == "AMD" ]]; then
-        echo -e "   - AMD CPU: ${GREEN}OK${RESET}"
-    else
-        echo -e "   - Kernel with mitigation patches: $kernel_with_patches"
-        echo -e "   - PTI: $pti"
-    fi
-    echo
-
-    if (( result != 0 )); then
-        echo "Red Hat recommends that you:"
-        if (( ! new_kernel )); then
-            echo -e "* Update your kernel and reboot the system."
-        fi
-        if (( ! hw_support )); then
-            echo -e "* Ask your HW vendor for CPU microcode update."
-        fi
-        if (( noibrs || noibpb || nopti )); then
-            echo -e "* Remove kernel commandline options as noted above."
-        fi
-        echo
-    fi
-
-    echo -e "For more information see:"
+    echo -e "For more information about the vulnerabilities see:"
     echo -e "https://access.redhat.com/security/vulnerabilities/speculativeexecution"
     exit "$result"
 fi
