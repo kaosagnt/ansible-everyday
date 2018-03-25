@@ -32,9 +32,9 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: "Fetch latest script from https://meltdown.ovh"
+    - name: "Fetch latest script from https://raw.githubusercontent.com/speed47/spectre-meltdown-checker/master/spectre-meltdown-checker.sh"
       get_url:
-          url: https://meltdown.ovh/spectre-meltdown-checker.sh
+          url: https://raw.githubusercontent.com/speed47/spectre-meltdown-checker/master/spectre-meltdown-checker.sh
           dest: scripts/spectre-meltdown-checker.sh
           mode: 0755
           owner: "{{ ansible_env.SUDO_USER }}"
