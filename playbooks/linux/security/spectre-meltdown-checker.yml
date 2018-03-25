@@ -1,0 +1,54 @@
+
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2018 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# https://github.com/speed47/spectre-meltdown-checker
+# Check for Kernel Side-Channel Attacks -
+# CVE-2017-5754 CVE-2017-5753 CVE-2017-5715 on GNU/Linux hosts
+# Generic checker that runs on all GNU/Linux hosts.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Are we vulnerable to CVE-2017-5754 CVE-2017-5753 CVE-2017-5715 on GNU/Linux hosts"
+  become: yes
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../../common/common_information.yml
+
+    - name: "Fetch latest script from https://meltdown.ovh"
+      get_url:
+          url: https://meltdown.ovh/spectre-meltdown-checker.sh
+          dest: scripts/spectre-meltdown-checker.sh
+          mode: 0755
+          owner: "{{ ansible_env.SUDO_USER }}"
+          group: "{{ ansible_env.SUDO_GID }}"
+          force: yes
+      register: script_download
+      delegate_to: localhost
+      run_once: yes
+
+    - name: "Check for Linux Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715 on GNU/Linux hosts"
+      script: scripts/spectre-meltdown-checker.sh --no-color
+      when: (ansible_system == 'Linux'
+             and
+            script_download.failed == false)
+      register: vulnerable_info
+      changed_when: false
+      failed_when: vulnerable_info.rc > 0

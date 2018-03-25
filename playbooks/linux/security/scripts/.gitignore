@@ -1,0 +1,2 @@
+# have Git ignore scripts that are dynamically downloaded.
+spectre-meltdown-checker.sh

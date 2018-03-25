@@ -24,6 +24,7 @@ you use:
 
     python-netaddr
     python-passlib
+    python2-ndg_httpsclient
 
 Install the callback plugin(s) if you want human readability:
 
@@ -105,6 +106,9 @@ but many are not and will work on other Operating Systems.
     ansible_rpm-yum-dnf-update-rpm - update / install RPM packages
 
 	ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name
+
+	ansible_security-linux-github-speed47-spectre-meltdown-checker - more generic check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
+		https://github.com/speed47/spectre-meltdown-checker
 
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
 		https://access.redhat.com/security/vulnerabilities/2934281
