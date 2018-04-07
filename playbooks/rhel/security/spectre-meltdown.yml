@@ -31,7 +31,7 @@
     - include: ../../common/common_information.yml
 
     - name: "Check for Linux Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715 on RHEL/CENTOS hosts"
-      script: scripts/spectre-meltdown--a79614b.sh -n
+      script: scripts/spectre-meltdown-180327_0.sh -n
       when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5)

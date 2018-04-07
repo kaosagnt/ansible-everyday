@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Version: 2.3
+# Version: 2.4
 
 # Warning! Be sure to download the latest version of this script from its primary source:
 # https://access.redhat.com/security/vulnerabilities/speculativeexecution
@@ -20,6 +20,12 @@
 # Checking against the list of vulnerable packages is necessary because of the way how features
 # are back-ported to older versions of packages in various channels.
 
+# With version 2.4 of this script, checks for "vulnerabilities" files in
+# /sys/devices/system/cpu/vulnerabilities/ were added. These files are available in newer kernels,
+# and state explicitly the system's vulnerability/mitigation state for Meltdown, Spectre V1, and
+# Spectre V2. If present (all_vuln_files=1), those files will take precedence.
+# Otherwise (all_vuln_files=0), as would be the case in some older pre-retpoline but post-
+# Spectre/Meltdown kernels, the script will rely on its older detection mechanisms.
 
 basic_args() {
     # Parses basic commandline arguments and sets basic environment.
@@ -151,10 +157,12 @@ gather_info() {
     #
     # Notes:
     #     MOCK_DEBUG_X86_PATH can be used to mock /sys/kernel/debug/x86 directory
+    #     MOCK_VULNS_PATH can be used to mock /sys/devices/system/cpu/vulnerabilities directory
     #     MOCK_CMDLINE_PATH can be used to mock /proc/cmdline file
     #     MOCK_EUID can be used to mock EUID variable
 
     local debug_x86=${MOCK_DEBUG_X86_PATH:-/sys/kernel/debug/x86}
+    local vulns=${MOCK_VULNS_PATH:-/sys/devices/system/cpu/vulnerabilities}
     local cmdline_path=${MOCK_CMDLINE_PATH:-/proc/cmdline}
     local euid=${MOCK_EUID:-$EUID}
 
@@ -173,9 +181,14 @@ gather_info() {
         fallback_needed=1
     fi
 
+    # Are cpu/vulnerabilities files present?
+    if [[ -r "${vulns}/meltdown" && -r "${vulns}/spectre_v1" && -r "${vulns}/spectre_v2" ]]; then
+        all_vuln_files=1
+        retpo_kernel=1
+    fi
+
     # Are all debug files accessible?
     if (( rhel == 5 )); then
-        # RHEL5 has only pti_enabled implemented yet
         if [[ -r "${debug_x86}/pti_enabled" ]]; then
             all_debug_files=1
         fi
@@ -185,16 +198,29 @@ gather_info() {
         fi
     fi
 
+    # Read status from vulnerabilities files
+    if (( all_vuln_files )); then
+        if grep --quiet -v 'Vulnerable' ${vulns}/meltdown; then
+            vulns_md_mitigation=1
+        fi
+        if grep --quiet -v 'Vulnerable' ${vulns}/spectre_v1; then
+            vulns_sv1_mitigation=1
+        fi
+        if grep --quiet -v 'Vulnerable' ${vulns}/spectre_v2; then
+            vulns_sv2_mitigation=1
+        fi
+    fi  
+
     # Read features from debugfs
     if (( all_debug_files )); then
         new_kernel=1
-        if (( rhel == 5 )); then
-            # RHEL5 has only pti_enabled implemented yet
-            pti_debugfs=$( <"${debug_x86}/pti_enabled" )
-        else
-            pti_debugfs=$( <"${debug_x86}/pti_enabled" )
-            ibpb_debugfs=$( <"${debug_x86}/ibpb_enabled" )
-            ibrs_debugfs=$( <"${debug_x86}/ibrs_enabled" )
+        pti_debugfs=$( <"${debug_x86}/pti_enabled" )
+        ibpb_debugfs=$( <"${debug_x86}/ibpb_enabled" )
+        ibrs_debugfs=$( <"${debug_x86}/ibrs_enabled" )
+        if (( retpo_kernel )); then
+            if [[ -r "${debug_x86}/retp_enabled" ]]; then
+                retp_debugfs=$( <"${debug_x86}/retp_enabled" )
+            fi
         fi
     fi
 
@@ -207,7 +233,8 @@ gather_info() {
     if dmesg | grep --quiet -e 'x86/pti: Unmapping kernel while in userspace' \
                             -e 'x86/pti: Kernel page table isolation enabled' \
                             -e 'x86/pti: Xen PV detected, disabling' \
-                            -e 'x86/pti: Xen PV detected, disabling PTI protection'; then
+                            -e 'x86/pti: Xen PV detected, disabling PTI protection' \
+                            -e 'Kernel page table isolation enabled'; then
         new_kernel=1
         pti_dmesg=1
     fi
@@ -245,6 +272,14 @@ gather_info() {
     if grep --quiet 'noibpb' "$cmdline_path"; then
         noibpb=1
     fi
+    if grep --quiet 'nospectre_v2' "$cmdline_path"; then
+        nospectre_v2=1
+    fi
+
+    if grep --quiet -e '\sspectre_v2=' "$cmdline_path"; then
+        spectre_v2=$(sed "s/.*\sspectre_v2=\([a-zA-Z]\)/\1/" $cmdline_path)
+    fi
+
 }
 
 
@@ -252,50 +287,153 @@ check_variants() {
     # Checks which variants are mitigated based on many global boolean flags.
     #
     # Side effects:
-    #     Sets global variables variant_1, variant_2, variant_3.
+    #     Sets global variable `result`, a bitmask of vulnerable variants
+
+    # If vulnerabilities files are available, rely on them 
+    if (( all_vuln_files )); then
+        if (( vulns_sv1_mitigation )); then
+            (( result &= ~2 ))
+        fi
+        if (( vulns_sv2_mitigation )); then
+            (( result &= ~4 ))
+        fi
+        if (( vulns_md_mitigation )); then
+            (( result &= ~8 ))
+        fi
+        return
+    fi
 
     if (( new_kernel )); then
-        variant_1="Mitigated"
+        (( result &= ~2 ));
     fi
 
     if [[ "$vendor" == "Intel" ]]; then
         if (( ! fallback_needed )); then
-            if (( pti_debugfs == 1 && ibrs_debugfs == 1 && ibpb_debugfs == 1 )); then
-                variant_2="Mitigated"
-                variant_3="Mitigated"
+            if (( pti_debugfs == 1 )); then
+                (( result &= ~8 ))
             fi
-            if (( pti_debugfs == 1 && ibrs_debugfs == 2 && ibpb_debugfs == 1 )); then
-                variant_2="Mitigated"
-                variant_3="Mitigated"
-            fi
-            if (( pti_debugfs == 1 && ibrs_debugfs == 0 && ibpb_debugfs == 0 )); then
-                variant_3="Mitigated"
+            # The tests below check system defaults. It is possible that they will report
+            # false positives in systems where SPEC_CTRL is unavailable, but SMT has been
+            # disabled and ibpb_enabled is set to '2'.
+            if (( ibrs_debugfs != 0 && ibpb_debugfs != 0 )); then
+                (( result &= ~4 ))
             fi
         else
-            if (( ibrs_dmesg && ibpb_dmesg && ! noibrs && ! noibpb )); then
-                variant_2="Mitigated"
+            if (( ibrs_dmesg && ibpb_dmesg && ! noibrs && ! noibpb && ! nospectre_v2 )); then
+                (( result &= ~4 ))
             fi
             if (( pti_dmesg )); then
-                variant_3="Mitigated"
+                (( result &= ~8 ))
             fi
         fi
     fi
 
     if [[ "$vendor" == "AMD" ]]; then
-        variant_3="AMD is not vulnerable to this variant"
+        (( result &= ~8 ))  # AMD isn't vulnerable to meltdown
 
         if (( ! fallback_needed )); then
             if (( pti_debugfs == 0 && ibrs_debugfs == 0 && ibpb_debugfs == 2 )); then
-                variant_2="Mitigated"
+                (( result &= ~4 )) # Pre-retpoline kernels if updated microcode is applied
             fi
             if (( pti_debugfs == 0 && ibrs_debugfs == 2 && ibpb_debugfs == 1 )); then
-                variant_2="Mitigated"
+                (( result &= ~4 )) # Pre-retpoline kernels on old CPUs which don't need microcode
             fi
         else
-            if (( ibpb_dmesg && ! noibpb )); then
-                variant_2="Mitigated"
+            if (( ibpb_dmesg && ! noibpb && && ! noibrs && ! nospectre_v2 )); then
+                (( result &= ~4 )) # Fallback detection -- assume kernel-set defaults based on dmesg
             fi
         fi
+    fi
+}
+
+
+get_results() {
+  # Set messsages to display vulnerability/mitigation status
+  # to the user.
+  # Sets the following globals:
+  # pti, ibrs, ibpb - Whether these features were disabled by the user
+  # kernel_with_patches - Whether the kernel is spectre/meltdown aware
+  # hw - Whether the hw/firmware supports mitigation features
+  # result - The return code, a bitmask that represents vulnerable variants
+
+    local vulns=${MOCK_VULNS_PATH:-/sys/devices/system/cpu/vulnerabilities}
+
+    if (( new_kernel )); then
+        kernel_with_patches="${GREEN}OK${RESET}"
+        if (( hw_support )); then
+            hw="${GREEN}YES${RESET}"
+        else
+            hw="${RED}NO${RESET}"
+        fi
+    else
+        kernel_with_patches="${RED}Not installed${RESET}"
+        hw="${YELLOW}Cannot detect without updated kernel${RESET}"
+    fi
+
+    if (( nopti )); then
+        pti="${RED}Disabled on kernel commandline by 'nopti'${RESET}"
+    else
+        pti="Not disabled on kernel commandline"
+    fi
+
+    if (( noibrs )); then
+        ibrs="${RED}Disabled on kernel commandline by 'noibrs'${RESET}"
+    elif (( nospectre_v2 )); then
+        ibrs="${RED}Disabled on kernel commandline by 'nospectre_v2'${RESET}"
+    elif [[ ($spectre_v2 == "off") || ($spectre_v2 == "retpoline") ]]; then
+        ibrs="${RED}Disabled on kernel commandline by 'spectre_v2=${spectre_v2}'${RESET}"
+    else
+        ibrs="Not disabled on kernel commandline"
+    fi
+
+    if (( noibpb )); then
+        ibpb="${RED}Disabled on kernel commandline by 'noibpb'${RESET}"
+    elif (( nospectre_v2 )); then
+        ibpb="${RED}Disabled on kernel commandline by 'nospectre_v2'${RESET}"
+    elif [[ ($spectre_v2 == "off") ]]; then
+        ibpb="${RED}Disabled on kernel commandline by 'spectre_v2=${spectre_v2}'${RESET}"
+    else
+        ibpb="Not disabled on kernel commandline"
+    fi
+
+    if [[ ($spectre_v2 == "off") ||  ($spectre_v2 == "ibrs") || ($spectre_v2 == "ibrs_always") ]]; then
+        retpolines="${RED}Disabled on kernel commandline by 'spectre_v2=${spectre_v2}'${RESET}"
+    else
+        retpolines="Not disabled on kernel commandline"
+    fi
+
+    if (( all_vuln_files )); then
+        variant_1=$( <"${vulns}/spectre_v1" )
+        variant_2=$( <"${vulns}/spectre_v2" )
+        variant_3=$( <"${vulns}/meltdown" )
+    else
+        if (( ! (result & 2) )); then
+            variant_1="Mitigated"
+        fi
+        if (( ! (result & 4) )); then
+            variant_2="Mitigated"
+        fi
+        if (( ! (result & 8) )); then
+            variant_3="Mitigated"
+        elif [[ $vendor == "AMD" ]]; then
+            variant_3="AMD is not vulnerable to this variant"
+        fi
+    fi
+
+    if (( result & 2 )); then
+        variant_1="${RED}$variant_1${RESET}"
+    else
+        variant_1="${GREEN}$variant_1${RESET}"
+    fi
+    if (( result & 4 )); then
+        variant_2="${RED}$variant_2${RESET}"
+    else
+        variant_2="${GREEN}$variant_2${RESET}"
+    fi
+    if (( result & 8 )); then
+        variant_3="${RED}$variant_3${RESET}"
+    else
+        variant_3="${GREEN}$variant_3${RESET}"
     fi
 }
 
@@ -325,6 +463,7 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     pti_debugfs=0
     ibrs_debugfs=0
     ibpb_debugfs=0
+    retp_debugfs=0
     dmesg_wrapped=0
     pti_dmesg=0
     ibrs_dmesg=0
@@ -332,18 +471,31 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     not_ibrs_dmesg=0
     not_ibpb_dmesg=0
     new_kernel=0
+    retpo_kernel=0
     nopti=0
     noibrs=0
     noibpb=0
+    nospectre_v2=0
+    spectre_v2="auto"
     hw_support=0
 
+    # /sys/devices/system/cpu/vulnerabilities updates
+    # See comments on line 23 above
+    all_vuln_files=0
+    vulns_md_mitigation=0
+    vulns_sv1_mitigation=0
+    vulns_sv2_mitigation=0
+
+    # Assume all vulnerabilities present
     variant_1="Vulnerable"
     variant_2="Vulnerable"
     variant_3="Vulnerable"
+    result=14
 
     # Tests
     gather_info
     check_variants
+    get_results
 
     # Debug prints
     if [[ "$debug" ]]; then
@@ -357,6 +509,7 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         echo "pti_debugfs = *$pti_debugfs*"
         echo "ibrs_debugfs = *$ibrs_debugfs*"
         echo "ibpb_debugfs = *$ibpb_debugfs*"
+        echo "retp_debugfs = *$retp_debugfs*"
         echo "dmesg_wrapped = *$dmesg_wrapped*"
         echo "pti_dmesg = *$pti_dmesg*"
         echo "ibrs_dmesg = *$ibrs_dmesg*"
@@ -364,6 +517,7 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         echo "not_ibrs_dmesg = *$not_ibrs_dmesg*"
         echo "not_ibpb_dmesg = *$not_ibpb_dmesg*"
         echo "new_kernel = *$new_kernel*"
+        echo "retpo_kernel = *$retpo_kernel*"
         echo "nopti = *$nopti*"
         echo "noibrs = *$noibrs*"
         echo "noibpb = *$noibpb*"
@@ -371,58 +525,15 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         echo "variant_1 = *$variant_1*"
         echo "variant_2 = *$variant_2*"
         echo "variant_3 = *$variant_3*"
+        echo "all_vuln_files = *$all_vuln_files*"
+        echo "vulns_md_mitigation = *$vulns_md_mitigation*"
+        echo "vulns_sv1_mitigation = *$vulns_sv1_mitigation*"
+        echo "vulns_sv2_mitigation = *$vulns_sv2_mitigation*"
+        echo "nospectre_v2 = *$nospectre_v2*"
+        echo "spectre_v2 = *$spectre_v2*"
+        echo "retpolines = *$retpolines*"
+        echo "result = *$result*"
         echo
-    fi
-
-    # Results
-    if (( new_kernel )); then
-        kernel_with_patches="${GREEN}OK${RESET}"
-        if (( hw_support )); then
-            hw="${GREEN}YES${RESET}"
-        else
-            hw="${RED}NO${RESET}"
-        fi
-    else
-        kernel_with_patches="${RED}Not installed${RESET}"
-        hw="${YELLOW}Cannot detect without updated kernel${RESET}"
-    fi
-
-    if (( nopti )); then
-        pti="${RED}Disabled on kernel commandline by 'nopti'${RESET}"
-    else
-        pti="Not disabled on kernel commandline"
-    fi
-
-    if (( noibrs )); then
-        ibrs="${RED}Disabled on kernel commandline by 'noibrs'${RESET}"
-    else
-        ibrs="Not disabled on kernel commandline"
-    fi
-
-    if (( noibpb )); then
-        ibpb="${RED}Disabled on kernel commandline by 'noibpb'${RESET}"
-    else
-        ibpb="Not disabled on kernel commandline"
-    fi
-
-    (( result = 0 ))
-    if [[ "$variant_1" == "Vulnerable" ]]; then
-        (( result |= 2 ))
-        variant_1="${RED}$variant_1${RESET}"
-    else
-        variant_1="${GREEN}$variant_1${RESET}"
-    fi
-    if [[ "$variant_2" == "Vulnerable" ]]; then
-        (( result |= 4 ))
-        variant_2="${RED}$variant_2${RESET}"
-    else
-        variant_2="${GREEN}$variant_2${RESET}"
-    fi
-    if [[ "$variant_3" == "Vulnerable" ]]; then
-        (( result |= 8 ))
-        variant_3="${RED}$variant_3${RESET}"
-    else
-        variant_3="${GREEN}$variant_3${RESET}"
     fi
 
     # Output
@@ -454,6 +565,7 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     fi
     echo -e "   - IBRS: $ibrs"
     echo -e "   - IBPB: $ibpb"
+    echo -e "   - Retpolines: $retpolines"
     echo
 
     echo -e "Variant #3 (Meltdown): $variant_3"
@@ -466,18 +578,15 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     fi
     echo
 
-    if (( result == 4 && rhel == 5 )); then
-        echo -e "${YELLOW}Mitigation for Variant #2 is not available for RHEL5 yet.${RESET}"
-        echo
-    elif (( result != 0 )); then
+    if (( result != 0 )); then
         echo "Red Hat recommends that you:"
-        if (( ! new_kernel )); then
+        if (( ! retpo_kernel )); then
             echo -e "* Update your kernel and reboot the system."
         fi
         if (( ! hw_support )); then
             echo -e "* Ask your HW vendor for CPU microcode update."
         fi
-        if (( noibrs || noibpb || nopti )); then
+        if (( noibrs || noibpb || nopti || nospectre_v2 )); then
             echo -e "* Remove kernel commandline options as noted above."
         fi
         echo
