@@ -46,7 +46,7 @@
 
     - name: "Check for Linux Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715 on GNU/Linux hosts"
       script: scripts/spectre-meltdown-checker.sh --no-color
-      when: (ansible_system == 'Linux'
+      when: (ansible_system in ['Linux', 'FreeBSD', 'NetBSD']
              and
             script_download.failed == false)
       register: vulnerable_info
