@@ -1,4 +1,5 @@
----
+#!/bin/sh
+
 # %BEGIN_COPYRIGHT%
 # 
 # Copyright 2015-2018 Ian McWilliam (kaosagnt@gmail.com).
@@ -17,25 +18,22 @@
 #
 # %END_COPYRIGHT%
 
-# Common Handlers
+# Add the command line arg  -e hosts=ianm to override the default
+# playbook hosts setting
 
-# Backup /etc/sysconfig/iptables to /etc/sysconfig/iptables.{yyyymmdd}
-    - name: "Backup iptables"
-      copy:
-           src: "/etc/sysconfig/{{ iptables_file }}"
-           dest: "/etc/sysconfig/{{ iptables_file }}.{{ lookup('pipe', 'date +%Y%m%d') }}"
-           mode: 0600
-           remote_src: yes
-      when: ansible_system == 'Linux'
+SCRIPT_DIR=$(dirname `which $0`)
 
-# Save running iptables config to /etc/sysconfig/ [ iptables | ip6tables ]
-    - name: "Save running iptables"
-      shell: "iptables-save > /etc/sysconfig/{{ iptables_file }}"
-      when: ansible_system == 'Linux'
+# Include our default settings
+. ${SCRIPT_DIR}/ansible_common
 
-# Restart IP tables
-    - name: "Restart iptables"
-      service:
-              name: "{{ iptables_service }}"
-              state: restarted
-      when: ansible_system == 'Linux'
+# Debug
+#printf "path = ${ANSIBLE_PLAYBOOKS_PATH}\n\n"
+
+if [ ${ANSIBLE_VERSION_COMPARE} != 1 ]; then
+	printf "${0##*/} requires ansible >= 2.3.\n\n"
+	exit 1
+fi
+
+ansible-playbook ${MUNGED_ARGS} \
+	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
+	${ANSIBLE_PLAYBOOKS_PATH}/net/find-IP-geolocation-information.yml

@@ -1,0 +1,130 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2018 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Open a network port in iptables.
+
+# The ansible hosts file can be used to override the
+# RHEL <=6 check by adding a host variable of
+# use_iptables=true
+# eg
+# [some_host_group]
+# some_hostname use_iptables=true
+#
+# Even though RHEL >=7 ships with firewalld by default
+# some people disable firewalld and use iptables instead.
+
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Open a network port in iptables"
+  become: yes
+
+  vars:
+       source_ip_s: ""
+       protocol_s: "tcp"
+       iptables_file: "iptables"
+       iptables_service: "iptables"
+       ip_ver: "ipv4"
+#       print_information: true
+
+  vars_prompt:
+    - name: "port_numbers"
+      prompt: "Enter the port number(s)\n(seperated by a comma for multiple ports)"
+      private: no
+
+    - name: "protocol"
+      prompt: "\nEnter the TCP/IP protocol for the port(s) (leave blank for default 'tcp')"
+      private: no
+
+    - name: "source_ip"
+      prompt: "\nEnter the source IP / network to restrict port access (leave blank for all network access)"
+      private: no
+
+  tasks:
+    - include: ../../common/common_information.yml
+
+    - include: network-common-checks.yml
+
+    # Open a network port in iptables.
+
+    - name: "Insert iptables rule for port(s) provided - ALL IP addresses"
+      iptables:
+               chain: INPUT
+               state: present
+               destination_port: "{{ item }}"
+               protocol: "{{ protocol_s }}"
+               jump: ACCEPT
+               match: conntrack
+               ctstate: NEW
+               ip_version: "{{ ip_ver }}"
+      when: (
+             (ansible_os_family == 'RedHat'
+              and
+              ansible_lsb.major_release|int <= 6
+             )
+             or
+             (
+              hostvars[inventory_hostname]['use_iptables'] is defined
+              and
+              hostvars[inventory_hostname]['use_iptables'] | bool == True
+             )
+            )
+            and
+            (source_ip_s == "")
+      register: add_port_iptables
+      notify:
+             - "Backup iptables"
+             - "Save running iptables"
+             - "Restart iptables"
+      with_items:
+        - "{{ port_numbers.split(',') }}"
+
+    - name: "Insert iptables rule for port(s) provided - Restrict IP addresses"
+      iptables:
+               chain: INPUT
+               state: present
+               source: "{{ source_ip_s }}"
+               destination_port: "{{ item }}"
+               protocol: "{{ protocol_s }}"
+               jump: ACCEPT
+               match: conntrack
+               ctstate: NEW
+               ip_version: "{{ ip_ver }}"
+      when: (
+             (ansible_os_family == 'RedHat'
+              and
+              ansible_lsb.major_release|int <= 6
+             )
+             or
+             (
+              hostvars[inventory_hostname]['use_iptables'] is defined
+              and
+              hostvars[inventory_hostname]['use_iptables'] | bool == True
+             )
+            )
+            and
+            (source_ip_s != "")
+      register: add_port_iptables
+      notify:
+             - "Backup iptables"
+             - "Save running iptables"
+             - "Restart iptables"
+      with_items:
+        - "{{ port_numbers.split(',') }}"
+
+  handlers:
+    - include: ../common/common_handlers.yml

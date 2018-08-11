@@ -17,45 +17,71 @@
 #
 # %END_COPYRIGHT%
 
-# Open a network port in iptables. Common checks.
+# iptables / firewalld. Common checks.
 
-#   - name: Debug
+#   - name: "Debug"
 #     local_action: command printf "Port number - {{ item|int }}."
 #     changed_when: false
 #     with_items:
 #       - "{{ port_numbers.split(',') }}"
 
-    - name: Protocol
+    - name: "Protocol"
       set_fact:
                protocol_s: "udp"
       when: protocol != "" and protocol == "udp"
       changed_when: false
 
-    - name: Invalid Protocol
+    - name: "Invalid Protocol"
       local_action: command printf "Invalid Protocol - {{ protocol }}."
       when:
          - protocol_s not in ["tcp", "udp"]
       changed_when: false
       failed_when: true
 
-    - name: Source IP
+    - name: "Source IP"
       set_fact:
-               source_ip_s: " -s {{ source_ip }} "
+               source_ip_s: "{{ source_ip }}"
       when: source_ip != ""
       changed_when: false
 
-    - name: Invalid source address
+    - name: "Invalid source address"
       local_action: command printf "Invalid source address - {{ source_ip }}."
-      when: source_ip != "" and source_ip|ipv4 == False
+      when: source_ip != ""
+            and
+            source_ip|ipaddr == False
       changed_when: false
       failed_when: true
 
-#    - name: Debug
+    - name: "Set IP 6 version"
+      set_fact:
+               ip_ver: "ipv6"
+      when: source_ip|ipv6 == True
+      changed_when: false
+
+    - name: "Set IPTables 6 filename / service name"
+      set_fact:
+               iptables_file: "ip6tables"
+               iptables_service: "ip6tables"
+      when: iptables_file is defined
+            and
+            ip_ver == "ipv6"
+      changed_when: false
+
+    - name: "Firewalld Check zone"
+      set_fact:
+               zone_s: "public"
+      when: zone_s is defined
+            and
+            zone_s == ""
+      changed_when: false
+
+#    - name: "Debug"
 #      local_action: command printf "Source IP - {{ source_ip_s }}."
 #      local_action: command printf "Source IPv4 - {{ source_ip|ipv4 }}."
+#      local_action: command printf "Source IPv6 - {{ source_ip|ipv6 }}."
 #      changed_when: false
 
-    - name: Invalid port numbers
+    - name: "Invalid port numbers"
       local_action: command printf "Invalid port number - {{ item }}."
       when: item == "" or item|int == 0
       failed_when: true

@@ -17,14 +17,16 @@
 #
 # %END_COPYRIGHT%
 
-# Close a network port in iptables / firewalld.
+# Open a network port in firewalld.
 - hosts: "{{ hosts | default('localhost') }}"
-  name: "Close a network port in iptables/firewalld"
+  name: "Open a network port in firewalld"
   become: yes
 
   vars:
-       source_ip_s: " "
+       source_ip_s: ""
        protocol_s: "tcp"
+       rich_rule: ""
+       ip_ver: "ipv4"
 #       print_information: true
 
   vars_prompt:
@@ -40,36 +42,63 @@
       prompt: "\nEnter the source IP / network to restrict port access (leave blank for all network access)"
       private: no
 
+    - name: "zone_s"
+      prompt: "\nEnter the zone to apply the rule to (leave blank for default 'public')"
+      private: no
+
   tasks:
     - include: ../../common/common_information.yml
 
     - include: network-common-checks.yml
 
-    - name: Remove iptables rule for port(s) provided
-      lineinfile:
-                 dest: /etc/sysconfig/iptables
-                 state: absent
-                 regexp: "-A INPUT{{source_ip_s}}-m state --state NEW -m {{ protocol_s }} -p {{ protocol_s }} --dport {{ item }} -j ACCEPT"
-      when: (ansible_os_family == 'RedHat')
-            and
-            (ansible_lsb.major_release|int <= 6)
-      register: close_port
-      notify: Restart iptables
-      with_items:
-        - "{{ port_numbers.split(',') }}"
+    # Open a network port in firewalld.
 
-    - name: Remove firewalld rule for port(s) provided
+    - name: "Insert firewalld rule for port(s) provided - ALL IP addresses"
       firewalld:
                 port: "{{ item }}/{{ protocol_s }}"
                 permanent: true
-                state: disabled
+                state: enabled
                 immediate: yes
-      when: ((ansible_os_family == 'RedHat')
+                zone: "{{ zone_s }}"
+      when: (
+             (ansible_os_family == 'RedHat'
+              and
+              ansible_lsb.major_release|int >= 7
+             )
+             or
+             (
+              hostvars[inventory_hostname]['use_iptables'] is defined
+              and
+              hostvars[inventory_hostname]['use_iptables'] | bool == False
+             )
+            )
             and
-            (ansible_lsb.major_release|int >= 7))
+            (source_ip_s == "")
       register: add_port_firewalld
       with_items:
         - "{{ port_numbers.split(',') }}"
 
-  handlers:
-    - include: ../common/common_handlers.yml
+    - name: "Insert firewalld rule for port(s) provided - Restrict IP addresses"
+      firewalld:
+                rich_rule: 'rule family="{{ ip_ver }}" source address="{{ source_ip_s }}" port port="{{ item }}" protocol="{{ protocol_s }}" accept'
+                permanent: true
+                state: enabled
+                immediate: yes
+                zone: "{{ zone_s }}"
+      when: (
+             (ansible_os_family == 'RedHat'
+              and
+              ansible_lsb.major_release|int >= 7
+             )
+             or
+             (
+              hostvars[inventory_hostname]['use_iptables'] is defined
+              and
+              hostvars[inventory_hostname]['use_iptables'] | bool == False
+             )
+            )
+            and
+            (source_ip_s != "")
+      register: add_port_firewalld
+      with_items:
+        - "{{ port_numbers.split(',') }}"

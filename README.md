@@ -85,8 +85,11 @@ but many are not and will work on other Operating Systems.
 
     ansible_gather-facts - gather facts about remote hosts and save to the facts/ directory
 
-    ansible_net-close-network-port - close network port(s) on remote hosts IPTables / Firewalld
-    ansible_net-open-network-port - open network port(s) remote hosts. IPTables / Firewalld
+    ansible_net-close-network-port-firewalld - close network port(s) on remote hosts. Firewalld
+    ansible_net-open-network-port-firewalld - open network port(s) remote hosts. Firewalld
+    ansible_net-list-all-zones-firewalld - list firewalld zone information.
+    ansible_net-close-network-port-iptables - close network port(s) on remote hosts. IPTables
+    ansible_net-open-network-port-iptables - open network port(s) remote hosts. IPTables
 	
 	ansible_openbsd-pkg-add-update-package - add or update packages on an OpenBSD system
 	ansible_openbsd-pkg-info-list-files - list the files of an installed OpenBSD package

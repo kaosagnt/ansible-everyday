@@ -1,5 +1,4 @@
-#!/bin/sh
-
+---
 # %BEGIN_COPYRIGHT%
 # 
 # Copyright 2015-2018 Ian McWilliam (kaosagnt@gmail.com).
@@ -18,18 +17,33 @@
 #
 # %END_COPYRIGHT%
 
-# Add the command line arg  -e hosts=ianm to override the default
-# playbook hosts setting
+# List network zones for firewalld.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "List network zones for firewalld"
+  become: yes
 
-SCRIPT_DIR=$(dirname `which $0`)
+  vars:
+#       print_information: true
 
-# Include our default settings
-. ${SCRIPT_DIR}/ansible_common
+  tasks:
+    - include: ../../common/common_information.yml
 
-# Debug
-#printf "path = ${ANSIBLE_PLAYBOOKS_PATH}\n\n"
+#    - include: network-common-checks.yml
 
-ansible-playbook ${MUNGED_ARGS} \
-	--ask-become-pass \
-	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
-	${ANSIBLE_PLAYBOOKS_PATH}/rhel/networking/network-open-port.yml
+    # List network zones for firewalld.
+
+    - name: "List all firewalld network zone information"
+      command: firewall-cmd --list-all-zones
+      when: (
+             (ansible_os_family == 'RedHat'
+              and
+              ansible_lsb.major_release|int >= 7
+             )
+             or
+             (
+              hostvars[inventory_hostname]['use_iptables'] is defined
+              and
+              hostvars[inventory_hostname]['use_iptables'] | bool == False
+             )
+            )
+      changed_when: false
