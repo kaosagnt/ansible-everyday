@@ -123,6 +123,8 @@ but many are not and will work on other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/CVE-2017-1000253
 	ansible_security-rhel-cve-2017-1000366 - check for Stack Guard Page Circumvention Affecting Multiple Packages CVE-2017-1000366
 		https://access.redhat.com/security/vulnerabilities/stackguard
+	ansible_security-rhel-cve-2018-3620-3645 - check for L1TF - L1 Terminal Fault Attack - CVE-2018-3620 / CVE-2018-3645
+		https://access.redhat.com/security/vulnerabilities/L1TF
 	ansible_security-rhel-cve-2018-3639 - check for Kernel Side-Channel Attack using Speculative Store Bypass - CVE-2018-3639
 		https://access.redhat.com/security/vulnerabilities/ssbd
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
