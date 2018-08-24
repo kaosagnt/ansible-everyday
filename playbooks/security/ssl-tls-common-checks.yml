@@ -1,0 +1,40 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2018 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# SSL /TLS common checks.
+
+    - name: "Invalid Certificate Name"
+      local_action: command printf "Invalid certificate name."
+      when:
+         - ssl_cert_name == ""
+      changed_when: false
+      failed_when: true
+
+    - name: "Set SSL / TLS Certificate path"
+      set_fact:
+               ssl_cert_path: "/etc/ssl/certs"
+      when: ssl_cert_path is not defined
+            or
+            ssl_cert_path == ""
+      changed_when: false
+
+#    - name: "Debug"
+#      local_action: command printf "Cert Name - {{ ssl_cert_name }}\n"
+#      local_action: command printf "Cert Path - {{ ssl_cert_path }}\n"
+#      changed_when: false

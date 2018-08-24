@@ -1,0 +1,74 @@
+
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2018 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Check when an SSL / TLS certificate will expire.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Check when an SSL / TLS certificate will expire."
+  become: yes
+
+  vars_prompt:
+    - name: "ssl_cert_name"
+      prompt: "\nEnter the name of the SSL/TLS Certificate"
+      private: no
+
+    - name: "ssl_cert_path"
+      prompt: "\nEnter the path to the SSL/TLS Certificate (blank for default: /etc/ssl/certs/)"
+      private: no
+
+  vars:
+        time_check_sec: 1209600
+#       print_information: true
+
+  tasks:
+    - include: ../common/common_information.yml
+
+    - include: ssl-tls-common-checks.yml
+
+    # RHEL contains <= 0.15 PyOpenSSL and won't run......
+    # So wwe don't use the Ansible openssl module.
+
+    - name: "Certificate details"
+      command: openssl x509 -text -noout -in "{{ ssl_cert_path }}/{{ ssl_cert_name }}"
+      register: cert_details
+      changed_when: false
+      failed_when: cert_details.rc != 0
+
+    - name: "Is Certificate valid"
+      command: openssl x509 -checkend "{{ time_check_sec }}" -noout -in "{{ ssl_cert_path }}/{{ ssl_cert_name }}"
+      register: cert_status
+      changed_when: false
+      failed_when: false
+      #failed_when: cert_status.rc != 0
+      #failed_when: cert_status.stdout_lines|length > 0
+
+    - name: "Certificate is valid"
+      local_action: command printf "\nThe Certificate is valid within the 2 weeks test period or longer.\n"
+      when: (cert_status.rc is defined
+             and
+             cert_status.rc == 0)
+      changed_when: false
+
+    - name: "Certificate has expired or will expire"
+      local_action: command printf "\nThe Certificate has expired or will expire within the next 2 weeks.\nPlease manually check the certificate.\n"
+      when: (cert_status.rc is defined
+             and
+             cert_status.rc != 0)
+      failed_when: cert_status.rc != 0
+      changed_when: false
