@@ -42,7 +42,7 @@
     - include: ssl-tls-common-checks.yml
 
     # RHEL contains <= 0.15 PyOpenSSL and won't run......
-    # So wwe don't use the Ansible openssl module.
+    # So we don't use the Ansible openssl module.
 
     - name: "Certificate details"
       command: openssl x509 -text -noout -in "{{ ssl_cert_path }}/{{ ssl_cert_name }}"
