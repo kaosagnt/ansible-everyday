@@ -110,8 +110,10 @@ but many are not and will work on other Operating Systems.
 
 	ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name
 
-	ansible_security-check-ssl-tls-certificate-expired - Checks SSL / TLS security certificates to see whether they have expired or will expire within
-		the next 2 weeks 
+	ansible_security-check-ssl-tls-certificate-expired - Checks SSL / TLS security certificate files to see whether they have expired or will expire
+		within the next 2 weeks
+	ansible_security-check-remote-ssl-tls-certificate-expired-https - Checks remotely via HTTPS request SSL / TLS security certificates to see whether
+		they have expired or will expire within the next 2 weeks
 	ansible_security-linux-bsd-github-speed47-spectre-meltdown-checker - more generic check for Kernel Side-Channel Attacks - CVE-2017-5754
 		CVE-2017-5753 CVE-2017-5715
 		https://github.com/speed47/spectre-meltdown-checker - also works on some BSD operating systems
