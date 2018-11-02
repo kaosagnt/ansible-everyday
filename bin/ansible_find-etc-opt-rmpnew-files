@@ -29,16 +29,8 @@ SCRIPT_DIR=$(dirname `which $0`)
 # Debug
 #printf "path = ${ANSIBLE_PLAYBOOKS_PATH}\n\n"
 #printf "ARGS = ${MUNGED_ARGS}\n\n"
-#printf "A_V_C = ${ANSIBLE_VERSION_COMPARE}\n\n"
-
-V_PLAYBOOK=find_rpmnew-v2.yml
-
-if [ ${ANSIBLE_VERSION_COMPARE} != 1 ]; then
-
-	V_PLAYBOOK=find_rpmnew-v1.yml
-fi
 
 ansible-playbook ${MUNGED_ARGS} \
 	--ask-become-pass \
 	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
-	${ANSIBLE_PLAYBOOKS_PATH}/rhel/find/${V_PLAYBOOK}
+	${ANSIBLE_PLAYBOOKS_PATH}/rhel/find/find_rpmnew.yml

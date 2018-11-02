@@ -29,9 +29,6 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    # The ansible find module ships >= 2.0.0. Convert this
-    # to use the find module when Centos 6 ansible >= 2.0.0
-    # find: paths="/etc/" patterns="^.*?.(?:rpmnew|rpmsave)$" use_regex=true
     - name: "Find rpmnew | rpmsave files in the /etc/ and /opt/rh/ directories"
       find:
            paths: "{{ item }}"
@@ -44,8 +41,8 @@
                  - "/etc/"
                  - "/opt/rh/"
 
-    - debug: var=file_info
+    #- debug: var=file_info
 
     - name: "Files found /etc/ and /opt/rh/ directories"
-      local_action: command printf "{{ file_info|json_query('results[*].files[*].path') }}\n"
+      local_action: command printf "{{ file_info | json_query('results[*].files[*].path') | to_nice_json }}\n"
       changed_when: false

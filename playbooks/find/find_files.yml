@@ -17,8 +17,7 @@
 #
 # %END_COPYRIGHT%
 
-# Find any files in the directory specified using the -regex option
-# of find(1).
+# Find any files in the directory specified.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Find any files in the directory specified"
   become: yes
@@ -39,23 +38,39 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid directory name
+    - name: "Invalid directory name"
       local_action: command printf "Invalid directory name."
       when: directory_name == ""
       failed_when: true
 
-    - name: Invalid regex file name
+    - name: "Invalid search expression"
       local_action: command printf "Invalid file name."
       when: regex_to_find == ""
       failed_when: true
 
-    # The ansible find module ships >= 2.0.0. Convert this
-    # to use the find module when Centos 6 ansible >= 2.0.0
-    # find: paths="/etc/" patterns="^.*?\.(?:rpmnew|rpmsave)$" use_regex=true
-    - name: Find files in the directory specified using regex
-      script: scripts/find_files "{{ directory_name | quote }}" "{{ regex_to_find | quote }}"
+    - name: "Find files in the directory specified"
+      find:
+           paths: "{{ directory_name }}"
+           patterns: "{{ regex_to_find }}"
+           recurse: yes
+      #     use_regex: true
       register: file_info
       changed_when: false
-      failed_when: file_info.rc > 0
 
-    - include: ../common/common_find_files.yml
+    - name: "Files found < 100 - print list"
+      local_action: command printf "{{ file_info | json_query('files[*].path') | to_nice_json }}\n"
+      #local_action: command printf "{{ file_info.matched }}\n"
+      when: file_info.matched > 0
+            and
+            file_info.matched <= 100
+      changed_when: false
+
+    - name: "Files found > 100 - save list"
+      local_action: copy content="{{ file_info | json_query('files[*].path') | to_nice_json }}" dest="{{ upload_dest_directory }}/ansible_find_files_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}.txt"
+      when: file_info.matched > 100
+      changed_when: false
+
+    - name: "No Files found"
+      local_action: command printf "No files were found in the directory {{ directory_name }} using {{ regex_to_find }}\n"
+      when: file_info.matched == 0
+      changed_when: false
