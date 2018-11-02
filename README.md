@@ -26,22 +26,14 @@ you use:
     python-passlib
     python2-ndg_httpsclient
 
-Install the callback plugin(s) if you want human readability:
+Ansible >= 2.2 conatins the stdout_callback plugin(s) option if you want
+human readability.
 
-    https://gist.github.com/cliffano/9868180
-    plugins/callback/human_log_1.py
+    ansible.cfg
+    stdout_callback = <module_name>
 
-    https://gist.github.com/dmsimard/cd706de198c85a8255f6
-    plugins/callback/human_log_2.py
-
-    Version 1 + 2 compatible
-    https://github.com/n0ts/ansible-human_log
-    plugins/callback/human_log_1_2.py
-
-to the appropriate location for the version of ansible in use. eg. Centos 6
-
-    ansible 1 : callback_plugins = /usr/share/ansible_plugins/callback_plugins
-    ansible 2 : callback_plugins = /usr/share/ansible/plugins/callback
+skippy, debug, minimal, yaml, unixy and many more.
+See: https://docs.ansible.com/ansible/2.5/plugins/callback.html
 
 ansible_decode-facts is a perl script that requires the following Perl
 modules to be installed on your local ansible machine:
