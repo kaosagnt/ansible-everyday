@@ -33,19 +33,19 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Invalid RPM package name
+    - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
       when: rpm_package == ""
       failed_when: true
 
-    - name: List files of installed RPMs
+    - name: "List files of installed RPMs"
       script: scripts/rpm_list_files  "{{ item }}"
       register: rpm_info
       changed_when: false
       with_items:
         - "{{ rpm_package.split(',') }}"
 
-    - name: Print RPM files v2
+    - name: "Print RPM files v2"
       local_action: command printf "\n\n{{ item.item }}\n\n{{ (item.stdout|from_json).found_list.replace('%%', '\n') }}\n\n"
       changed_when: false
       when: ansible_version.major|int == 2

@@ -20,7 +20,7 @@
 # Update RPM package to the latest release. 
 # on RHEL/CENTOS hosts <= 7
 
-    - name: Yum update RPM
+    - name: "Yum update RPM"
       yum:
           pkg: "{{ item }}"
           disablerepo: "{{ disable_repo }}"
@@ -34,13 +34,13 @@
       with_items:
         - "{{ rpm_package.split(',') }}"
 
-    - name: Assign variables v1
+    - name: "Assign variables v1"
       set_fact:
                print_yum_update: "{{ yum_rpm_update }}"
       when: ansible_version.major|int == 1
       changed_when: false
 
-    - name: Assign variables v2
+    - name: "Assign variables v2"
       set_fact:
                print_yum_update: "{{ yum_rpm_update.results[0] }}"
       when: ansible_version.major|int == 2
@@ -48,7 +48,7 @@
 
     - include: ../common/common_yum_tasks.yml
 
-#    - name: debug
+#    - name: "debug"
 #      local_action: command printf "{{ print_yum_update.results }}\n\n"
 #      local_action: command printf "\n\n{{ yum_rpm_update['results'] }}\n\n"
 #      changed_when: false

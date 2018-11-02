@@ -45,24 +45,24 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Invalid directive
+    - name: "Invalid directive"
       local_action: command printf "Invalid directive - {{ directive }}."
       when: directive not in ['s', 'q']
       failed_when: true
 
-    - name: Invalid RPM package name
+    - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
       when: rpm_package == ""
       failed_when: true
 
-    - name: Set directive search
+    - name: "Set directive search"
       set_fact:
                directive: "{{ (directive == 's') | ternary('search','info') }}"
       changed_when: false
 
     - include: ../common/common_rpm_fix_vars.yml
 
-    - name: Include Yum rpm-info
+    - name: "Include Yum rpm-info"
       include: yum-rpm-info.yml
       when: (ansible_os_family == 'RedHat')
             and
@@ -70,7 +70,7 @@
              ansible_lsb.major_release|int <= 7)
       changed_when: false
 
-    - name: Include DNF rpm-info
+    - name: "Include DNF rpm-info"
       include: dnf-rpm-info.yml
       when: ((ansible_os_family == 'RedHat')
             and

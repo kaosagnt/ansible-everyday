@@ -19,7 +19,7 @@
 
 # Execute dnf repolist on RHEL/CENTOS >= 8 hosts
 
-    - name: DNF repolist
+    - name: "DNF repolist"
       script: scripts/yum_dnf_repo_list dnf "{{ repo_type }}"
       when: ((ansible_os_family == 'RedHat')
             and

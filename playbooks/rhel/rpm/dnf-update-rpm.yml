@@ -20,7 +20,7 @@
 # Update RPM package to the latest release. 
 # on RHEL/CENTOS hosts >= 8
 
-    - name: DNF update RPM
+    - name: "DNF update RPM"
       dnf:
           pkg: "{{ item }}"
           disablerepo: "{{ disable_repo }}"
@@ -33,13 +33,13 @@
       with_items:
         - "{{ rpm_package.split(',') }}"
 
-    - name: Assign variables v1
+    - name: "Assign variables v1"
       set_fact:
                print_dnf_update: "{{ dnf_rpm_update }}"
       when: ansible_version.major|int == 1
       changed_when: false
 
-    - name: Assign variables v2
+    - name: "Assign variables v2"
       set_fact:
                print_dnf_update: "{{ dnf_rpm_update.results[0] }}"
       when: ansible_version.major|int == 2
@@ -47,7 +47,7 @@
 
     - include: ../common/common_dnf_tasks.yml
 
-    #- name: debug
+    #- name: "debug"
       #local_action: command printf "{{ print_dnf_update.results }}\n\n"
       #local_action: command printf "{{ dnf_rpm_update['results'] }}\n\n"
       #changed_when: false

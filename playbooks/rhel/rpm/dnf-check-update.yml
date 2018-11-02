@@ -19,7 +19,7 @@
 
 # Execute dnf check-update on RHEL/CENTOS >= 8 hosts
 
-    - name: DNF check-update
+    - name: "DNF check-update"
       script: scripts/check_yum_dnf_updates dnf -d="{{ disable_repo }}" -e="{{ enable_repo }}"
       when: ((ansible_os_family == 'RedHat')
             and
@@ -29,17 +29,17 @@
       failed_when: dnf_info.rc > 0
 
     # DNF reporting
-    - name: Print DNF updates found
+    - name: "Print DNF updates found"
       local_action: command printf "Approximately {{ (dnf_info.stdout|from_json).update_count }} update(s) found - \n\n{{ (dnf_info.stdout|from_json).update_list.replace('%%', '\n') }}\n\n"
       when: dnf_info is defined and (dnf_info.stdout|from_json).found == true
       changed_when: false
 
-    - name: Print no DNF updates found
+    - name: "Print no DNF updates found"
       local_action: command printf "No updates found."
       when: dnf_info is defined and (dnf_info.stdout|from_json).found == false
       changed_when: false
 
-    - name: Print DNF error
+    - name: "Print DNF error"
       local_action: command printf "An error occurred\n{{ (dnf_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
       when: dnf_info is defined and (dnf_info.stdout|from_json).error_msg != ""
       changed_when: false

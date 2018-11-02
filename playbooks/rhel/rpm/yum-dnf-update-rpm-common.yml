@@ -43,14 +43,14 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Invalid RPM package name
+    - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
       when: rpm_package == ""
       failed_when: true
 
     - include: ../common/common_rpm_fix_vars.yml
 
-    - name: Include Yum update RPM
+    - name: "Include Yum update RPM"
       include: yum-update-rpm.yml
       when: (ansible_os_family == 'RedHat') 
             and
@@ -58,7 +58,7 @@
             ansible_lsb.major_release|int <= 7)
       changed_when: false
 
-    - name: Include DNF update RPM
+    - name: "Include DNF update RPM"
       include: dnf-update-rpm.yml
       when: ((ansible_os_family == 'RedHat') 
             and

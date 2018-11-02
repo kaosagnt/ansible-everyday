@@ -33,12 +33,12 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Invalid RPM package name
+    - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
       when: rpm_package == ""
       failed_when: true
 
-    - name: List files of installed RPMs
+    - name: "List files of installed RPMs"
       script: scripts/rpm_list_files  "{{ rpm_package }}"
       register: file_info
       changed_when: false

@@ -32,23 +32,23 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Invalid RPM package name
+    - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
       when: rpm_package == ""
       failed_when: true
 
-    - name: Check if RPM is installed
+    - name: "Check if RPM is installed"
       script: scripts/check_rpm_installed  "{{ rpm_package | trim | quote }}"
       register: rpm_info
       changed_when: false
       failed_when: rpm_info.rc > 0
 
-    - name: Print RPMs found
+    - name: "Print RPMs found"
       local_action: command printf "{{ rpm_package | trim }} search term found {{ (rpm_info.stdout|from_json).rpm_count }} package(s)\n{{ (rpm_info.stdout|from_json).rpm_names.replace('%%', '\n') }}"
       when: (rpm_info.stdout|from_json).found == true
       changed_when: false
 
-    - name: Print no RPMs found
+    - name: "Print no RPMs found"
       local_action: command printf "{{ rpm_package | trim }} is not installed."
       when: (rpm_info.stdout|from_json).found == false
       changed_when: false

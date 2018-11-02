@@ -19,7 +19,7 @@
 
 # Execute yum check-update on RHEL/CENTOS <= 7 hosts
 
-    - name: Yum check-update
+    - name: "Yum check-update"
       script: scripts/check_yum_dnf_updates yum -d="{{ disable_repo }}" -e="{{ enable_repo }}"
       when: (ansible_os_family == 'RedHat')
             and
@@ -30,23 +30,23 @@
       failed_when: yum_info.rc > 0
 
     # Yum reporting
-    - name: Print Yum updates found
+    - name: "Print Yum updates found"
       local_action: command printf "Approximately {{ (yum_info.stdout|from_json).update_count }} update(s) found - \n\n{{ (yum_info.stdout|from_json).update_list.replace('%%', '\n') }}\n\n"
       when: yum_info is defined and (yum_info.stdout|from_json).found == true
       changed_when: false
 
-    - name: Print no Yum updates found
+    - name: "Print no Yum updates found"
       local_action: command printf "No updates found."
       when: yum_info is defined and (yum_info.stdout|from_json).found == false
       changed_when: false
 
-    - name: Print Yum error
+    - name: "Print Yum error"
       local_action: command printf "An error occurred\n{{ (yum_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
       when: yum_info is defined and (yum_info.stdout|from_json).error_msg != ""
       changed_when: false
       failed_when:
           ((yum_info.stdout|from_json).error_msg != ""
-       	  and
-       	  (yum_info.stdout|from_json).found == false
-       	  and 
-       	  (yum_info.stdout|from_json).update_count == 0)
+           and
+           yum_info.stdout|from_json).found == false
+           and 
+           yum_info.stdout|from_json).update_count == 0)

@@ -39,7 +39,7 @@
 
     - include: ../common/common_rpm_fix_vars.yml
 
-    - name: Include Yum check-update
+    - name: "Include Yum check-update"
       include: yum-check-update.yml
       when: (ansible_os_family == 'RedHat')
             and
@@ -47,7 +47,7 @@
              ansible_lsb.major_release|int <= 7)
       changed_when: false
 
-    - name: Include DNF check-update
+    - name: "Include DNF check-update"
       include: dnf-check-update.yml
       when: ((ansible_os_family == 'RedHat')
             and
