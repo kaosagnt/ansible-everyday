@@ -99,7 +99,7 @@ playbook_version() {
 
 if [ X"${ANSIBLE_VERSION_OVERIDE}" == X"yes" ]; then
 
-	ANSIBLE_CONFIG_FILE=ansible.cfg.1.ianm
+	ANSIBLE_CONFIG_FILE=ansible.1.cfg
 	ANSIBLE_PLAYBOOK_VERSION=$(playbook_version)
 
 	$(version_compare ${ANSIBLE_PLAYBOOK_VERSION} "2.0.0")
@@ -110,7 +110,7 @@ if [ X"${ANSIBLE_VERSION_OVERIDE}" == X"yes" ]; then
 
 	if [ ${ANSIBLE_VERSION_COMPARE} != 2 ]; then
  		# >=
-		ANSIBLE_CONFIG_FILE=ansible.cfg.2.ianm
+		ANSIBLE_CONFIG_FILE=ansible.2.cfg
 	fi
 fi
 
