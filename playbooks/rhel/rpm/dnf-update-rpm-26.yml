@@ -17,24 +17,33 @@
 #
 # %END_COPYRIGHT%
 
-# Update RPM package to the latest release. 
-# on RHEL/CENTOS hosts <= 7
+# Update RPM package to the latest release. Ansible < 2.7.x
+# DNF module changed in ansible 2.7.0
+# on RHEL/CENTOS hosts >= 8
 
-    - name: "Yum update RPM - ansible >= 2.7"
-      yum:
-          pkg: "{{ rpm_package.split(',') }}"
+    - name: "DNF update RPM - ansible < 2.7"
+      dnf:
+          pkg: "{{ item }}"
           disablerepo: "{{ disable_repo }}"
           enablerepo: "{{ enable_repo }}"
           state: latest
-      when: (ansible_os_family == 'RedHat') 
+      when: ((ansible_os_family == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 5 and
-             ansible_lsb.major_release|int <= 7)
-            and
-            (ansible_version.full is version('2.7', '>='))
-      #register: yum_rpm_update
+            (ansible_lsb.major_release|int >= 8))
 
-#    - name: "debug"
-#      local_action: command printf "{{ print_yum_update }}\n\n"
-#      local_action: command printf "\n\n{{ yum_rpm_update }}\n\n"
+      register: dnf_rpm_update
+      with_items:
+        - "{{ rpm_package.split(',') }}"
+
+    - name: "Assign variables"
+      set_fact:
+               print_dnf_update: "{{ dnf_rpm_update.results[0] }}"
+      changed_when: false
+
+    - include: ../common/common_dnf_tasks.yml
+
+#    - name: debug
+#      local_action: command printf "{{ print_dnf_update.results }}\n\n"
+#      local_action: command printf "{{ dnf_rpm_update['results'] }}\n\n"
 #      changed_when: false
+
