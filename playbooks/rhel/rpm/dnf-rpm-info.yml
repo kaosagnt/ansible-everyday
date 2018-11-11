@@ -26,11 +26,11 @@
       failed_when: dnf_rpm_info.rc > 0
 
     - name: "DNF print RPM information found"
-      local_action: command printf "{{ rpm_package }} information found\n\n{{ (dnf_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n') }}"
+      local_action: command printf "{{ rpm_package }} information found\n\n{{ (dnf_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
       when: (dnf_rpm_info.stdout|from_json).found == true
       changed_when: false
 
     - name: "DNF print no RPM information found"
-      local_action: command printf "{{ rpm_package }} information could not be found.\n\n{{ (dnf_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n') }}"
+      local_action: command printf "{{ rpm_package }} information could not be found.\n\n{{ (dnf_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
       when: (dnf_rpm_info.stdout|from_json).found == false
       changed_when: false
