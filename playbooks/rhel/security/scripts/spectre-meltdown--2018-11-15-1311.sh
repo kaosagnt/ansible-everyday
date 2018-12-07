@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-VERSION="3.0"
+VERSION="3.1"
 
 # Warning! Be sure to download the latest version of this script from its primary source:
 # https://access.redhat.com/security/vulnerabilities/speculativeexecution
@@ -28,11 +28,13 @@ read_array() {
     #
     # Side effects:
     #     Overwrites content of the array 'array_name' with lines from stdin
+
     local array_name="$1"
 
     local i=0
     while IFS= read -r line; do
         if [[ "$line" ]]; then
+            # shellcheck disable=SC1087
             read -r "$array_name[$(( i++ ))]" <<< "$line"
         fi
     done
@@ -212,6 +214,7 @@ get_virtualization() {
     #     Virtualization type, "None", or "virt-what not available"
 
     local virt
+
     if command -v virt-what &> /dev/null; then
         virt=$( virt-what 2>&1 | tr '\n' ' ' )
         if [[ "$virt" ]]; then
@@ -269,6 +272,8 @@ set_default_values() {
     dmesg_ibpb=0
     dmesg_not_ibpb=0
     dmesg_retpoline_tried=0
+
+    cpu_flag_ibpb=0
 
     unsafe_modules_list_lsmod_modinfo=()
     unsafe_modules_list_dmesg=()
@@ -436,6 +441,13 @@ parse_facts() {
         # Fallback
         model_name="$( awk '/model name/ { for(i = 4; i < NF; i++) printf "%s ", $i; print $i; exit }' "$cpuinfo_path" )"
     fi
+
+    # Read CPU flags
+    if grep -E --quiet 'flags[[:space:]]+:.*ibpb' "$cpuinfo_path"; then
+        cpu_flag_ibpb=1
+    fi
+
+    # Store architecture as `uname -r` does not contain it on RHEL5
     arch=$( uname -m )
 }
 
@@ -499,7 +511,8 @@ draw_conclusions() {
     # Special edge case for RHEL5 & RHEL6
     edge_case_1=0
     if [[ "$vuln_spectre_v2_value" =~ "Full retpoline" ]]; then
-        if (( ! ibpb )); then
+        # We have to rely on either dmesg, debugfs, or CPU flags
+        if (( ! ibpb && ! cpu_flag_ibpb )); then
             edge_case_1=1
             mitigation_spectre_v2=0
         fi
@@ -601,7 +614,7 @@ debug_print() {
                 avail_debug_ibrs debug_ibrs avail_debug_retp debug_retp
                 dmesg_log_used dmesg_command_used dmesg_wrapped
                 dmesg_pti dmesg_ibrs dmesg_not_ibrs dmesg_ibpb dmesg_not_ibpb dmesg_retpoline_tried
-                model_number model_name arch
+                model_number model_name cpu_flag_ibpb arch
 
                 running_kernel rhel virtualization vendor unspecified_arch
                 avail_vuln_files avail_debug_files new_kernel retpoline_kernel retpoline_tried
@@ -636,8 +649,7 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
 
     vendor=$( check_cpu_vendor )
     if (( $? == 1 )); then
-        # Architectures other than x86_64, x86, POWER are supported on a best-effort basis if
-        # vulnerability files are present
+        # Architectures other than x86_64, x86, POWER are not supported
         unspecified_arch=1
     else
         unspecified_arch=0
