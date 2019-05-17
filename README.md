@@ -124,6 +124,8 @@ but many are not and will work on other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/L1TF
 	ansible_security-rhel-cve-2018-3639 - check for Kernel Side-Channel Attack using Speculative Store Bypass - CVE-2018-3639
 		https://access.redhat.com/security/vulnerabilities/ssbd
+	ansible_security-rhel-cve-2018-12130 - check for MDS - Microarchitectural Store Buffer Data - CVE-2018-12130, CVE-2018-12126, CVE-2018-12127,
+		CVE-2019-11091
 	ansible_security-rhel-cve-2019-5736 - check for runc - Malicious container escape - CVE-2019-5736
 		https://access.redhat.com/security/vulnerabilities/runcescape
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
