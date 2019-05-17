@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-VERSION="3.1"
+VERSION="3.2"
 
 # Warning! Be sure to download the latest version of this script from its primary source:
 # https://access.redhat.com/security/vulnerabilities/speculativeexecution
@@ -508,13 +508,45 @@ draw_conclusions() {
         (( mitigation_spectre_v2 = ibrs && ibpb ))
     fi
 
-    # Special edge case for RHEL5 & RHEL6
-    edge_case_1=0
+    # Special edge case #1 for RHEL5 & RHEL6
+    edge_case_1=0  # Full retpoline => Retpoline without IBPB
     if [[ "$vuln_spectre_v2_value" =~ "Full retpoline" ]]; then
         # We have to rely on either dmesg, debugfs, or CPU flags
         if (( ! ibpb && ! cpu_flag_ibpb )); then
             edge_case_1=1
             mitigation_spectre_v2=0
+        fi
+    fi
+
+    # Special edge case #2, #3, and #4 for retpoline on Skylake
+    # Retpoline is newly considered good enough mitigation for Spectre v2
+    # Message priorities are:
+    # - "Vulnerable"
+    # - "Vulnerable: Minimal ASM retpoline"
+    # - "Vulnerable: Retpoline without IBPB"
+    # - "Vulnerable: Retpoline on Skylake+"  (older releases only)
+    # - "Vulnerable: Retpoline with unsafe module(s)"
+    # - "Mitigation: ..."
+    #
+    # "Vulnerable: Retpoline on Skylake+" basically means "Mitigation: Full retpoline"
+    # However, there are catches:
+    # 1) Special edge case #1 may be applicable, check for it the same way
+    # 2) Unsafe modules have lower priority, check unsafe modules
+    edge_case_2=0  # Retpoline on Skylake => Full retpoline
+    edge_case_3=0  # Retpoline on Skylake => Retpoline without IBPB
+    edge_case_4=0  # Retpoline on Skylake => Retpoline with unsafe module(s)
+    if [[ "$vuln_spectre_v2_value" =~ "Retpoline on Skylake" ]]; then
+        # We have to rely on either dmesg, debugfs, or CPU flags
+        # We also need to check for unsafe modules
+        if (( ! ibpb && ! cpu_flag_ibpb )); then
+            edge_case_3=1
+            mitigation_spectre_v2=0
+        elif (( unsafe_modules )); then
+            edge_case_4=1
+            mitigation_spectre_v2=0
+        else
+            edge_case_2=1
+            mitigation_spectre_v2=1
         fi
     fi
 
@@ -567,12 +599,21 @@ draw_conclusions() {
     fi
 
     if (( avail_vuln_spectre_v2 )); then
+        # edge_case_1 ... Full retpoline => Retpoline without IBPB
+        # edge_case_2 ... Retpoline on Skylake => Full retpoline
+        # edge_case_3 ... Retpoline on Skylake => Retpoline without IBPB
+        # edge_case_4 ... Retpoline on Skylake => Retpoline with unsafe module(s)
         if (( mitigation_spectre_v2 )); then
             string_spectre_v2="${GREEN}$vuln_spectre_v2_value${RESET}"
+            if (( edge_case_2 )); then
+                string_spectre_v2="${GREEN}Mitigation: Full retpoline ***${RESET}"
+            fi
         else
             string_spectre_v2="${RED}$vuln_spectre_v2_value${RESET}"
-            if (( edge_case_1 )); then
+            if (( edge_case_1 || edge_case_3 )); then
                 string_spectre_v2="${RED}Vulnerable: Retpoline without IBPB ***${RESET}"
+            elif (( edge_case_4 )); then
+                string_spectre_v2="${RED}Vulnerable: Retpoline with unsafe module(s) ***${RESET}"
             fi
         fi
     else
@@ -622,7 +663,8 @@ debug_print() {
                 updated_microcode ibrs ibpb pti not_affected_meltdown_amd
                 vulnerable_spectre_v1 vulnerable_spectre_v2 vulnerable_meltdown
                 unsafe_modules_lsmod_modinfo unsafe_modules_dmesg unsafe_modules
-                string_spectre_v1 string_spectre_v2 string_meltdown result edge_case_1
+                string_spectre_v1 string_spectre_v2 string_meltdown result
+                edge_case_1 edge_case_2 edge_case_3 edge_case_4
                )
     for variable in "${variables[@]}"; do
         echo "$variable = *${!variable}*"
