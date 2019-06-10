@@ -26,7 +26,7 @@ you use:
     python-passlib
     python2-ndg_httpsclient
 
-Ansible >= 2.2 conatins the stdout_callback plugin(s) option if you want
+Ansible >= 2.2 contains the stdout_callback plugin(s) option if you want
 human readability.
 
     ansible.cfg
