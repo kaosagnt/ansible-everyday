@@ -128,6 +128,8 @@ but many are not and will work on other Operating Systems.
 		CVE-2019-11091 https://access.redhat.com/security/vulnerabilities/mds
 	ansible_security-rhel-cve-2019-5736 - check for runc - Malicious container escape - CVE-2019-5736
 		https://access.redhat.com/security/vulnerabilities/runcescape
+	ansible_security-rhel-tcp-sack-panic-cve-2019-11477-8-9 - check for TCP SACK PANIC - Kernel vulnerabilities - CVE-2019-11477,
+		CVE-2019-11478 & CVE-2019-11479 https://access.redhat.com/security/vulnerabilities/tcpsack
     ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 	ansible_security-spectre-meltdown - check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
 		https://access.redhat.com/security/vulnerabilities/speculativeexecution
