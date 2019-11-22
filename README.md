@@ -126,6 +126,8 @@ but many are not and will work on other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/ssbd
 	ansible_security-rhel-cve-2018-12130 - check for MDS - Microarchitectural Store Buffer Data - CVE-2018-12130, CVE-2018-12126, CVE-2018-12127,
 		CVE-2019-11091 https://access.redhat.com/security/vulnerabilities/mds
+	ansible_security-rhel-cve-2018-12207 - check for Machine Check Error on Page Size Change - CVE-2018-12207
+		https://access.redhat.com/security/vulnerabilities/ifu-page-mce 
 	ansible_security-rhel-cve-2019-5736 - check for runc - Malicious container escape - CVE-2019-5736
 		https://access.redhat.com/security/vulnerabilities/runcescape
 	ansible_security-rhel-tcp-sack-panic-cve-2019-11477-8-9 - check for TCP SACK PANIC - Kernel vulnerabilities - CVE-2019-11477,
