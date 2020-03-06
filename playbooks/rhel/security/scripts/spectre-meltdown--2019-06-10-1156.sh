@@ -7,7 +7,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-VERSION="3.2"
+VERSION="3.3"
 
 # Warning! Be sure to download the latest version of this script from its primary source:
 # https://access.redhat.com/security/vulnerabilities/speculativeexecution
@@ -152,8 +152,8 @@ check_supported_kernel() {
     local running_kernel="$1"
 
     # Check supported platform
-    if [[ "$running_kernel" != *".el"[5-7]* ]]; then
-        echo "This script is meant to be used only on Red Hat Enterprise Linux 5, 6 and 7."
+    if [[ "$running_kernel" != *".el"[5-8]* ]]; then
+        echo -e "${RED}This script is meant to be used only on RHEL 5-8.${RESET}"
         exit 1
     fi
 }
@@ -166,7 +166,7 @@ get_rhel() {
     #     running_kernel - kernel string as returned by 'uname -r'
     #
     # Prints:
-    #     RHEL number, e.g. '5', '6', or '7'
+    #     RHEL number, e.g. '5', '6', '7', or '8'
 
     local running_kernel="$1"
 
