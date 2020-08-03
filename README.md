@@ -134,6 +134,8 @@ but many are not and will work on other Operating Systems.
 		CVE-2019-11478 & CVE-2019-11479 https://access.redhat.com/security/vulnerabilities/tcpsack
 	ansible_security-rhel-cve-2019-14835 - check for VHOST-NET guest to host escape - Kernel vulnerability CVE-2019-14835
 		https://access.redhat.com/security/vulnerabilities/kernel-vhost
+	ansible_security-rhel-cve-2020-10713 - Boot Hole Vulnerability - GRUB 2 boot loader
+		https://access.redhat.com/security/vulnerabilities/grub2bootloader
 	ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 	ansible_security-spectre-meltdown - check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
 		https://access.redhat.com/security/vulnerabilities/speculativeexecution
