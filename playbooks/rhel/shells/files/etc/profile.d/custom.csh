@@ -9,7 +9,7 @@ alias df	df -k
 alias du	du -k
 
 set prompt="%m:%~>"
-set correct=all
+set correct=cmd
 set autolist=ambiguous
 
 setenv PATH $PATH":/usr/sbin:/sbin:$HOME/bin"
