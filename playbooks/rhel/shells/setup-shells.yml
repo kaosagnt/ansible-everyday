@@ -31,7 +31,7 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Include Yum installer
+    - name: "Include Yum installer"
       include: yum-setup-shells.yml
       when: (ansible_os_family == 'RedHat')
             and
@@ -39,7 +39,7 @@
              ansible_lsb.major_release|int <= 7)
       changed_when: false
 
-    - name: Include DNF installer
+    - name: "Include DNF installer"
       include: dnf-setup-shells.yml
       when: ((ansible_os_family == 'RedHat')
             and
@@ -47,47 +47,36 @@
       changed_when: false
 
     # Does /etc/profile.d/custom.sh exist?
-    - name: Check for /etc/profile.d/custom.sh
+    - name: "Check for /etc/profile.d/custom.sh"
       stat:
            path: /etc/profile.d/custom.sh
       register: cust_sh
       changed_when: false
 
     # Does /etc/profile.d/custom.csh exist?
-    - name: Check for /etc/profile.d/custom.csh
+    - name: "Check for /etc/profile.d/custom.csh"
       stat:
            path: /etc/profile.d/custom.csh
       register: cust_csh
       changed_when: false
 
     # Install custom.sh file into /etc/profile.d/
-    - name: Install custom.sh file into /etc/profile.d/
+    - name: "Install custom.sh file into /etc/profile.d/"
       copy:
            src: "{{ files_dir }}/custom.sh"
            dest: /etc/profile.d/custom.sh
            owner: root
            group: root
            mode: 0644
-      register: cust_sh_install
       when: cust_sh.stat.exists == false
 
-    - name: Install custom.sh print results
-      local_action: command printf "custom.sh installed into /etc/profile.d/"
-      when: cust_sh_install.changed == true
-      changed_when: false
-
     # Install custom.csh file into /etc/profile.d/
-    - name: Install custom.csh file into /etc/profile.d/
+    - name: "Install custom.csh file into /etc/profile.d/"
       copy:
            src: "{{ files_dir }}/custom.csh"
            dest: /etc/profile.d/custom.csh
            owner: root
            group: root
            mode: 0644
-      register: cust_csh_install
       when: cust_csh.stat.exists == false
 
-    - name: Install custom.csh print results
-      local_action: command printf "custom.csh installed into /etc/profile.d/"
-      when: cust_csh_install.changed == true
-      changed_when: false
