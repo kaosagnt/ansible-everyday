@@ -136,11 +136,17 @@ but many are not and will work on other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/kernel-vhost
 	ansible_security-rhel-cve-2020-10713 - Boot Hole Vulnerability - GRUB 2 boot loader
 		https://access.redhat.com/security/vulnerabilities/grub2bootloader
+	ansible_security-rhel-CVE-2020-14372 - ACPI Secure Boot vulnerability - GRUB 2 CVE-2020-14372
+		https://access.redhat.com/security/vulnerabilities/RHSB-2021-003
 	ansible_security-rhel-cve-2021-3156 - Privilege escalation via command line argument parsing - sudo
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-002
+	ansible_secuitry-rhel-DNSpooq - Multiple vulnerabilities within dnsmasq CVE-2020-25681, CVE-2020-25682, CVE-2020-25683, CVE-2020-25684,
+		CVE-2020-25685, CVE-2020-25686, CVE-2020-25687
+		https://access.redhat.com/security/vulnerabilities/RHSB-2021-001
 	ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 	ansible_security-spectre-meltdown - check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
 		https://access.redhat.com/security/vulnerabilities/speculativeexecution
+
     ansible_service-enable-disable-at-boot - enable / disable services to start up at boot time
     ansible_service-rhel-check-status - check the status of a service eg stopped / running
     ansible_service-start-stop-restart - start / stop / restart a service
