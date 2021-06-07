@@ -140,6 +140,8 @@ but many are not and will work on other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-003
 	ansible_security-rhel-cve-2021-3156 - Privilege escalation via command line argument parsing - sudo
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-002
+	ansible_security-rhel-cve-2021-30465 - RHSB-2021-004 Symlink-Exchange attack - runc - CVE-2021-30465
+		https://access.redhat.com/security/vulnerabilities/RHSB-2021-004
 	ansible_secuitry-rhel-DNSpooq - Multiple vulnerabilities within dnsmasq CVE-2020-25681, CVE-2020-25682, CVE-2020-25683, CVE-2020-25684,
 		CVE-2020-25685, CVE-2020-25686, CVE-2020-25687
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-001
