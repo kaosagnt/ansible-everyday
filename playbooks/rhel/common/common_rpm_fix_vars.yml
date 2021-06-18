@@ -27,4 +27,4 @@
     - name: Fix other variables
       set_fact:
           disable_repo: "{{ disable_repo | replace(' ', '') }}"
-          enble_repo: "{{ enable_repo | replace(' ', '') }}"
+          enable_repo: "{{ enable_repo | replace(' ', '') }}"
