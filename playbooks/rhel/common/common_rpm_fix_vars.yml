@@ -19,12 +19,12 @@
 
 # Common rpm fix variables by running certain filters over them.
 
-    - name: Fix rpm package variable
+    - name: "Fix rpm package variable"
       set_fact:
           rpm_package: "{{ rpm_package | replace(' ', '') }}"
       when: rpm_package is defined
 
-    - name: Fix other variables
+    - name: "Fix other variables"
       set_fact:
           disable_repo: "{{ disable_repo | replace(' ', '') }}"
           enable_repo: "{{ enable_repo | replace(' ', '') }}"
