@@ -30,13 +30,6 @@ SCRIPT_DIR=$(dirname `which $0`)
 #printf "path = ${ANSIBLE_PLAYBOOKS_PATH}\n\n"
 #printf "ARGS = ${MUNGED_ARGS}\n\n"
 
-ANSIBLE_PLAYBOOK_FILE=pkg-info-list-files.yml
-
-#if [ ${ANSIBLE_VERSION_COMPARE} != 2 ]; then
-	# >=
-#	ANSIBLE_PLAYBOOK_FILE=pkg_info-list-files-v2.yml
-#fi
-
 ansible-playbook ${MUNGED_ARGS} \
 	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
-	${ANSIBLE_PLAYBOOKS_PATH}/openbsd/pkg/${ANSIBLE_PLAYBOOK_FILE}
+	${ANSIBLE_PLAYBOOKS_PATH}/openbsd/pkg/pkg-info-list-files.yml
