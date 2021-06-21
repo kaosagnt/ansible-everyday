@@ -60,7 +60,8 @@ deploying 100 new servers. These scripts/playbooks allow you to get those
 everyday administration tasks completed.
 
 A lot of the playbooks are designed for RHEL (or it's derivatives eg Centos/Fedora)
-but many are not and will work on other Operating Systems.
+and Debian / Ubuntu derived systems but many are not and will work on
+other Operating Systems.
 
     ansible_acl-get - retrive the ACL of a file / directory
     ansible_acl-remove - remove an ACL on a file / directory 
