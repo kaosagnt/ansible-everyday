@@ -16,6 +16,8 @@
 #
 # %END_COPYRIGHT%
 
+# env DEBUG=1 name-of-script
+DEBUG=${DEBUG-0}
 ANSIBLE_BASE_PATH=${SCRIPT_DIR%/bin*}
 
 # Include user definable config.
@@ -35,60 +37,50 @@ ANSIBLE_CONFIG_FILE=ansible.cfg
 ANSIBLE_PLAYBOOKS_PATH=${ANSIBLE_BASE_PATH}/playbooks
 ANSIBLE_FACTS_PATH=${ANSIBLE_BASE_PATH}/facts
 
+# Debug
+print_debug() {
+	printf "ANSIBLE_BASE_PATH=%s\nSCRIPT_DIR=%s\n" \
+			"${ANSIBLE_BASE_PATH}" \
+			"${SCRIPT_DIR}"
+
+	printf "ANSIBLE_CONF_PATH=%s\nANSIBLE_HOSTS_PATH=%s\n" \
+			"${ANSIBLE_CONF_PATH}" \
+			"${ANSIBLE_HOSTS_PATH}" \
+
+	printf "ANSIBLE_VERSION_OVERIDE=%s\nANSIBLE_CONFIG_FILE=%s\n" \
+			"${ANSIBLE_VERSION_OVERIDE}" \
+			"${ANSIBLE_CONFIG_FILE}"
+
+	printf "ANSIBLE_PLAYBOOKS_PATH=%s\nANSIBLE_FACTS_PATH=%s\n\n" \
+			"${ANSIBLE_PLAYBOOKS_PATH}" \
+			"${ANSIBLE_FACTS_PATH}"
+}
+
 # Munge together all command line args.
 MUNGED_AGRS=""
 
 for i in "$@"
 do
-
-	MUNGED_ARGS+=" ${i}"
-
+	MUNGED_ARGS="${MUNGED_ARGS} ${i}"
 done
+
+version_gte() {
+	test "$(printf '%s\n' "${2}" "${1}" | sort -V | head -n 1)" = "${2}";
+}
 
 version_compare() {
 
-	# http://stackoverflow.com/questions/4023830/bash-how-compare-two-strings-in-version-format
-	# 0) =
-	# 1) >
-	# 2) <
+	# 0) <
+	# 1) >=
 
-	if [ $1 == $2 ]; then
-
+	if version_gte $VERSION $VERSION2; then
+		return 1
+	else
 		return 0
 	fi
-
-	local IFS=.
-	local i ver1=($1) ver2=($2)
-
-	# Fill empty fields in ver1 with zeros
-	for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++))
-	do
-		ver1[i]=0
-	done
-
-	for ((i = 0; i < ${#ver1[@]}; i++))
-	do
-		if [ -z ${ver2[i]} ]; then
-
-			# Fill empty fields in ver2 with zeros
-			ver2[i]=0
-		fi
-
-		if ((10#${ver1[i]} > 10#${ver2[i]})); then
-
-			return 1
-		fi
-
-		if ((10#${ver1[i]} < 10#${ver2[i]})); then
-
-			return 2
-		fi
-	done
-
-	return 0
 }
 
-playbook_version() {
+playbook_version () {
 
 	local _playbook_version=$(eval ansible-playbook --version \
 							| grep -E -o "([0-9]{1,}\.)+[0-9]{1,}" \
@@ -97,25 +89,48 @@ playbook_version() {
 	printf ${_playbook_version}
 }
 
-if [ X"${ANSIBLE_VERSION_OVERIDE}" == X"yes" ]; then
+if [ X"${ANSIBLE_VERSION_OVERIDE}" = X"yes" ]; then
 
-	ANSIBLE_CONFIG_FILE=ansible.1.cfg
+	ANSIBLE_CONFIG_FILE=ansible.2.cfg
 	ANSIBLE_PLAYBOOK_VERSION=$(playbook_version)
+	#ANSIBLE_PLAYBOOK_VERSION="2.9.21"
+	#ANSIBLE_PLAYBOOK_VERSION="2.9.213.93.9.511.1.111.1.1"
 
-	$(version_compare ${ANSIBLE_PLAYBOOK_VERSION} "2.0.0")
+	$(version_compare ${ANSIBLE_PLAYBOOK_VERSION} "3.0.0")
 	ANSIBLE_VERSION_COMPARE=$?
 
 	# Debug
-	#printf "Version compare : ${ANSIBLE_VERSION_COMPARE}\n\n"
+	if [ ${DEBUG} -eq 1 ]; then
+		printf "Version: %s\nANSIBLE_VERSION_COMPARE: %s\n\n" \
+				"${ANSIBLE_PLAYBOOK_VERSION}" \
+				"${ANSIBLE_VERSION_COMPARE}"
+	fi
 
-	if [ ${ANSIBLE_VERSION_COMPARE} != 2 ]; then
- 		# >=
-		ANSIBLE_CONFIG_FILE=ansible.2.cfg
+	if [ ${ANSIBLE_VERSION_COMPARE} -ne 1 ]; then
+		# >= 3.0
+		ANSIBLE_CONFIG_FILE=ansible.3.cfg
+	fi
+
+	$(version_compare ${ANSIBLE_PLAYBOOK_VERSION} "4.0.0")
+	ANSIBLE_VERSION_COMPARE=$?
+
+	# Debug
+	if [ ${DEBUG} -eq 1 ]; then
+		printf "ANSIBLE_VERSION_COMPARE: %s\n\n" \
+				"${ANSIBLE_VERSION_COMPARE}"
+	fi
+
+	if [ ${ANSIBLE_VERSION_COMPARE} -ne 1 ]; then
+		# >= 4.0
+		ANSIBLE_CONFIG_FILE=ansible.4.cfg
 	fi
 fi
 
 ANSIBLE_CONFIG="${ANSIBLE_CONF_PATH}/${ANSIBLE_CONFIG_FILE}"
 export ANSIBLE_CONFIG
 
-printf "Playbook Version: ${ANSIBLE_PLAYBOOK_VERSION}\n"
-printf "Config File: ${ANSIBLE_CONFIG}\n\n"
+[ ${DEBUG} -eq 1 ] && print_debug
+
+printf "Playbook Version: %s\nConfig File: %s\n\n" \
+		"${ANSIBLE_PLAYBOOK_VERSION}" \
+		"${ANSIBLE_CONFIG}"

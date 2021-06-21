@@ -32,7 +32,10 @@ SCRIPT_DIR=$(dirname `which $0`)
 
 ANSIBLE_PLAYBOOK_FILE=rpm-list-files.yml
 
-#if [ ${ANSIBLE_VERSION_COMPARE} != 2 ]; then
+#$(version_compare ${ANSIBLE_PLAYBOOK_VERSION} "2.0.0")
+#ANSIBLE_VERSION_COMPARE=$?
+
+#if [ ${ANSIBLE_VERSION_COMPARE} != 1 ]; then
 	# >=
 #	ANSIBLE_PLAYBOOK_FILE=rpm-list-files-v2.yml
 #fi

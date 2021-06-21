@@ -35,7 +35,7 @@ ANSIBLE_VERSION_COMPARE=$?
 #printf "path = ${ANSIBLE_PLAYBOOKS_PATH}\n\n"
 #printf "\n\nANSIBLE_VERSION_COMPARE=${ANSIBLE_VERSION_COMPARE}\n\n"
 
-if [ ${ANSIBLE_VERSION_COMPARE} -eq 2 ]; then
+if [ ${ANSIBLE_VERSION_COMPARE} -eq 0 ]; then
     # < 2.7.0
 	V_PLAYBOOK=yum-dnf-update-rpm-common-26.yml
 fi
