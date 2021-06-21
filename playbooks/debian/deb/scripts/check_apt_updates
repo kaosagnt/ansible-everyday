@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to apt update.
+#
+# Returns: JSON string:
+# {
+#	"found": true/false ,
+#	"update_count": "Count of number of DEB packages" ,
+#	"update_list": "String of DEB package filenames" ,
+#	"error_msg": "Error Message string if an error occurred"
+# }
+
+PACKAGE_MANAGER=apt
+ETC_APT="/etc/apt/sources.list.d"
+PKG_MAN_ERR=0
+PKG_LIST_ERR=0
+TEMP_FILE=$(mktemp --tmpdir ansible_apt_tmp.XXXXXXXXX)
+
+# Debug
+#printf "Temp Filename = ${TEMP_FILE}\n\n"
+
+# clean the cache
+apt-get autoclean > /dev/null
+
+# Check for updates.
+${PACKAGE_MANAGER} update >& ${TEMP_FILE}
+
+PKG_MAN_ERR=$?
+
+if [ ! ${PKG_MAN_ERR} -eq 0 ]; then
+
+	ERROR_MSG="Something went wrong. ${PACKAGE_MANAGER} exited with: ${PKG_MAN_ERR}\n"
+
+else
+
+	ERROR_MSG=$(cat ${TEMP_FILE} | egrep -e "^(E:)\s")
+	# Escape any quote chars as this will be placed into
+	# a json data structure.
+	SINGLE_QUOTE="\'"
+	DOUBLE_QUOTE='\"'
+	BACK_SLASH='\\'
+	#ERROR_MSG=${ERROR_MSG//\'/${SINGLE_QUOTE}}
+	ERROR_MSG=${ERROR_MSG//\/${BACK_SLASH}}
+	ERROR_MSG=${ERROR_MSG//'"'/${DOUBLE_QUOTE}}
+fi
+
+UPDATE_COUNT=0
+FOUND="false"
+
+# Debug
+#printf "\nERR_MSG = ${ERROR_MSG}\n\n"
+
+# Remove any newline chars from the name and replace with %%.
+# %% will be later substituded in the output display.
+ERROR_MSG=${ERROR_MSG//$'\n'/%%}
+
+if [ ! ${PKG_MAN_ERR} -eq 0 ]; then
+
+	printf '{ "found": false , %s , %s "%s" }' \
+			'"update_count": "0" , "update_list": ""' \
+			'"error_msg":' \
+			"${ERROR_MSG}"
+
+else
+
+	ALL_UPDATED=$(cat ${TEMP_FILE} \
+					| egrep 'All packages are up to date.')
+
+	if [ "${ALL_UPDATED}" != "All packages are up to date." ]; then
+
+		UPDATE_COUNT=$(cat ${TEMP_FILE} \
+						| egrep 'package(s)? can be upgraded' \
+						| egrep -o "[0-9]{1,}" \
+						| awk '{printf("%s", $1)}')
+
+		${PACKAGE_MANAGER} list --upgradeable >& ${TEMP_FILE}
+
+		PKG_LIST_ERR=$?
+
+		if [ ${PKG_LIST_ERR} -eq 0 ]; then
+
+			UPDATE_LIST=$(cat ${TEMP_FILE} \
+							| egrep 'upgradable')
+
+			# Remove any newline chars from the name and replace with %%.
+			# %% will be later substituded in the output display.
+			UPDATE_LIST=${UPDATE_LIST//$'\n'/%%}
+
+			# Cut the last char off the end of the string.
+			#UPDATE_LIST=${UPDATE_LIST%?}
+
+			# Debug
+			#printf "${UPDATE_LIST}\n"
+
+			if [ X"${UPDATE_COUNT}" != X"0" ]; then
+				FOUND="true"
+			fi
+
+
+		else
+
+			ERROR_MSG="Something went wrong. ${PACKAGE_MANAGER} list --upgradeable exited with: ${PKG_LIST_ERR}%%"
+		fi
+	fi
+
+	printf '{ %s %s , %s "%s" , %s "%s" , %s "%s" }' \
+		'"found":' \
+		"${FOUND}" \
+		'"update_count":' \
+		"${UPDATE_COUNT}" \
+		'"update_list":' \
+		"${UPDATE_LIST}" \
+		'"error_msg":' \
+		"${ERROR_MSG}"
+fi
+
+# Remove temp file
+unlink ${TEMP_FILE}

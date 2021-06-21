@@ -1,0 +1,71 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Install shell and setup /etc/profile.d/custom.* files
+# on Debian/Ubuntu hosts
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Install tcsh and setup /etc/profile.d/custom.* files on Debian/Ubuntu hosts"
+  become: yes
+
+  vars:
+       shell_name: "{{ shell | default('') }}"
+       files_dir: ../../common/files/etc/profile.d
+       #print_information: true
+
+  tasks:
+    - include: ../../common/common_information.yml
+
+    - name: "Include APT installer"
+      include: apt-setup-shells.yml
+      when: ansible_os_family == 'Debian'
+      changed_when: false
+
+    # Does /etc/profile.d/custom.sh exist?
+    - name: "Check for /etc/profile.d/custom.sh"
+      stat:
+           path: /etc/profile.d/custom.sh
+      register: cust_sh
+      changed_when: false
+
+    # Does /etc/profile.d/custom.csh exist?
+    - name: "Check for /etc/profile.d/custom.csh"
+      stat:
+           path: /etc/profile.d/custom.csh
+      register: cust_csh
+      changed_when: false
+
+    # Install custom.sh file into /etc/profile.d/
+    - name: "Install custom.sh file into /etc/profile.d/"
+      copy:
+           src: "{{ files_dir }}/custom.sh"
+           dest: /etc/profile.d/custom.sh
+           owner: root
+           group: root
+           mode: 0644
+      when: cust_sh.stat.exists == false
+
+    # Install custom.csh file into /etc/profile.d/
+    - name: "Install custom.csh file into /etc/profile.d/"
+      copy:
+           src: "{{ files_dir }}/custom.csh"
+           dest: /etc/profile.d/custom.csh
+           owner: root
+           group: root
+           mode: 0644
+      when: cust_csh.stat.exists == false

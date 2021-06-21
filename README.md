@@ -70,6 +70,13 @@ but many are not and will work on other Operating Systems.
 
     ansible_boot-rhel-recreate-rescue-boot-image - recreate with rescue boot image for RHEL >=7 and Fedora Systems
 
+    ansible_deb-apt-file-search - find which Deb package provides a file
+    ansible_deb-apt-setup-shells - install a shell Deb package eg tcsh and profile files
+    ansible_deb-apt-update - check for Deb package updates
+    ansible_deb-apt-upgrade-deb - update / install Deb packages
+    ansible_deb-info - obtain information about a particular Deb package
+    ansible_deb-is-deb-installed - find out if a Deb package is installed on a remote host
+
     ansible_decode-facts - produce some human readable facts from the Ansible json fact files
 
     ansible_find-etc-opt-rmpnew-files - find leftover rpmnew / rpmsave files in the /etc and /opt directories
@@ -79,7 +86,7 @@ but many are not and will work on other Operating Systems.
 
     ansible_net-close-network-port-firewalld - close network port(s) on remote hosts. Firewalld
     ansible_net-open-network-port-firewalld - open network port(s) remote hosts. Firewalld
-    ansible_net-list-all-zones-firewalld - list firewalld zone information.
+    ansible_net-list-all-zones-firewalld - list firewalld zone information
     ansible_net-close-network-port-iptables - close network port(s) on remote hosts. IPTables
     ansible_net-open-network-port-iptables - open network port(s) remote hosts. IPTables
 	

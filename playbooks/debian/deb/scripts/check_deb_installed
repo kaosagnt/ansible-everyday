@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to query the existance of a Deb package.
+#
+# Returns: JSON string:
+# {
+#	"found": true/false ,
+#	"deb_count": "Count of number of Deb packages" ,
+#	"deb_names": "String of Deb package names"
+# }
+
+DEB_PACKAGE=${1}
+DEB_COUNT=0
+
+if [ ! -z ${DEB_PACKAGE} ]; then
+
+	DEB_COUNT=$(apt list --installed | grep -i ${DEB_PACKAGE} | wc -l)
+
+	DEB_NAMES=$(apt list --installed | grep -i ${DEB_PACKAGE} | sort)
+fi
+
+if [[ ${DEB_COUNT} =~ 0 ]]; then
+
+	printf '{ "found": false , "deb_count": "0" , "deb_names": "" }'
+
+else
+
+	# Remove any newline chars from the name and replace with %%.
+	# %% will be later substituded in the output display.
+	DEB_NAMES=${DEB_NAMES//$'\n'/%%}
+
+	# Cut the last char off the end of the string.
+	#DEB_NAMES=${DEB_NAMES%?}
+
+	# Debug
+	#printf "${DEB_NAMES}\n"
+
+	printf '{ "found": true  , "deb_count": "%s" , "deb_names": "%s" }' \
+			 "${DEB_COUNT}" \
+			 "${DEB_NAMES}"
+fi

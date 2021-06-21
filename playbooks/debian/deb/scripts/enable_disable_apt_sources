@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Script to enable / disable APT sources.
+#
+DISABLE_SOURCE=""
+ENABLE_SOURCE=""
+ETC_APT="/etc/apt/sources.list.d"
+
+for ARGUMENT in "$@"; do
+
+	case ${ARGUMENT} in
+		-d=*|--disable=*)	DISABLE_TEMP="${ARGUMENT#*=}"
+							shift
+							;;
+
+		-e=*|--enable=*)	ENABLE_TEMP="${ARGUMENT#*=}"
+							shift
+							;;
+
+		*)					# unknown option
+							;;
+	esac
+done
+
+if [ ! -z ${DISABLE_TEMP} ]; then
+	# Use a 'here string <<<' for the while loop so we can modify the
+	# DISABLE_SOURCE variable otherwise the while loop will execute in a
+	# sub shell and we will loose all DISABLE_SOURCE changes.
+	while read SOURCE_NAME; do
+		if [ -f "${ETC_APT}/${SOURCE_NAME}" ]; then
+			mv "${ETC_APT}/${SOURCE_NAME}" \
+				"${ETC_APT}/${SOURCE_NAME}.disabled"
+		fi
+	done <<< "$(echo "${DISABLE_TEMP}" | sed -n 1'p' | tr ',' '\n')"
+fi
+
+if [ ! -z ${ENABLE_TEMP} ]; then
+    # Use a 'here string <<<' for the while loop so we can modify the
+    # ENABLE_REPO variable otherwise the while loop will execute in a
+    # sub shell and we will loose all ENABLE_SOURCE changes.
+    while read SOURCE_NAME; do
+		if [ -f "${ETC_APT}/${SOURCE_NAME}.disabled" ]; then
+			mv "${ETC_APT}/${SOURCE_NAME}.disabled" \
+				"${ETC_APT}/${SOURCE_NAME}"
+		fi
+    done <<< "$(echo "${ENABLE_TEMP}" | sed -n 1'p' | tr ',' '\n')"
+fi

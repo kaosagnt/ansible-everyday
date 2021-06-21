@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Ansible script to query the information of an Deb package or
+# search for an Deb package.
+#
+# Returns: STDOUT
+
+PACKAGE_MANAGER=apt
+DIRECTIVE=show
+DEB_PACKAGE=""
+
+for ARGUMENT in "$@"; do
+
+	case ${ARGUMENT} in
+
+		-d=*|--debpackage=*)	DEBPACKAGE_TEMP="${ARGUMENT#*=}"
+								shift
+								;;
+
+		-s=*|--search=*)		DIRECTIVE_TEMP="${ARGUMENT#*=}"
+								shift
+								;;
+
+		*)						# unknown option
+								;;
+	esac
+done
+
+if [ ! -z ${DEBPACKAGE_TEMP} ]; then
+
+	# Replace comma chars with space.
+	DEB_PACKAGE=${DEBPACKAGE_TEMP//[,]/ }
+fi
+
+if [ ! -z ${DIRECTIVE_TEMP} ]; then
+    if [ X"${DIRECTIVE_TEMP}" = X"search" ]; then
+        DIRECTIVE=search
+    fi
+fi
+
+TEMP_FILE=$(mktemp --tmpdir ansible_deb_info.XXXXXXXXX)
+
+if [ ! -z "${DEB_PACKAGE}" ]; then
+
+	${PACKAGE_MANAGER}  \
+		${DIRECTIVE} ${DEB_PACKAGE} >& ${TEMP_FILE}
+
+	# Strip blank lines to make output more consise.
+	sed -i '/^[[:space:]]*$/d' ${TEMP_FILE}
+fi
+
+ERROR_MSG=$(cat ${TEMP_FILE} | egrep -e "^(E:)\s")
+
+# Debug
+#cat ${TEMP_FILE}
+
+#printf "\nERR_MSG = ${ERROR_MSG}\n\n"
+#printf "\nTEMP_FILE = $TEMP_FILE\n\n"
+
+if [ ! -z "${ERROR_MSG}" ] || [ -z "${DEB_PACKAGE}" ]; then
+
+	printf "%s\n\n" \
+			"${ERROR_MSG}"
+	exit 1
+else
+
+	if [ X"${DIRECTIVE}" = X"show" ]; then
+		# Strip the first few lines using tail.
+		DEB_INFORMATION=$(cat ${TEMP_FILE} | tail -n +2)
+	else
+		# Strip the first few lines using tail.
+		DEB_INFORMATION=$(cat ${TEMP_FILE} | tail -n +4)
+	fi
+
+	printf "\n%s\n\n" \
+		"${DEB_INFORMATION}"
+fi
+
+# Remove temp file
+unlink ${TEMP_FILE}

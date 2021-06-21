@@ -1,0 +1,68 @@
+---
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Find out Deb information installed on Debian/Ubuntu hosts
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Find out Deb information installed on Debian/Ubuntu hosts"
+  become: yes
+
+  vars_prompt:
+    - name: "directive"
+      prompt: "Search for a Deb package or Query Deb information(s/q)"
+      private: no
+
+    - name: "deb_package"
+      prompt: "\nEnter the Deb package name (single package only)"
+      private: no
+
+    - name: "disable_source"
+      prompt: "\nEnter the list of Source filename(s) to disable\n(seperated by a comma for multiple, leave blank for none)"
+      private: no
+
+    - name: "enable_source"
+      prompt: "\nEnter the list of Source filenames(s) to enable\n(seperated by a comma for multiple, leave blank for none)"
+      private: no
+
+#  vars:
+#       print_information: true
+
+  tasks:
+    - include: ../../common/common_information.yml
+
+    - name: "Invalid directive"
+      local_action: command printf "Invalid directive - {{ directive }}."
+      when: directive not in ['s', 'q']
+      failed_when: true
+
+    - name: "Invalid Deb package name"
+      local_action: command printf "Invalid Deb package name."
+      when: deb_package == ""
+      failed_when: true
+
+    - name: Set directive search
+      set_fact:
+               directive: "{{ (directive == 's') | ternary('search','show') }}"
+      changed_when: false
+
+    - include: ../common/common_apt_fix_vars.yml
+
+    - name: "Include APT deb-info"
+      include: apt-deb-info.yml
+      when: (ansible_os_family == 'Debian')
+      changed_when: false

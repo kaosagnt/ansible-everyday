@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# %BEGIN_COPYRIGHT%
+# 
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Add the command line arg  -e hosts=ianm to override the default
+# playbook hosts setting
+
+SCRIPT_DIR=$(dirname `which $0`)
+
+usage() {
+	printf "%s\n%s\n%s\n" \
+			"usage: ${0##*/} shell_name [-e]" \
+			"   shell_name: name of unix shell to install. eg. tcsh" \
+			"   -e hosts={comma seperated list of hostnames to override the default}"
+	exit 1
+}
+
+[ $# -gt 0 ] || usage
+
+STRTEST="${1}"
+STRARG=$(echo ${STRTEST} | awk  '{ string=substr($0, 1, 1); print string; }' )
+
+if [ "${STRARG}" = "-" ] ; then
+
+	# First arg looks like an option not a shell name.
+	usage
+fi
+
+SHELL_NAME=${1}
+shift;
+
+# Debug
+#printf "Shell name = ${SHELL_NAME}\n\n"
+#exit
+
+# Include our default settings
+. ${SCRIPT_DIR}/ansible_common
+
+#ANSIBLE_SSH_PIPELINING=0
+
+ansible-playbook ${MUNGED_ARGS} \
+	--ask-become-pass \
+	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
+	--extra-vars="shell=${SHELL_NAME}" \
+	${ANSIBLE_PLAYBOOKS_PATH}/debian/shells/setup-shells.yml
