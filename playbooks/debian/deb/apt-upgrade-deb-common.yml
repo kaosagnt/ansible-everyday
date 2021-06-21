@@ -42,8 +42,8 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: "Invalid DEB package name"
-      local_action: command printf "Invalid DEB package name."
+    - name: "Invalid Deb package name"
+      local_action: command printf "Invalid Deb package name."
       when: deb_package == ""
       failed_when: true
 
