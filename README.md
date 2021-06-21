@@ -103,6 +103,7 @@ other Operating Systems.
     ansible_rpm-list-files - list the files of an RPM package
     ansible_rpm-setup-nano - set up the nano editor and config file
     ansible_rpm-setup-shells - install a shell RPM eg tcsh and profile files.
+    ansible_rpm-whatprovides - find which RPM package provides a file
 
     ansible_rpm-yum-dnf-check-update - check for RPM package updates
     ansible_rpm-yum-dnf-repolist - execute repolist all on RHEL hosts to show yum / dnf repository information.
