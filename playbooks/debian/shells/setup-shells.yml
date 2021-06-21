@@ -43,10 +43,10 @@
       register: cust_sh
       changed_when: false
 
-    # Does /etc/profile.d/custom.csh exist?
-    - name: "Check for /etc/profile.d/custom.csh"
+    # Does /etc/csh/cshrc.d/custom.csh exist?
+    - name: "Check for /etc/csh/cshrc.d/custom.csh"
       stat:
-           path: /etc/profile.d/custom.csh
+           path: /etc/csh/cshrc.d/custom.csh
       register: cust_csh
       changed_when: false
 
@@ -60,11 +60,11 @@
            mode: 0644
       when: cust_sh.stat.exists == false
 
-    # Install custom.csh file into /etc/profile.d/
-    - name: "Install custom.csh file into /etc/profile.d/"
+    # Install custom.csh file into /etc/csh/cshrc.d/
+    - name: "Install custom.csh file into /etc/csh/cshrc.d/"
       copy:
            src: "{{ files_dir }}/custom.csh"
-           dest: /etc/profile.d/custom.csh
+           dest: /etc/csh/cshrc.d/custom.csh
            owner: root
            group: root
            mode: 0644
