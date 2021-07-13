@@ -68,23 +68,23 @@ other Operating Systems.
     ansible_acl-set - set an ACL on a file / directory
     ansible_acl-stat-file - get the information of a file / directory specified using stat
     ansible_acl-xattr-get - get the Extended Attributes of a file / directory
-
+    
     ansible_boot-rhel-recreate-rescue-boot-image - recreate with rescue boot image for RHEL >=7 and Fedora Systems
-
+    
     ansible_deb-apt-file-search - find which Deb package provides a file
     ansible_deb-apt-setup-shells - install a shell Deb package eg tcsh and profile files
     ansible_deb-apt-update - check for Deb package updates
     ansible_deb-apt-upgrade-deb - update / install Deb packages
     ansible_deb-info - obtain information about a particular Deb package
     ansible_deb-is-deb-installed - find out if a Deb package is installed on a remote host
-
+    
     ansible_decode-facts - produce some human readable facts from the Ansible json fact files
-
+    
     ansible_find-etc-opt-rmpnew-files - find leftover rpmnew / rpmsave files in the /etc and /opt directories
     ansible_find-files - find files or directories. If the list of files are large then the list of files are uploaded instead of being displayed
-
+    
     ansible_gather-facts - gather facts about remote hosts and save to the facts/ directory
-
+    
     ansible_net-close-network-port-firewalld - close network port(s) on remote hosts. Firewalld
     ansible_net-open-network-port-firewalld - open network port(s) remote hosts. Firewalld
     ansible_net-list-all-zones-firewalld - list firewalld zone information
@@ -94,9 +94,9 @@ other Operating Systems.
 	ansible_openbsd-pkg-add-update-package - add or update packages on an OpenBSD system
 	ansible_openbsd-pkg-info-list-files - list the files of an installed OpenBSD package
 	ansible_openbsd-pkg-info-list-installed-packages - obtain a list of packages installed on an OpenBSD system
-
+    
     ansible_ping-hosts - use ansible to ping remote hosts. This is not a traditional ping command
-
+    
     ansible_rpm-info - obtain information about a particular RPM package
     ansible_rpm-install-repo - install a 3rd party RPM repository
     ansible_rpm-is-rpm-installed - find out if an RPM is installed on a remote host
@@ -104,21 +104,21 @@ other Operating Systems.
     ansible_rpm-setup-nano - set up the nano editor and config file
     ansible_rpm-setup-shells - install a shell RPM eg tcsh and profile files.
     ansible_rpm-whatprovides - find which RPM package provides a file
-
+    
     ansible_rpm-yum-dnf-check-update - check for RPM package updates
     ansible_rpm-yum-dnf-repolist - execute repolist all on RHEL hosts to show yum / dnf repository information.
     ansible_rpm-yum-dnf-update-rpm - update / install RPM packages
-
-	ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name
-
-	ansible_security-check-ssl-tls-certificate-expired - Checks SSL / TLS security certificate files to see whether they have expired or will expire
-		within the next 2 weeks
+    
+    ansible_scl-info - List any installed RHEL Software Collections using scl -l. Lists all collections or query by name
+    
+    ansible_security-check-ssl-tls-certificate-expired - Checks SSL / TLS security certificate files to see whether they have expired or will expire
+     	within the next 2 weeks
 	ansible_security-check-remote-ssl-tls-certificate-expired-https - Checks remotely via HTTPS request SSL / TLS security certificates to see whether
 		they have expired or will expire within the next 2 weeks
 	ansible_security-linux-bsd-github-speed47-spectre-meltdown-checker - more generic check for Kernel Side-Channel Attacks - CVE-2017-5754
 		CVE-2017-5753 CVE-2017-5715
 		https://github.com/speed47/spectre-meltdown-checker - also works on some BSD operating systems
-
+    
 	ansible_security-rhel-cve-2017-6074 - check for use-after-free in the IPv6 implementation of the DCCP protocol in the Linux kernel - CVE-2017-607
 		https://access.redhat.com/security/vulnerabilities/2934281
 	ansible_security-rhel-cve-2017-14491- check for dnsmasq: Multiple Critical and Important vulnerabilities - CVE-2017-14491
@@ -157,11 +157,13 @@ other Operating Systems.
 	ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 	ansible_security-spectre-meltdown - check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
 		https://access.redhat.com/security/vulnerabilities/speculativeexecution
-
+    
     ansible_service-enable-disable-at-boot - enable / disable services to start up at boot time
     ansible_service-rhel-check-status - check the status of a service eg stopped / running
     ansible_service-start-stop-restart - start / stop / restart a service
-
+    
+    ansible_ubuntu-security-status - Execute ubuntu-security-status / ubuntu-support-status on Ubuntu hosts
+    
     ansible_user-create-new-user - create a new user. no default password.
     ansible_user-disable-user-login - disable a user login
     ansible_user-htpasswd-add-user - create / add a new user to an Apache htpasswd file
