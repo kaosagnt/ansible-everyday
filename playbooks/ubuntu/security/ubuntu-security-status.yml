@@ -36,7 +36,7 @@
       changed_when: false
 
     - name: "Run ubuntu-security-status"
-      shell: printf "%s\n" "{{ item }}" && ubuntu-security-status {{ item }} && echo
+      shell: printf "ubuntu-security-status %s\n" "{{ item }}" && ubuntu-security-status {{ item }} && echo
       when: ansible_distribution == 'Ubuntu'
             and
             ansible_distribution_major_version|int >= 20
