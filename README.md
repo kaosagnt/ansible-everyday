@@ -115,6 +115,8 @@ other Operating Systems.
      	within the next 2 weeks
 	ansible_security-check-remote-ssl-tls-certificate-expired-https - Checks remotely via HTTPS request SSL / TLS security certificates to see whether
 		they have expired or will expire within the next 2 weeks
+	ansible_security-cve-2021-42574-42694-find_unicode_control2 - check for RHSB-2021-007 Trojan source attacks (CVE-2021-42574,CVE-2021-42694)
+		https://access.redhat.com/security/vulnerabilities/RHSB-2021-007
 	ansible_security-linux-bsd-github-speed47-spectre-meltdown-checker - more generic check for Kernel Side-Channel Attacks - CVE-2017-5754
 		CVE-2017-5753 CVE-2017-5715
 		https://github.com/speed47/spectre-meltdown-checker - also works on some BSD operating systems

@@ -1,0 +1,79 @@
+---
+# %BEGIN_COPYRIGHT%
+#
+# Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# RHSB-2021-007 Trojan source attacks (CVE-2021-42574,CVE-2021-42694)
+# https://access.redhat.com/security/vulnerabilities/RHSB-2021-007
+# Scan a directory structure for CVE-2021-42574, CVE-2021-42694.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "RHSB-2021-007 Trojan source attacks (CVE-2021-42574,CVE-2021-42694)"
+  become: yes
+
+  vars_prompt:
+    - name: "chrs_to_find"
+      prompt: "\nSearch for all non-printable unicode characters (all, bidi)"
+      private: no
+
+    - name: "verbose_mode"
+      prompt: "\nVerbose mode (y,n)"
+      private: no
+
+    - name: "scan_directory"
+      prompt: "\nEnter the path of the directory to scan"
+      private: no
+
+  vars:
+        verbose_arg: ""
+#       print_information: true
+
+  tasks:
+    - include: ../common/common_information.yml
+
+    - name: "Invalid choice"
+      local_action: command printf "Invalid choice for non-printable unicode characters."
+      when: (chrs_to_find not in ('all', 'bidi'))
+      failed_when: true
+
+    - name: "Invalid choice"
+      local_action: command printf "Invalid choice for verbose mode."
+      when: (verbose_mode not in ('y', 'Y', 'n', 'N'))
+      failed_when: true
+
+    - name: "Invalid directory"
+      local_action: command printf "Invalid directory path."
+      when: (scan_directory == "")
+      failed_when: true
+
+    - name: "Set verbose mode"
+      set_fact:
+               verbose_arg: "-v"
+      when: verbose_mode in ('y', 'Y')
+      changed_when: false
+
+    - name: "Are we RHEL 6?"
+      local_action: command printf "Requires RHEL > 6."
+      when: (ansible_os_family == 'RedHat') 
+            and
+            (ansible_lsb.major_release|int < 7)
+      failed_when: true
+
+    - name: "Scan a directory structure for CVE-2021-42574, CVE-2021-42694."
+      script: scripts/find_unicode_control2--2021-11-01-1136/find_unicode_control2.py {{ verbose_arg }} -d -p {{ chrs_to_find }} {{ scan_directory|quote }}
+      register: vulnerable_info
+      changed_when: false
+      failed_when: vulnerable_info.rc > 0
