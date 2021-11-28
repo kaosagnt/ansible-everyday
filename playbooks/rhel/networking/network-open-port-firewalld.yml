@@ -47,9 +47,9 @@
       private: no
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
-    - include: network-common-checks.yml
+    - import_tasks: network-common-checks.yml
 
     # Open a network port in firewalld.
 

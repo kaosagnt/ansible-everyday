@@ -55,9 +55,9 @@
       private: no
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
-    - include: network-common-checks.yml
+    - import_tasks: network-common-checks.yml
 
     # Close a network port in iptables.
 
@@ -128,4 +128,4 @@
         - "{{ port_numbers.split(',') }}"
 
   handlers:
-    - include: ../common/common_handlers.yml
+    - import_tasks: ../common/common_handlers.yml
