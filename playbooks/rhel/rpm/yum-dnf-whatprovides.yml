@@ -27,13 +27,12 @@
       prompt: "\nEnter the filename / regex to find in an RPM"
       private: no
 
-
   vars:
         package_manager: "dnf"
         print_information: true
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "Valid filename / regex?"
       local_action: command printf "Invalid filename / regex."

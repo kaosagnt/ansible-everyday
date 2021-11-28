@@ -32,7 +32,7 @@
 #       print_information: true
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "Valid repo list type?"
       local_action: command printf "Invalid RPM repository list type."
@@ -58,7 +58,7 @@
       changed_when: false
 
     - name: "Include Yum repolist"
-      include: yum-repolist.yml
+      import_tasks: yum-repolist.yml
       when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5 and
@@ -66,7 +66,7 @@
       changed_when: false
 
     - name: "Include DNF repolist"
-      include: dnf-repolist.yml
+      import_tasks: dnf-repolist.yml
       when: ((ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 8))
