@@ -28,7 +28,7 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Recreate Rescue Boot Image
+    - name: "Recreate Rescue Boot Image"
       script: scripts/mk-rescue-image
       register: rescue_img
       failed_when: rescue_img.rc > 0
@@ -36,7 +36,7 @@
             and
             (ansible_lsb.major_release|int >= 7))
 
-    - name: Recreate Grub config
+    - name: "Recreate Grub config"
       command: grub2-mkconfig -o /boot/grub2/grub.cfg
       register: grub_cfg
       failed_when: grub_cfg.rc > 0
