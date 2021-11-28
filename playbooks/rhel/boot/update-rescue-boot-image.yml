@@ -34,7 +34,7 @@
       failed_when: rescue_img.rc > 0
       when: ((ansible_os_family == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 7))
+            (ansible_lsb.major_release|int == 7))
 
     - name: "Recreate Grub config"
       command: grub2-mkconfig -o /boot/grub2/grub.cfg
@@ -42,5 +42,5 @@
       failed_when: grub_cfg.rc > 0
       when: ((ansible_os_family == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 7))
+            (ansible_lsb.major_release|int == 7))
 
