@@ -21,14 +21,12 @@
 # Change the /etc/nanorc tabsize from default 8 to 4. 
 # on RHEL/CENTOS hosts
 
-    - name: Yum install nano RPM
+    - name: "Yum install nano RPM"
       yum:
-          pkg: "{{ item }}"
+          pkg: ['nano']
           state: latest
       when: (ansible_os_family == 'RedHat') 
             and
             (ansible_lsb.major_release|int >= 5 and
             ansible_lsb.major_release|int <= 7)
       register: yum_install
-      with_items:
-        - nano
