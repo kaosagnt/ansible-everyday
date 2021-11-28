@@ -30,7 +30,7 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Include Yum installer
+    - name: "Include Yum installer"
       include: yum-setup-nano.yml
       when: (ansible_os_family == 'RedHat')
             and
@@ -38,7 +38,7 @@
              ansible_lsb.major_release|int <= 7)
       changed_when: false
 
-    - name: Include DNF installer
+    - name: "Include DNF installer"
       include: dnf-setup-nano.yml
       when: ((ansible_os_family == 'RedHat')
             and
@@ -46,14 +46,14 @@
       changed_when: false
 
     # Does /etc/nanorc exist?
-    - name: Check for /etc/nanorc
+    - name: "Check for /etc/nanorc"
       stat:
            path: /etc/nanorc
       register: nanorc_present
       changed_when: false
 
     # Set out tabsize to 4.
-    - name: Set nano tabsize to 4
+    - name: "Set nano tabsize to 4"
       lineinfile:
                  dest: /etc/nanorc
                  backup: yes
