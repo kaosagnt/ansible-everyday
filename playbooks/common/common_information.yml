@@ -38,7 +38,7 @@
            ansible_distribution_major_version is not defined  
 
     # Set ansible_lsb.major_release when not defined.
-    - name: Set undefined ansible_lsb information
+    - name: "Set undefined ansible_lsb information"
       set_fact:
                ansible_lsb:
                            major_release: "{{ ansible_distribution_major_version }}"
@@ -49,7 +49,7 @@
             ansible_lsb.major_release is not defined)
 
     # Print ansible fact information
-    - name: Ansible fact information
+    - name: "Ansible fact information"
       local_action: command printf "\nansible_distribution - {{ ansible_distribution }}\nansible_os_family - {{ ansible_os_family }}\nansible_distribution_version - {{ ansible_distribution_version }}\nansible_distribution_version(int) - {{ ansible_distribution_version|int }}\nansible_lsb.major_release - {{ ansible_lsb.major_release }}\nansible_distribution_major_version - {{ ansible_distribution_major_version }}\nansible_distribution_release - {{ ansible_distribution_release }}\n\n"
       when: print_information is defined
       changed_when: false
