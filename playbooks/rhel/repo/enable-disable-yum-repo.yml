@@ -37,17 +37,17 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Invalid YUM repo name
+    - name: "Invalid YUM repo name"
       local_action: command printf "Invalid YUM repo name."
       when: repo_name == ""
       failed_when: true
 
-    - name: Invalid YUM repo action
+    - name: "Invalid YUM repo action"
       local_action: command printf "Invalid YUM repo action - {{ repo_action }}."
       when: repo_action not in ['e', 'd']
       failed_when: true
 
-    - name: Set YUM repo action
+    - name: "Set YUM repo action"
       set_fact:
                repo_enabled: "{{ (repo_action == 'e') | ternary('yes','no') }}"
       changed_when: false
@@ -56,7 +56,7 @@
     # NOTE:
     # All comments will be removed if modifying an existing repo file.
 
-    - name: Enable / Disable YUM repo
+    - name: "Enable / Disable YUM repo"
       yum_repository:
                      name: "{{ item }}"
                      state: present

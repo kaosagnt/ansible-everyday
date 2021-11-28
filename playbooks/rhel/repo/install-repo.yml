@@ -32,7 +32,7 @@
 
     - include: define-repo.yml
 
-    - name: Include Yum installer
+    - name: "Include Yum installer"
       include: yum-repo-install.yml
       when: (ansible_os_family == 'RedHat')
             and
@@ -40,7 +40,7 @@
              ansible_lsb.major_release|int <= 7)
       changed_when: false
 
-    - name: Include DNF installer
+    - name: "Include DNF installer"
       include: dnf-repo-install.yml
       when: ((ansible_os_family == 'RedHat')
             and
