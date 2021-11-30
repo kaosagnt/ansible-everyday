@@ -27,7 +27,7 @@
   tasks:
     - include: ../../common/common_information.yml
 
-    - name: Check OpenSSL version RPM for DROWN vulnerability 
+    - name: "Check OpenSSL version RPM for DROWN vulnerability"
       script: scripts/DROWN-test
       when: (ansible_os_family == 'RedHat')
             and
@@ -36,13 +36,13 @@
       changed_when: false
       failed_when: vulnerable_info.rc > 0
 
-    - name: Print vulnerabilities found
+    - name: "Print vulnerabilities found"
       local_action: command printf "{{ (vulnerable_info.stdout|from_json).vulnerable_list.replace('%%', '\n') }}"
       when: (vulnerable_info.stdout|from_json).vulnerable == true
       changed_when: false
       failed_when: true
 
-    - name: Print no vulnerabilities found
+    - name: "Print no vulnerabilities found"
       local_action: command printf "{{ (vulnerable_info.stdout|from_json).vulnerable_list.replace('%%', '\n') }}"
       when: (vulnerable_info.stdout|from_json).vulnerable == false
       changed_when: false
