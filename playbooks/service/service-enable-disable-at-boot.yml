@@ -37,7 +37,7 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid service name
+    - name: "Invalid service name"
       local_action: command printf "Invalid service name."
       when: service_name == ""
       failed_when: true
@@ -52,7 +52,7 @@
                service_enabled: "{{ (service_enable == 'e') | ternary('yes','no') }}"
       changed_when: false
 
-    - name: Service enable / disable at boot
+    - name: "Service enable / disable at boot"
       service:
               name: "{{ item }}"
               enabled: "{{ service_enabled }}"

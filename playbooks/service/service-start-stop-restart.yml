@@ -37,45 +37,45 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid service name
+    - name: "Invalid service name"
       local_action: command printf "Invalid service name."
       when: service_name == ""
       failed_when: true
 
-    - name: Invalid service action
+    - name: "Invalid service action"
       local_action: command printf "Invalid service action."
       when: service_action not in ['start', 'stop', 'restart']
       failed_when: true
 
-    - name: Is service action start?
+    - name: "Is service action start?"
       set_fact:
           service_action: "started"
       when: service_action == "start"
       failed_when: false
       changed_when: false
 
-    - name: Is service action stop?
+    - name: "Is service action stop?"
       set_fact:
           service_action: "stopped"
       when: service_action == "stop"
       failed_when: false
       changed_when: false
 
-    - name: Is service action restart?
+    - name: "Is service action restart?"
       set_fact:
           service_action: "restarted"
       when: service_action == "restart"
       failed_when: false
       changed_when: false
 
-    - name: Is service action reload?
+    - name: "Is service action reload?"
       set_fact:
           service_action: "reloaded"
       when: service_action == "reload"
       failed_when: false
       changed_when: false
 
-    - name: Service Action
+    - name: "Service Action"
       service: name="{{ item }}" state="{{ service_action }}"
       with_items:
         - "{{ service_name.split(',') }}"
