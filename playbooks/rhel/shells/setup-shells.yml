@@ -29,10 +29,10 @@
 #       print_information: true
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "Include Yum installer"
-      include: yum-setup-shells.yml
+      import_tasks: yum-setup-shells.yml
       when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5 and
@@ -40,7 +40,7 @@
       changed_when: false
 
     - name: "Include DNF installer"
-      include: dnf-setup-shells.yml
+      import_tasks: dnf-setup-shells.yml
       when: ((ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 8))

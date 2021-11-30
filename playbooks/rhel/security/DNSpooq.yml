@@ -30,7 +30,7 @@
 #       print_information: true
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "DNSpooq on RHEL/CENTOS hosts"
       script: scripts/cve-2020-25681--2021-01-19-0942.sh -n
