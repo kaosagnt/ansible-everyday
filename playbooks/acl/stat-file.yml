@@ -38,28 +38,28 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid file / directory name
+    - name: "Invalid file / directory name"
       local_action: command printf "Invalid file or directory name."
       when: file_directory_name == ""
       failed_when: true
 
-    - name: Invalid symlinks directive
+    - name: "Invalid symlinks directive"
       local_action: command printf "Invalid file or directory name."
       when: follow_symlinks not in ('y', 'Y', 'n', 'N')
       failed_when: true
 
-    - name: Set follow symlinks
+    - name: "Set follow symlinks"
       set_fact:
                symlinks: "yes"
       when: follow_symlinks in ('y', 'Y')
 
-    - name: Get the file / directory information
+    - name: "Get the file / directory information"
       stat:
             path: "{{ file_directory_name }}"
             get_checksum: no
             follow: "{{ symlinks }}"
       register: stat_data
 
-    - name: Print stat data
+    - name: "Print stat data"
       local_action: command printf "{{ stat_data.stat }}"
       changed_when: false

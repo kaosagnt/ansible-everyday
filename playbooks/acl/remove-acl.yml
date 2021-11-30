@@ -41,40 +41,40 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid file / directory name
+    - name: "Invalid file / directory name"
       local_action: command printf "Invalid file or directory name."
       when: file_directory_name == ""
       failed_when: true
 
-    - name: Invalid entity type
+    - name: "Invalid entity type"
       local_action: command printf "Invalid entity type - {{ user_group_other }}."
       when: user_group_other not in ['u', 'g', 'o']
       failed_when: true
 
-    - name: Set Entity Type User
+    - name: "Set Entity Type User"
       set_fact:
                entity_type: user
       when: user_group_other == 'u'
       changed_when: false
 
-    - name: Set Entity Type Group
+    - name: "Set Entity Type Group"
       set_fact:
                entity_type: group
       when: user_group_other == 'g'
       changed_when: false
 
-    - name: Set Entity Type Other
+    - name: "Set Entity Type Other"
       set_fact:
                entity_type: other
       when: user_group_other == 'o'
       changed_when: false
 
     # Debug
-    #- name: Debug data
+    #- name: "Debug data"
     #  local_action: command printf "entity_type - {{ entity_type }}\n"
     #  changed_when: false
 
-    - name: Remove the ACL
+    - name: "Remove the ACL"
       acl:
           name: "{{ file_directory_name }}"
           state: absent
@@ -82,6 +82,6 @@
           etype: "{{ entity_type }}"
       register: acl_data
 
-    - name: Print ACL data
+    - name: "Print ACL data"
       local_action: command printf "{{ acl_data.acl }}"
       changed_when: false

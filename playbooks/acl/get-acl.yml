@@ -33,18 +33,18 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid file / directory name
+    - name: "Invalid file / directory name"
       local_action: command printf "Invalid file or directory name."
       when: file_directory_name == ""
       failed_when: true
 
-    - name: Get the ACL
+    - name: "Get the ACL"
       acl:
             name: "{{ file_directory_name }}"
             state: query
       register: acl_data
 #      changed_when: false
 
-    - name: Print ACL data
+    - name: "Print ACL data"
       local_action: command printf "{{ acl_data.acl }}"
       changed_when: false

@@ -33,17 +33,17 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid file / directory name
+    - name: "Invalid file / directory name"
       local_action: command printf "Invalid file or directory name."
       when: file_directory_name == ""
       failed_when: true
 
-    - name: Get the xattr(s)
+    - name: "Get the xattr(s)"
       xattr:
             name: "{{ file_directory_name }}"
       register: xattr_data
 #      changed_when: false
 
-    - name: Print xattr data
+    - name: "Print xattr data"
       local_action: command printf "{{ xattr_data.xattr }}"
       changed_when: false
