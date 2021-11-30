@@ -1,4 +1,3 @@
-
 ---
 # %BEGIN_COPYRIGHT%
 # 
@@ -37,9 +36,9 @@
 #       print_information: true
 
   tasks:
-    - include: ../common/common_information.yml
+    - import_tasks: ../common/common_information.yml
 
-    - include: ssl-tls-common-checks.yml
+    - import_tasks: ssl-tls-common-checks.yml
 
     # RHEL contains <= 0.15 PyOpenSSL and won't run......
     # So we don't use the Ansible openssl module.
