@@ -29,10 +29,10 @@
        #print_information: true
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "Include APT installer"
-      include: apt-setup-shells.yml
+      import_tasks: apt-setup-shells.yml
       when: ansible_os_family == 'Debian'
       changed_when: false
 

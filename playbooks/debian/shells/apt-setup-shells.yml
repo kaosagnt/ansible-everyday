@@ -27,4 +27,4 @@
       when: ansible_os_family == 'Debian'
       register: apt_install
 
-    - include: ../common/common_apt_tasks.yml
+    - import_tasks: ../common/common_apt_tasks.yml

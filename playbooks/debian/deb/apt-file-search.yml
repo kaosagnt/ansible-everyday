@@ -31,7 +31,7 @@
         #print_information: true
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "Ensure apt-file is installed"
       stat:
