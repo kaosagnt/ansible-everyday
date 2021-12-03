@@ -39,7 +39,7 @@
 #       print_information: true
 
   tasks:
-    - include: ../common/common_information.yml
+    - import_tasks: ../common/common_information.yml
 
 #    - name: "Debug"
 #      local_action: command printf " {{ new_username.find(':') }} "
