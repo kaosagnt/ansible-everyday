@@ -31,7 +31,7 @@
 #       print_information: true
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "Invalid package name"
       local_action: command printf "Invalid package name."
@@ -44,4 +44,4 @@
       changed_when: false
       failed_when: file_info.rc > 0
 
-    - include: ../../common/common_find_files.yml
+    - import_tasks: ../../common/common_find_files.yml

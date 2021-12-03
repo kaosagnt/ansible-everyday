@@ -23,7 +23,7 @@
   become: yes
 
   tasks:
-    - include: ../../common/common_information.yml
+    - import_tasks: ../../common/common_information.yml
 
     - name: "pkg_info fetch installed packages"
       script: scripts/pkg_info_list_installed
