@@ -41,11 +41,11 @@
   tasks:
     - include: ../common/common_information.yml
 
-#    - name: Debug
+#    - name: "Debug"
 #      local_action: command printf " {{ new_username.find(':') }} "
 #      changed_when: false
 
-    - name: Invalid User name
+    - name: "Invalid User name"
       local_action: command printf "Invalid username."
       when: new_username.find(':') >= 0
             or
@@ -57,7 +57,7 @@
       failed_when: true
       changed_when: false
 
-    - name: Invalid Users full name
+    - name: "Invalid Users full name"
       local_action: command printf "Invalid users full name."
       when: full_username.find(':') >= 0 
             or
@@ -65,7 +65,7 @@
       failed_when: true
       changed_when: false
 
-    - name: Invalid SSH Public Key
+    - name: "Invalid SSH Public Key"
       local_action: command printf "Invalid ssh id_rsa.pub / id_ed25519.pub key."
       when: add_pub_ssh_key.find('ssh-rsa') != 0
             and 
@@ -75,18 +75,18 @@
       failed_when: true
       changed_when: false
 
-    - name: Create new user on remote node
+    - name: "Create new user on remote node"
       user:
            name: "{{ new_username }}"
            comment: "{{ full_username }}"
            shell: /bin/bash
       register: new_user
 
-#    - name: Debug new_user
+#    - name: "Debug new_user"
 #      local_action: command printf "{{ new_user }}"
 #      changed_when: false
 
-    - name: Adding public SSH key to new user account
+    - name: "Adding public SSH key to new user account"
       authorized_key:
                      user: "{{ new_username }}"
                      key: "{{ add_pub_ssh_key }}"

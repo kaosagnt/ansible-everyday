@@ -33,11 +33,11 @@
   tasks:
     - include: ../common/common_information.yml
 
-#    - name: Debug
+#    - name: "Debug"
 #      local_action: command printf " {{ existing_username.find(':') }} "
 #      changed_when: false
 
-    - name: Invalid User name
+    - name: "Invalid User name"
       local_action: command printf "Invalid username."
       when: existing_username.find(':') >= 0
             or
@@ -49,13 +49,13 @@
       failed_when: true
       changed_when: false
 
-    - name: Remove existing user on remote node.
+    - name: "Remove existing user on remote node."
       user:
            name: "{{ existing_username }}"
            state: absent
            remove: yes
       register: existing_user
 
-#    - name: Debug exisiting_user
+#    - name: "Debug exisiting_user"
 #      local_action: command printf "{{ existing_user }}"
 #      changed_when: false

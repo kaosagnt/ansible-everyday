@@ -37,17 +37,17 @@
   tasks:
     - include: ../common/common_information.yml
 
-    - name: Invalid user name
+    - name: "Invalid user name"
       local_action: command printf "Invalid user name."
       when: user_name == ''
       failed_when: true
 
-    - name: Invalid user key
+    - name: "Invalid user key"
       local_action: command printf "Invalid user public key."
       when: user_key.find('ssh-') != 0
       failed_when: true
 
-    - name: Adding public SSH key to user account
+    - name: "Adding public SSH key to user account"
       authorized_key:
                      user: "{{ user_name }}"
                      key: "{{ user_key }}"
@@ -55,6 +55,6 @@
                      state: present
       register: authkey_result
 
-    #- name: debug
+    #- name: "debug"
     #  local_action: command printf "{{ authkey_result }}\n\n"
     #  changed_when: false

@@ -34,11 +34,11 @@
   tasks:
     - include: ../common/common_information.yml
 
-#    - name: Debug
+#    - name: "Debug"
 #      local_action: command printf " {{ username.find(':') }} "
 #      changed_when: false
 
-    - name: Invalid User name
+    - name: "Invalid User name"
       local_action: command printf "Invalid username."
       when: username.find(':') >= 0
             or
@@ -52,12 +52,12 @@
 
     # expires takes the ansible epoch and takes roughly a year away
     # from this figure so it is in the past.
-    - name: Disable user login on remote node
+    - name: "Disable user login on remote node"
       user:
            name: "{{ username }}"
            expires: "{{ (ansible_date_time.epoch|int - 31556926|int) }}"
       register: disable_user
 
-    #- name: Debug disable_user
+    #- name: "Debug disable_user"
     #  local_action: command printf "{{ disable_user }}\n\n{{ ansible_date_time.epoch }}\n"
     #  changed_when: false

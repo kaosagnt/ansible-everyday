@@ -34,11 +34,11 @@
   tasks:
     - include: ../common/common_information.yml
 
-#    - name: Debug
+#    - name: "Debug"
 #      local_action: command printf " {{ username.find(':') }} "
 #      changed_when: false
 
-    - name: Invalid User name
+    - name: "Invalid User name"
       local_action: command printf "Invalid username."
       when: username.find(':') >= 0
             or
@@ -51,10 +51,10 @@
       changed_when: false
 
     # --unlock
-    - name: Renable user login on remote node
+    - name: "Renable user login on remote node"
       command: usermod --expiredate '' "{{ username }}"
       register: renable_user
 
-    #- name: Debug renable_user
+    #- name: "Debug renable_user"
     #  local_action: command printf "{{ renable_user }}\n\n{{ ansible_date_time.epoch }}\n"
     #  changed_when: false
