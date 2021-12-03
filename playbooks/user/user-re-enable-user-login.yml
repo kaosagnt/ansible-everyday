@@ -17,10 +17,10 @@
 #
 # %END_COPYRIGHT%
 
-# Renable an existing user login on remote node. Set the expires on
+# Re-enable an existing user login on remote node. Set the expires on
 # u*ix Operating systems that support it to enable all forms of login.
 - hosts: "{{ hosts | default('localhost') }}"
-  name: "Renable an existing user login on remote node."
+  name: "Re-enable an existing user login on remote node."
   become: yes
 
   vars_prompt:
@@ -51,10 +51,10 @@
       changed_when: false
 
     # --unlock
-    - name: "Renable user login on remote node"
+    - name: "Re-enable user login on remote node"
       command: usermod --expiredate '' "{{ username }}"
-      register: renable_user
+      register: re_enable_user
 
-    #- name: "Debug renable_user"
-    #  local_action: command printf "{{ renable_user }}\n\n{{ ansible_date_time.epoch }}\n"
+    #- name: "Debug re_enable_user"
+    #  local_action: command printf "{{ re_enable_user }}\n\n{{ ansible_date_time.epoch }}\n"
     #  changed_when: false

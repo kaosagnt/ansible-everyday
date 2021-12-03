@@ -31,4 +31,4 @@ SCRIPT_DIR=$(dirname `which $0`)
 ansible-playbook ${MUNGED_ARGS} \
 	--ask-become-pass \
 	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
-	${ANSIBLE_PLAYBOOKS_PATH}/user/user-renable-user-login.yml
+	${ANSIBLE_PLAYBOOKS_PATH}/user/user-re-enable-user-login.yml
