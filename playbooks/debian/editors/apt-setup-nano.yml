@@ -1,7 +1,6 @@
-#!/bin/sh
-
+---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -18,17 +17,13 @@
 #
 # %END_COPYRIGHT%
 
-# Add the command line arg  -e hosts=ianm to override the default
-# playbook hosts setting
+# Install nano editor if not present
+# Change the /etc/nanorc tabsize from default 8 to 4. 
+# on Debian hosts
 
-SCRIPT_DIR=$(dirname `which $0`)
-
-# Include our default settings
-. ${SCRIPT_DIR}/ansible_common
-
-#ANSIBLE_SSH_PIPELINING=0
-
-ansible-playbook ${MUNGED_ARGS} \
-	--ask-become-pass \
-	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
-	${ANSIBLE_PLAYBOOKS_PATH}/rhel/editors/setup-nano.yml
+    - name: "APT install nano DEB"
+      apt:
+          name: nano
+          state: latest
+      when: ansible_os_family == 'RedHat'
+      register: apt_install

@@ -80,6 +80,8 @@ other Operating Systems.
     
     ansible_decode-facts - produce some human readable facts from the Ansible json fact files
     
+    ansible_editors-setup-nano - set up the nano editor and config file
+    
     ansible_find-etc-opt-rmpnew-files - find leftover rpmnew / rpmsave files in the /etc and /opt directories
     ansible_find-files - find files or directories. If the list of files are large then the list of files are uploaded instead of being displayed
     
@@ -101,7 +103,6 @@ other Operating Systems.
     ansible_rpm-install-repo - install a 3rd party RPM repository
     ansible_rpm-is-rpm-installed - find out if an RPM is installed on a remote host
     ansible_rpm-list-files - list the files of an RPM package
-    ansible_rpm-setup-nano - set up the nano editor and config file
     ansible_rpm-setup-shells - install a shell RPM eg tcsh and profile files.
     ansible_rpm-whatprovides - find which RPM package provides a file
     

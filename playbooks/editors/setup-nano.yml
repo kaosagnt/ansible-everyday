@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2021 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,19 +19,19 @@
 
 # Install nano editor if not present
 # Change the /etc/nanorc tabsize from default 8 to 4. 
-# on RHEL/CENTOS hosts
+# on RHEL/CENTOS/Debian hosts
 - hosts: "{{ hosts | default('localhost') }}"
-  name: "Install nano rpm on RHEL/CENTOS hosts"
+  name: "Install nano rpm on RHEL / CENTOS / Debian hosts"
   become: yes
 
 #  vars:
 #       print_information: true
 
   tasks:
-    - import_tasks: ../../common/common_information.yml
+    - import_tasks: ../common/common_information.yml
 
     - name: "Include Yum installer"
-      import_tasks: yum-setup-nano.yml
+      import_tasks: ../rhel/editors/yum-setup-nano.yml
       when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5 and
@@ -39,10 +39,15 @@
       changed_when: false
 
     - name: "Include DNF installer"
-      import_tasks: dnf-setup-nano.yml
+      import_tasks: ../rhel/editors/dnf-setup-nano.yml
       when: ((ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 8))
+      changed_when: false
+
+    - name: "Include APT installer"
+      import_tasks: ../debian/editors/apt-setup-nano.yml
+      when: ansible_os_family == 'Debian'
       changed_when: false
 
     # Does /etc/nanorc exist?
