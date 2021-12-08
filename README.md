@@ -156,6 +156,8 @@ other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-004
 	ansible_security-rhel-cve-2021-33909 - RHSB-2021-006 Long path name in mountpoint flaws in the kernel and systemd
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-006
+	ansible_security-rhel-cve-2021-43527 - RHSB-2021-008 NSS Memory corruption when decoding DSA signatures
+		https://access.redhat.com/security/vulnerabilities/RHSB-2021-008
 	ansible_secuitry-rhel-DNSpooq - Multiple vulnerabilities within dnsmasq CVE-2020-25681, CVE-2020-25682, CVE-2020-25683, CVE-2020-25684,
 		CVE-2020-25685, CVE-2020-25686, CVE-2020-25687
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-001
