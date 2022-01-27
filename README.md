@@ -161,6 +161,8 @@ other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-006
 	ansible_security-rhel-cve-2021-43527 - RHSB-2021-008 NSS Memory corruption when decoding DSA signatures
 		https://access.redhat.com/security/vulnerabilities/RHSB-2021-008
+	ansible_security-rhel-cve-2021-4034 - RHSB-2022-001 Polkit Privilege Escalation - (CVE-2021-4034)
+		https://access.redhat.com/security/vulnerabilities/RHSB-2022-001
 	ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 	ansible_security-spectre-meltdown - check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
 		https://access.redhat.com/security/vulnerabilities/speculativeexecution
