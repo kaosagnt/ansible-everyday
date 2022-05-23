@@ -42,7 +42,7 @@ skippy, debug, minimal, yaml, unixy and many more.
 See: https://docs.ansible.com/ansible/2.5/plugins/callback.html
 
 Modern Ansible seems to be split into pieces. Ansible Core no longer contains the
-callbacks. You may nee to run the following to install them.
+callbacks. You may need to run the following to install them.
 
 	ansible-galaxy collection install community.general
 	ansible-galaxy collection list
