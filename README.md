@@ -22,9 +22,15 @@ config and host files into that directory.
 Requires the following Python modules to be installed locally on the machine
 you use:
 
-    python-netaddr
-    python-passlib
-    python2-ndg_httpsclient
+    python3-netaddr
+
+If you see the error
+
+	localhost failed | msg: You need to install "jmespath" prior to running json_query filter
+
+on Centos 8/9 Stream (Presumably RHEL 8/9 as well) you will need to install
+
+	python3-jmespath
 
 Ansible >= 2.2 contains the stdout_callback plugin(s) option if you want
 human readability.
@@ -35,6 +41,12 @@ human readability.
 skippy, debug, minimal, yaml, unixy and many more.
 See: https://docs.ansible.com/ansible/2.5/plugins/callback.html
 
+Modern Ansible seems to be split into pieces. Ansible Core nolonger contains the
+callbacks. You may nee to run the following to install them.
+
+	ansible-galaxy collection install community.general
+	ansible-galaxy collection list
+	
 ansible_decode-facts is a perl script that requires the following Perl
 modules to be installed on your local ansible machine:
 
