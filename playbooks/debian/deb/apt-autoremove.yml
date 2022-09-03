@@ -1,0 +1,41 @@
+---
+# %BEGIN_COPYRIGHT%
+#
+# Copyright 2015-2022 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Remove unused dependency packages for all module states except build-dep
+# on Debian/Ubuntu hosts
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Remove unused dependency packages for all module states except build-dep"
+  become: yes
+
+  vars:
+        print_apt_update: ""
+#       print_information: true
+
+  tasks:
+    - import_tasks: ../../common/common_information.yml
+
+    - name: "APT remove unused dependency packages"
+      ansible.builtin.apt:
+          autoremove: Yes
+      when: ansible_os_family == 'Debian'
+      #register: apt_deb_autoremove
+
+#    - name: "debug"
+#      local_action: command printf "\n\n{{ apt_deb_autoremove }}\n\n"
+#      changed_when: false

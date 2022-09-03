@@ -83,6 +83,7 @@ other Operating Systems.
     
     ansible_boot-rhel-recreate-rescue-boot-image - recreate with rescue boot image for RHEL >=7 and Fedora Systems
     
+    ansible_deb-apt-autoremove - remove unused dependency packages for all module states except build-dep.
     ansible_deb-apt-file-search - find which Deb package provides a file
     ansible_deb-apt-setup-shells - install a shell Deb package eg tcsh and profile files
     ansible_deb-apt-update - check for Deb package updates
