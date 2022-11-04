@@ -178,6 +178,9 @@ other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/RHSB-2022-001
 	ansible_security-rhel-cve-2022-0847 - RHSB-2022-002 Dirty Pipe - kernel arbitrary file manipulation - (CVE-2022-0847)
 		https://access.redhat.com/security/vulnerabilities/RHSB-2022-002
+	ansible_security-rhel-cve-2022-3602-3786 - RHSB-2022-004 X.509 Email Address Buffer Overflow - OpenSSL
+		(cve-2022-3602 and cve-2022-3786)
+		https://access.redhat.com/security/vulnerabilities/RHSB-2022-004
 	ansible_security-rhel-drown-test - check the OpenSSL RPM package version for the DROWN vunerability
 	ansible_security-spectre-meltdown - check for Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715
 		https://access.redhat.com/security/vulnerabilities/speculativeexecution
