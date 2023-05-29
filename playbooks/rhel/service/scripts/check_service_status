@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -22,7 +22,7 @@
 # lacks the functionality.
 #
 # Returns: JSON string:
-# { 
+# {
 #	"status": "string" ,
 #	"message": "string containg the return string from the service command"
 # }
@@ -53,14 +53,14 @@ SERVICE_MESSAGE=$(cat ${TEMP_FILE})
 SERVICE_MESSAGE=${SERVICE_MESSAGE//$'\n'/%%}
 
 if [ X"${SYSTEMD}" = X"true" ]; then
-	SERVICE_RUNNING=$(cat ${TEMP_FILE} | egrep 'active' \
+	SERVICE_RUNNING=$(cat ${TEMP_FILE} | grep -E 'active' \
 						| awk '{printf("%s", $1)}')
-	SERVICE_STOPPED=$(cat ${TEMP_FILE} | egrep 'inactive' \
+	SERVICE_STOPPED=$(cat ${TEMP_FILE} | grep -E 'inactive' \
 						| awk '{printf("%s", $1)}')
 else
-	SERVICE_RUNNING=$(cat ${TEMP_FILE} | egrep 'running' \
+	SERVICE_RUNNING=$(cat ${TEMP_FILE} | grep -E 'running' \
 					| awk '{printf("%s", $5)}')
-	SERVICE_STOPPED=$(cat ${TEMP_FILE} | egrep 'stopped' \
+	SERVICE_STOPPED=$(cat ${TEMP_FILE} | grep -E 'stopped' \
 					| awk '{printf("%s", $3)}')
 fi
 
@@ -70,7 +70,7 @@ fi
 
 if [ X"${SERVICE_RUNNING}" == X"running..."  ] || [ X"${SERVICE_RUNNING}" == X"active" ]; then
 
-	SERVICE_STATUS="running" 
+	SERVICE_STATUS="running"
 
 
 elif [ X"${SERVICE_STOPPED}" == X"stopped" ] || [ X"${SERVICE_STOPPED}" == X"inactive" ]; then
