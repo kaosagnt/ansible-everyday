@@ -186,6 +186,7 @@ other Operating Systems.
 		https://access.redhat.com/security/vulnerabilities/speculativeexecution
     
     ansible_service-enable-disable-at-boot - enable / disable services to start up at boot time
+    ansible_service-need-restart - check if any services need restarting after library updates on RHEL and Debian Linux Families
     ansible_service-rhel-check-status - check the status of a service eg stopped / running
     ansible_service-start-stop-restart - start / stop / restart a service
     
