@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,58 +19,59 @@
 
 #  Define Repository URLs on RHEL/CENTOS hosts
 
-    - set_fact:
-          ius_distribution_abbrev: "{{ (ansible_distribution == 'CentOS') | ternary('centos', 'rhel') }}"
+- name: "Set distribution facts"
+  set_fact:
+    ius_distribution_abbrev: "{{ (ansible_distribution == 'CentOS') | ternary('centos', 'rhel') }}"
 
-    - name: "Repo not Defined?"
-      local_action: command printf "Unknown Repository selected.\n\n"
-      when: repo_name not in ['cert', 'epel', 'ius', 'remi', 'repoforge', 'percona']
-      failed_when: true
-      changed_when: false
+- name: "Repo not Defined?"
+  local_action: command printf "Unknown Repository selected.\n\n"
+  when: repo_name not in ['cert', 'epel', 'ius', 'remi', 'repoforge', 'percona']
+  failed_when: true
+  changed_when: false
 
-    - name: "Are we EPEL?"
-      set_fact:
-          repo_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
-      when: repo_name == 'epel'
-      changed_when: false
+- name: "Are we EPEL?"
+  set_fact:
+    repo_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+  when: repo_name == 'epel'
+  changed_when: false
 
-    - name: "Are we IUS?"
-      set_fact:
-          repo_url: "https://{{ ius_distribution_abbrev }}{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
-      when: repo_name == 'ius'
-      changed_when: false
+- name: "Are we IUS?"
+  set_fact:
+    repo_url: "https://{{ ius_distribution_abbrev }}{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
+  when: repo_name == 'ius'
+  changed_when: false
 
-    - name: "Are we REMI?"
-      set_fact:
-          repo_url: "http://rpms.famillecollet.com/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
-      when: repo_name == 'remi'
-      changed_when: false
+- name: "Are we REMI?"
+  set_fact:
+    repo_url: "http://rpms.famillecollet.com/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
+  when: repo_name == 'remi'
+  changed_when: false
 
-    - name: "Are we Repoforge?"
-      set_fact:
-          repo_url: "http://repository.it4i.cz/mirrors/repoforge/redhat/el{{ ansible_distribution_major_version }}/en/{{ ansible_architecture }}/rpmforge/RPMS/rpmforge-release-0.5.3-1.el{{ ansible_distribution_major_version }}.rf.{{ ansible_architecture }}.rpm"
-      when: repo_name == 'repoforge'
-      changed_when: false
+- name: "Are we Repoforge?"
+  set_fact:
+    repo_url: "http://repository.it4i.cz/mirrors/repoforge/redhat/el{{ ansible_distribution_major_version }}/en/{{ ansible_architecture }}/rpmforge/RPMS/rpmforge-release-0.5.3-1.el{{ ansible_distribution_major_version }}.rf.{{ ansible_architecture }}.rpm"
+  when: repo_name == 'repoforge'
+  changed_when: false
 
-    - name: "Are we Percona release?"
-      set_fact:
-          repo_url: "https://www.percona.com/redir/downloads/percona-release/redhat/percona-release-0.1-3.noarch.rpm"
-      when: repo_name == 'percona'
-      changed_when: false
+- name: "Are we Percona release?"
+  set_fact:
+    repo_url: "https://www.percona.com/redir/downloads/percona-release/redhat/percona-release-0.1-3.noarch.rpm"
+  when: repo_name == 'percona'
+  changed_when: false
 
-    - name: "Are we Cert Forensics EL release?"
-      set_fact:
-          repo_url: "https://forensics.cert.org/cert-forensics-tools-release-el{{ ansible_distribution_major_version }}.rpm"
-      when: repo_name == 'cert' and ansible_distribution != 'Fedora'
-      changed_when: false
+- name: "Are we Cert Forensics EL release?"
+  set_fact:
+    repo_url: "https://forensics.cert.org/cert-forensics-tools-release-el{{ ansible_distribution_major_version }}.rpm"
+  when: repo_name == 'cert' and ansible_distribution != 'Fedora'
+  changed_when: false
 
-    - name: "Are we Cert Forensics Fedora release?"
-      set_fact:
-          repo_url: "https://forensics.cert.org/cert-forensics-tools-release-{{ ansible_distribution_major_version }}.rpm"
-      when: repo_name == 'cert' and ansible_distribution == 'Fedora'
-      changed_when: false
+- name: "Are we Cert Forensics Fedora release?"
+  set_fact:
+    repo_url: "https://forensics.cert.org/cert-forensics-tools-release-{{ ansible_distribution_major_version }}.rpm"
+  when: repo_name == 'cert' and ansible_distribution == 'Fedora'
+  changed_when: false
 
-    - name: "Print repository URL we are installing"
-      local_action: command printf "repo_url  {{ repo_url }}\n\n"
-      failed_when: false
-      changed_when: false
+- name: "Print repository URL we are installing"
+  local_action: command printf "repo_url  {{ repo_url }}\n\n"
+  failed_when: false
+  changed_when: false

@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,10 +19,9 @@
 
 # Common Yum tasks
 
-    - name: "Yum print results"
-      local_action: command printf "{{ item }}"
-      when: item != ''
-      with_items:
-           - "{{ print_yum_update.results|default('') }}"
-      changed_when: false
-
+- name: "Yum print results"
+  local_action: command printf "{{ item }}"
+  when: item != ''
+  with_items:
+    - "{{ print_yum_update.results|default('') }}"
+  changed_when: false

@@ -21,20 +21,20 @@
 # on Debian/Ubuntu hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Remove unused dependency packages for all module states except build-dep"
-  become: yes
+  become: true
 
   vars:
-        print_apt_update: ""
-#       print_information: true
+    print_apt_update: ""
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
 
     - name: "APT remove unused dependency packages"
       ansible.builtin.apt:
-          autoremove: Yes
+        autoremove: true
       when: ansible_os_family == 'Debian'
-      #register: apt_deb_autoremove
+      # register: apt_deb_autoremove
 
 #    - name: "debug"
 #      local_action: command printf "\n\n{{ apt_deb_autoremove }}\n\n"

@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,27 +21,27 @@
 # Usually found on RHEL/CENTOS hosts after yum / dnf updates.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Find any rpmnew | rpmsave files in the /etc/ or /opt/rh directories"
-  become: yes
+  become: true
 
-#  vars:
-#	print_information: true
+# vars:
+#   print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
 
     - name: "Find rpmnew | rpmsave files in the /etc/ and /opt/rh/ directories"
       find:
-           paths: "{{ item }}"
-           patterns: "^.*?.(?:rpmnew|rpmsave)$"
-           use_regex: true
-           recurse: yes
+        paths: "{{ item }}"
+        patterns: "^.*?.(?:rpmnew|rpmsave)$"
+        use_regex: true
+        recurse: true
       register: file_info
       changed_when: false
       with_items:
-                 - "/etc/"
-                 - "/opt/rh/"
+        - "/etc/"
+        - "/opt/rh/"
 
-    #- debug: var=file_info
+    # - debug: var=file_info
 
     - name: "Files found /etc/ and /opt/rh/ directories"
       local_action: command printf "{{ file_info | json_query('results[*].files[*].path') | to_nice_json }}\n"

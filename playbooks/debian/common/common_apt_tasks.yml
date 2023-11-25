@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,9 +19,9 @@
 
 # Common APT tasks
 
-    - name: "APT print results"
-      local_action: command printf "{{ item }}"
-      when: item != ''
-      with_items:
-           - "{{ print_apt_update.results|default('') }}"
-      changed_when: false
+- name: "APT print results"
+  local_action: command printf "{{ item }}"
+  when: item != ''
+  with_items:
+    - "{{ print_apt_update.results|default('') }}"
+  changed_when: false

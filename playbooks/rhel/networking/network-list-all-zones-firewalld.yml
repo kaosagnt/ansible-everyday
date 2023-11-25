@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,10 +20,10 @@
 # List network zones for firewalld.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "List network zones for firewalld"
-  become: yes
+  become: true
 
   vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml

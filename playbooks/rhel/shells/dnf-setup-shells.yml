@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -17,14 +17,14 @@
 #
 # %END_COPYRIGHT%
 
-# Install tcsh and setup /etc/profile.d/custom.* files 
+# Install tcsh and setup /etc/profile.d/custom.* files
 # on RHEL/CENTOS hosts
 
-    - name: "DNF install shell RPM"
-      dnf:
-          pkg: "{{ shell_name }}"
-          state: latest
-      when: ((ansible_os_family == 'RedHat') 
-            and
-            (ansible_lsb.major_release|int >= 8))
-      register: dnf_install
+- name: "DNF install shell RPM"
+  dnf:
+    pkg: "{{ shell_name }}"
+    state: latest
+  when: ((ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 8))
+  register: dnf_install

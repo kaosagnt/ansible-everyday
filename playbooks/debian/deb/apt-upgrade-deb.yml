@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -17,22 +17,22 @@
 #
 # %END_COPYRIGHT%
 
-# Update Deb package to the latest release. 
+# Update Deb package to the latest release.
 # on Debian/Ubuntu hosts
-    - name: "Enable / Disable APT sources"
-      script: scripts/enable_disable_apt_sources -d="{{ disable_source }}" -e="{{ enable_source }}"
-      when: ansible_os_family == 'Debian'
-      register: apt_info
-      changed_when: false
-      failed_when: apt_info.rc > 0
+- name: "Enable / Disable APT sources"
+  script: scripts/enable_disable_apt_sources -d="{{ disable_source }}" -e="{{ enable_source }}"
+  when: ansible_os_family == 'Debian'
+  register: apt_info
+  changed_when: false
+  failed_when: apt_info.rc > 0
 
-    - name: "APT upgrade Deb package"
-      apt:
-          name: "{{ deb_package.split(',') }}"
-          state: latest
-      when: ansible_os_family == 'Debian' 
-      #register: apt_deb_update
+- name: "APT upgrade Deb package"
+  apt:
+    name: "{{ deb_package.split(',') }}"
+    state: latest
+  when: ansible_os_family == 'Debian'
+  # register: apt_deb_update
 
-#    - name: "debug"
-#      local_action: command printf "\n\n{{ apt_deb_update }}\n\n"
-#      changed_when: false
+# - name: "debug"
+#   local_action: command printf "\n\n{{ apt_deb_update }}\n\n"
+#   changed_when: false

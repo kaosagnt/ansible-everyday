@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,18 +19,18 @@
 
 # Find out RPM information installed on RHEL/CENTOS hosts
 
-    - name: "Yum find RPM information"
-      script: scripts/rpm_information yum -r="{{ rpm_package }}" -s="{{ directive }}" -d="{{ disable_repo }}" -e="{{ enable_repo }}"
-      register: yum_rpm_info
-      changed_when: false
-      failed_when: yum_rpm_info.rc > 0
+- name: "Yum find RPM information"
+  script: scripts/rpm_information yum -r="{{ rpm_package }}" -s="{{ directive }}" -d="{{ disable_repo }}" -e="{{ enable_repo }}"
+  register: yum_rpm_info
+  changed_when: false
+  failed_when: yum_rpm_info.rc > 0
 
-    - name: "YUM print RPM information found"
-      local_action: command printf "{{ rpm_package }} information found\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
-      when: (yum_rpm_info.stdout|from_json).found == true
-      changed_when: false
+- name: "YUM print RPM information found"
+  local_action: command printf "{{ rpm_package }} information found\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
+  when: (yum_rpm_info.stdout|from_json).found == true
+  changed_when: false
 
-    - name: "YUM print no RPM information found"
-      local_action: command printf "{{ rpm_package }} information could not be found.\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
-      when: (yum_rpm_info.stdout|from_json).found == false
-      changed_when: false
+- name: "YUM print no RPM information found"
+  local_action: command printf "{{ rpm_package }} information could not be found.\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
+  when: (yum_rpm_info.stdout|from_json).found == false
+  changed_when: false

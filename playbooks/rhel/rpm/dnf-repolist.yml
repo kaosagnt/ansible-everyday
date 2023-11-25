@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,9 +19,9 @@
 
 # Execute dnf repolist on RHEL/CENTOS >= 8 hosts
 
-    - name: "DNF repolist"
-      script: scripts/yum_dnf_repo_list dnf "{{ repo_type }}"
-      when: ((ansible_os_family == 'RedHat')
-            and
-            (ansible_lsb.major_release|int >= 8))
-      changed_when: false
+- name: "DNF repolist"
+  script: scripts/yum_dnf_repo_list dnf "{{ repo_type }}"
+  when: ((ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 8))
+  changed_when: false

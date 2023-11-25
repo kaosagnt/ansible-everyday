@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,22 +20,22 @@
 # Common Handlers
 
 # Backup /etc/sysconfig/iptables to /etc/sysconfig/iptables.{yyyymmdd}
-    - name: "Backup iptables"
-      copy:
-           src: "/etc/sysconfig/{{ iptables_file }}"
-           dest: "/etc/sysconfig/{{ iptables_file }}.{{ lookup('pipe', 'date +%Y%m%d') }}"
-           mode: 0600
-           remote_src: yes
-      when: ansible_system == 'Linux'
+- name: "Backup iptables"
+  copy:
+    src: "/etc/sysconfig/{{ iptables_file }}"
+    dest: "/etc/sysconfig/{{ iptables_file }}.{{ lookup('pipe', 'date +%Y%m%d') }}"
+    mode: 0600
+    remote_src: true
+  when: ansible_system == 'Linux'
 
 # Save running iptables config to /etc/sysconfig/ [ iptables | ip6tables ]
-    - name: "Save running iptables"
-      shell: "iptables-save > /etc/sysconfig/{{ iptables_file }}"
-      when: ansible_system == 'Linux'
+- name: "Save running iptables"
+  shell: "iptables-save > /etc/sysconfig/{{ iptables_file }}"
+  when: ansible_system == 'Linux'
 
 # Restart IP tables
-    - name: "Restart iptables"
-      service:
-              name: "{{ iptables_service }}"
-              state: restarted
-      when: ansible_system == 'Linux'
+- name: "Restart iptables"
+  service:
+    name: "{{ iptables_service }}"
+    state: restarted
+  when: ansible_system == 'Linux'

@@ -18,12 +18,12 @@
 # %END_COPYRIGHT%
 
 # Install nano editor if not present
-# Change the /etc/nanorc tabsize from default 8 to 4. 
+# Change the /etc/nanorc tabsize from default 8 to 4.
 # on Debian hosts
 
-    - name: "APT install nano DEB"
-      apt:
-          name: nano
-          state: latest
-      when: ansible_os_family == 'RedHat'
-      register: apt_install
+- name: "APT install nano DEB"
+  apt:
+    name: nano
+    state: latest
+  when: ansible_os_family == 'RedHat'
+  register: apt_install

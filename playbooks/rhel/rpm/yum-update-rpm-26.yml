@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,29 +21,28 @@
 # YUM module changed in ansible 2.7.0
 # on RHEL/CENTOS hosts <= 7
 
-    - name: "Yum update RPM - ansible < 2.7"
-      yum:
-          pkg: "{{ item }}"
-          disablerepo: "{{ disable_repo }}"
-          enablerepo: "{{ enable_repo }}"
-          state: latest
-      when: (ansible_os_family == 'RedHat') 
-            and
-            (ansible_lsb.major_release|int >= 5 and
-             ansible_lsb.major_release|int <= 7)
- 
-      register: yum_rpm_update
-      with_items:
-        - "{{ rpm_package.split(',') }}"
+- name: "Yum update RPM - ansible < 2.7"
+  yum:
+    pkg: "{{ item }}"
+    disablerepo: "{{ disable_repo }}"
+    enablerepo: "{{ enable_repo }}"
+    state: latest
+  when: (ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 5 and
+        ansible_lsb.major_release|int <= 7)
+  register: yum_rpm_update
+  with_items:
+    - "{{ rpm_package.split(',') }}"
 
-    - name: "Assign variables"
-      set_fact:
-               print_yum_update: "{{ yum_rpm_update.results[0] }}"
-      changed_when: false
+- name: "Assign variables"
+  set_fact:
+    print_yum_update: "{{ yum_rpm_update.results[0] }}"
+  changed_when: false
 
-    - include: ../common/common_yum_tasks.yml
+- include: ../common/common_yum_tasks.yml
 
-#    - name: debug
-#      local_action: command printf "{{ print_yum_update.results }}\n\n"
-#      local_action: command printf "\n\n{{ yum_rpm_update['results'] }}\n\n"
-#      changed_when: false
+# - name: debug
+#   local_action: command printf "{{ print_yum_update.results }}\n\n"
+#   local_action: command printf "\n\n{{ yum_rpm_update['results'] }}\n\n"
+#   changed_when: false

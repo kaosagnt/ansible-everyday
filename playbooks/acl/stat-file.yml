@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,20 +20,20 @@
 # Get the information of a file / directory specified using stat.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Get the information of a file / directory specified using stat"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "file_directory_name"
       prompt: "Enter the file / directory name"
-      private: no
+      private: false
 
     - name: "follow_symlinks"
       prompt: "Follow symbolic links (y/n)"
-      private: no
+      private: false
 
   vars:
-#       print_information: true
-        symlinks: "no"
+#    print_information: true
+    symlinks: false
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -50,14 +50,14 @@
 
     - name: "Set follow symlinks"
       set_fact:
-               symlinks: "yes"
+        symlinks: true
       when: follow_symlinks in ('y', 'Y')
 
     - name: "Get the file / directory information"
       stat:
-            path: "{{ file_directory_name }}"
-            get_checksum: no
-            follow: "{{ symlinks }}"
+        path: "{{ file_directory_name }}"
+        get_checksum: false
+        follow: "{{ symlinks }}"
       register: stat_data
 
     - name: "Print stat data"

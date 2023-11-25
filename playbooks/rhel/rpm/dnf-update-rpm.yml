@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -17,23 +17,23 @@
 #
 # %END_COPYRIGHT%
 
-# Update RPM package to the latest release. 
+# Update RPM package to the latest release.
 # on RHEL/CENTOS hosts >= 8
 
-    - name: "DNF update RPM - ansible >= 2.7"
-      dnf:
-          pkg: "{{ rpm_package.split(',') }}"
-          disablerepo: "{{ disable_repo }}"
-          enablerepo: "{{ enable_repo }}"
-          state: latest
-      when: ((ansible_os_family == 'RedHat')
-            and
-            (ansible_lsb.major_release|int >= 8))
-            and
-            (ansible_version.full is version('2.7', '>='))
-#      register: dnf_rpm_update
+- name: "DNF update RPM - ansible >= 2.7"
+  dnf:
+    pkg: "{{ rpm_package.split(',') }}"
+    disablerepo: "{{ disable_repo }}"
+    enablerepo: "{{ enable_repo }}"
+    state: latest
+  when: ((ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 8))
+        and
+        (ansible_version.full is version('2.7', '>='))
+#  register: dnf_rpm_update
 
-#    - name: "debug"
-#      local_action: command printf "{{ print_dnf_update }}\n\n"
-#      local_action: command printf "{{ dnf_rpm_update }}\n\n"
-#      changed_when: false
+# - name: "debug"
+#   local_action: command printf "{{ print_dnf_update }}\n\n"
+#   local_action: command printf "{{ dnf_rpm_update }}\n\n"
+#   changed_when: false

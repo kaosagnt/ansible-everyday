@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,16 +20,16 @@
 # Execute yum/dnf whatprovides on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Execute yum/dnf whatprovides on RHEL/CENTOS hosts"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "file_regex"
       prompt: "\nEnter the filename / regex to find in an RPM"
-      private: no
+      private: false
 
   vars:
-        package_manager: "dnf"
-        print_information: true
+    package_manager: "dnf"
+    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -41,7 +41,7 @@
 
     - name: "Should we use YUM as the package manager?"
       set_fact:
-               package_manager: "yum"
+        package_manager: "yum"
       when: (ansible_os_family == 'RedHat')
             and
             (

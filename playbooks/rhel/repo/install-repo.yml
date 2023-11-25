@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,12 +20,12 @@
 #  Install RPM repositories on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Install RPM repositories on RHEL/CENTOS hosts"
-  become: yes
+  become: true
 
   vars:
-       repo_name: "{{ repo | default('') }}"
-       repo_url: ""
-#       print_information: true
+    repo_name: "{{ repo | default('') }}"
+    repo_url: ""
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml

@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -18,14 +18,14 @@
 # %END_COPYRIGHT%
 
 # Install nano editor if not present
-# Change the /etc/nanorc tabsize from default 8 to 4. 
+# Change the /etc/nanorc tabsize from default 8 to 4.
 # on RHEL/CENTOS hosts
 
-    - name: "DNF install nano RPM"
-      dnf:
-          pkg: ['nano']
-          state: latest
-      when: ((ansible_os_family == 'RedHat') 
-            and
-            (ansible_lsb.major_release|int >= 8))
-      register: dnf_install
+- name: "DNF install nano RPM"
+  dnf:
+    pkg: ['nano']
+    state: latest
+  when: ((ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 8))
+  register: dnf_install

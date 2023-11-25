@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -17,14 +17,14 @@
 #
 # %END_COPYRIGHT%
 
-# Install shell and setup /etc/profile.d/custom.* files 
+# Install shell and setup /etc/profile.d/custom.* files
 # on Debian/Ubuntu hosts
 
-    - name: "APT install shell Deb"
-      apt:
-          name: "{{ shell_name }}"
-          state: latest
-      when: ansible_os_family == 'Debian'
-      register: apt_install
+- name: "APT install shell Deb"
+  apt:
+    name: "{{ shell_name }}"
+    state: latest
+  when: ansible_os_family == 'Debian'
+  register: apt_install
 
-    - import_tasks: ../common/common_apt_tasks.yml
+- import_tasks: ../common/common_apt_tasks.yml

@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -17,24 +17,24 @@
 #
 # %END_COPYRIGHT%
 
-# Update RPM package to the latest release. 
+# Update RPM package to the latest release.
 # on RHEL/CENTOS hosts <= 7
 
-    - name: "Yum update RPM - ansible >= 2.7"
-      yum:
-          pkg: "{{ rpm_package.split(',') }}"
-          disablerepo: "{{ disable_repo }}"
-          enablerepo: "{{ enable_repo }}"
-          state: latest
-      when: (ansible_os_family == 'RedHat') 
-            and
-            (ansible_lsb.major_release|int >= 5 and
-             ansible_lsb.major_release|int <= 7)
-            and
-            (ansible_version.full is version('2.7', '>='))
-      #register: yum_rpm_update
+- name: "Yum update RPM - ansible >= 2.7"
+  yum:
+    pkg: "{{ rpm_package.split(',') }}"
+    disablerepo: "{{ disable_repo }}"
+    enablerepo: "{{ enable_repo }}"
+    state: latest
+  when: (ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 5 and
+         ansible_lsb.major_release|int <= 7)
+        and
+        (ansible_version.full is version('2.7', '>='))
+  # register: yum_rpm_update
 
-#    - name: "debug"
-#      local_action: command printf "{{ print_yum_update }}\n\n"
-#      local_action: command printf "\n\n{{ yum_rpm_update }}\n\n"
-#      changed_when: false
+# - name: "debug"
+#   local_action: command printf "{{ print_yum_update }}\n\n"
+#   local_action: command printf "\n\n{{ yum_rpm_update }}\n\n"
+#   changed_when: false

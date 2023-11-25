@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -17,11 +17,11 @@
 #
 # %END_COPYRIGHT%
 
-    - name: "DNF Install Repo"
-      dnf:
-          name: "{{ repo_url }}"
-          state: present
-      when: ((ansible_os_family == 'RedHat') 
-            and
-            (ansible_lsb.major_release|int >= 8))
-      register: dnf_repo
+- name: "DNF Install Repo"
+  dnf:
+    name: "{{ repo_url }}"
+    state: present
+  when: ((ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 8))
+  register: dnf_repo

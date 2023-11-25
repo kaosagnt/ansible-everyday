@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,15 +20,15 @@
 # Find out the status of a service on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Find out the status of a service on RHEL/CENTOS hosts"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "service_name"
       prompt: "Enter the of the service to query"
-      private: no
+      private: false
 
-#  vars:
-#       print_information: true
+# vars:
+#   print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml

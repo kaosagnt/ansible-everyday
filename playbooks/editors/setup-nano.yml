@@ -18,14 +18,14 @@
 # %END_COPYRIGHT%
 
 # Install nano editor if not present
-# Change the /etc/nanorc tabsize from default 8 to 4. 
+# Change the /etc/nanorc tabsize from default 8 to 4.
 # on RHEL/CENTOS/Debian hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Install nano rpm on RHEL / CENTOS / Debian hosts"
-  become: yes
+  become: true
 
-#  vars:
-#       print_information: true
+# vars:
+#   print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -53,16 +53,16 @@
     # Does /etc/nanorc exist?
     - name: "Check for /etc/nanorc"
       stat:
-           path: /etc/nanorc
+        path: /etc/nanorc
       register: nanorc_present
       changed_when: false
 
     # Set out tabsize to 4.
     - name: "Set nano tabsize to 4"
       lineinfile:
-                 dest: /etc/nanorc
-                 backup: yes
-                 backrefs: yes
-                 regexp: "^# set tabsize 8"
-                 line: "set tabsize 4"
+        dest: /etc/nanorc
+        backup: true
+        backrefs: true
+        regexp: "^# set tabsize 8"
+        line: "set tabsize 4"
       when: nanorc_present.stat.exists == true

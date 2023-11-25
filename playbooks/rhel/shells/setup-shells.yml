@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,12 +21,12 @@
 # on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Install tcsh and setup /etc/profile.d/custom.* files on RHEL/CENTOS hosts"
-  become: yes
+  become: true
 
   vars:
-       shell_name: "{{ shell | default('') }}"
-       files_dir: ../../common/files/etc/profile.d
-#       print_information: true
+    shell_name: "{{ shell | default('') }}"
+    files_dir: ../../common/files/etc/profile.d
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -49,34 +49,33 @@
     # Does /etc/profile.d/custom.sh exist?
     - name: "Check for /etc/profile.d/custom.sh"
       stat:
-           path: /etc/profile.d/custom.sh
+        path: /etc/profile.d/custom.sh
       register: cust_sh
       changed_when: false
 
     # Does /etc/profile.d/custom.csh exist?
     - name: "Check for /etc/profile.d/custom.csh"
       stat:
-           path: /etc/profile.d/custom.csh
+        path: /etc/profile.d/custom.csh
       register: cust_csh
       changed_when: false
 
     # Install custom.sh file into /etc/profile.d/
     - name: "Install custom.sh file into /etc/profile.d/"
       copy:
-           src: "{{ files_dir }}/custom.sh"
-           dest: /etc/profile.d/custom.sh
-           owner: root
-           group: root
-           mode: 0644
+        src: "{{ files_dir }}/custom.sh"
+        dest: /etc/profile.d/custom.sh
+        owner: root
+        group: root
+        mode: 0644
       when: cust_sh.stat.exists == false
 
     # Install custom.csh file into /etc/profile.d/
     - name: "Install custom.csh file into /etc/profile.d/"
       copy:
-           src: "{{ files_dir }}/custom.csh"
-           dest: /etc/profile.d/custom.csh
-           owner: root
-           group: root
-           mode: 0644
+        src: "{{ files_dir }}/custom.csh"
+        dest: /etc/profile.d/custom.csh
+        owner: root
+        group: root
+        mode: 0644
       when: cust_csh.stat.exists == false
-

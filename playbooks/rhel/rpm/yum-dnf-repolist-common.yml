@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,16 +20,15 @@
 # Execute yum/dnf repolist on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Execute yum/dnf repolist on RHEL/CENTOS hosts"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "repo_type"
       prompt: "\nEnter the lookup type. (e) - enabled, (d) disabled RPM repositories\nor leave blank for all"
-      private: no
-
+      private: false
 
 #  vars:
-#       print_information: true
+#     print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -41,19 +40,19 @@
 
     - name: "Is repo list type all?"
       set_fact:
-               repo_type: "all"
+        repo_type: "all"
       when: repo_type == ""
       changed_when: false
 
     - name: "Is repo list type enabled?"
       set_fact:
-               repo_type: "enabled"
+        repo_type: "enabled"
       when: repo_type == "e"
       changed_when: false
 
     - name: "Is repo list type disabled?"
       set_fact:
-               repo_type: "disabled"
+        repo_type: "disabled"
       when: repo_type == "d"
       changed_when: false
 

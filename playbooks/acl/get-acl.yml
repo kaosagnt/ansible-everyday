@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,15 +20,15 @@
 # Get the ACL(s) of the file / directory specified.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Get the ACL(s) of the file / directory specified"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "file_directory_name"
       prompt: "Enter the file / directory name"
-      private: no
+      private: false
 
-#  vars:
-#       print_information: true
+# vars:
+#   print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -40,8 +40,8 @@
 
     - name: "Get the ACL"
       acl:
-            name: "{{ file_directory_name }}"
-            state: query
+        name: "{{ file_directory_name }}"
+        state: query
       register: acl_data
 #      changed_when: false
 

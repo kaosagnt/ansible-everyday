@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,12 +19,12 @@
 
 # Common APT fix variables by running certain filters over them.
 
-    - name: "Fix Deb package variable"
-      set_fact:
-          deb_package: "{{ deb_package | replace(' ', '') }}"
-      when: deb_package is defined
+- name: "Fix Deb package variable"
+  set_fact:
+    deb_package: "{{ deb_package | replace(' ', '') }}"
+  when: deb_package is defined
 
-    - name: "Fix other variables"
-      set_fact:
-          disable_source: "{{ disable_source | replace(' ', '') }}"
-          enable_source: "{{ enable_source | replace(' ', '') }}"
+- name: "Fix other variables"
+  set_fact:
+    disable_source: "{{ disable_source | replace(' ', '') }}"
+    enable_source: "{{ enable_source | replace(' ', '') }}"

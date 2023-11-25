@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,15 +20,15 @@
 # Get the XATTR(s) Entended Attributes of the file / directory specified.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Get the xattr(s) of the file / directory specified"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "file_directory_name"
       prompt: "Enter the file / directory name"
-      private: no
+      private: false
 
-#  vars:
-#       print_information: true
+# vars:
+#   print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -40,7 +40,7 @@
 
     - name: "Get the xattr(s)"
       xattr:
-            name: "{{ file_directory_name }}"
+        name: "{{ file_directory_name }}"
       register: xattr_data
 #      changed_when: false
 

@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,22 +20,22 @@
 # Execute apt-file search on Debian/Ubuntu hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Execute apt-file search on Debian/Ubuntu hosts"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "file_regex"
       prompt: "\nEnter the filename / regex to find in a Deb package"
-      private: no
+      private: false
 
   vars:
-        #print_information: true
+    # print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
 
     - name: "Ensure apt-file is installed"
       stat:
-           path: /usr/bin/apt-file
+        path: /usr/bin/apt-file
       changed_when: false
 
     - name: "Valid filename / regex?"

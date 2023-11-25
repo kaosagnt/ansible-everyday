@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,27 +20,27 @@
 # Find out RPM information installed on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Find out RPM information installed on RHEL/CENTOS hosts"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "directive"
       prompt: "Search for an RPM or Query RPM information(s/q)"
-      private: no
+      private: false
 
     - name: "rpm_package"
       prompt: "\nEnter the RPM package name(s)\n(seperated by a comma for multiple)"
-      private: no
+      private: false
 
     - name: "disable_repo"
       prompt: "\nEnter the list of REPO ID(s) to disable\n(seperated by a comma for multiple, leave blank for none)"
-      private: no
+      private: false
 
     - name: "enable_repo"
       prompt: "\nEnter the list of REPO ID(s) to enable\n(seperated by a comma for multiple, leave blank for none)"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#     print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -57,7 +57,7 @@
 
     - name: "Set directive search"
       set_fact:
-               directive: "{{ (directive == 's') | ternary('search','info') }}"
+        directive: "{{ (directive == 's') | ternary('search','info') }}"
       changed_when: false
 
     - import_tasks: ../common/common_rpm_fix_vars.yml

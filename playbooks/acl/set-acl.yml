@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,27 +20,27 @@
 # Set the ACL(s) of the file / directory specified.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Set the ACL(s) of the file / directory specified"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "file_directory_name"
       prompt: "Enter the file / directory name"
-      private: no
+      private: false
 
     - name: "user_group_other"
       prompt: "Entity type - (u)ser, (g)roup or (o)ther"
-      private: no
+      private: false
 
     - name: "entity_name"
       prompt: "User or group name - leave blank for other"
-      private: no
+      private: false
 
     - name: "permissions"
       prompt: "Permissions (r, rw, rwx, rx, x, wx)"
-      private: no
+      private: false
 
-#  vars:
-#       print_information: true
+# vars:
+#   print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -62,34 +62,34 @@
 
     - name: "Set Entity Type User"
       set_fact:
-               entity_type: user
+        entity_type: user
       when: user_group_other == 'u'
       changed_when: false
 
     - name: "Set Entity Type Group"
       set_fact:
-               entity_type: group
+        entity_type: group
       when: user_group_other == 'g'
       changed_when: false
 
     - name: "Set Entity Type Other"
       set_fact:
-               entity_type: other
+        entity_type: other
       when: user_group_other == 'o'
       changed_when: false
 
     # Debug
-    #- name: "Debug data"
+    # - name: "Debug data"
     #  local_action: command printf "entity_type - {{ entity_type }}\n"
     #  changed_when: false
 
     - name: "Set the ACL"
       acl:
-          name: "{{ file_directory_name }}"
-          state: present
-          entity: "{{ entity_name }}"
-          etype: "{{ entity_type }}"
-          permissions: "{{ permissions }}"
+        name: "{{ file_directory_name }}"
+        state: present
+        entity: "{{ entity_name }}"
+        etype: "{{ entity_type }}"
+        permissions: "{{ permissions }}"
       register: acl_data
 
     - name: "Print ACL data"

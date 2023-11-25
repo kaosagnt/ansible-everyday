@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -17,12 +17,12 @@
 #
 # %END_COPYRIGHT%
 
-    - name: "Yum Install Repo"
-      yum:
-          name: "{{ repo_url }}"
-          state: present
-      when: (ansible_os_family == 'RedHat') 
-            and
-            (ansible_lsb.major_release|int >= 5 and
-             ansible_lsb.major_release|int <= 7)
-      register: yum_repo
+- name: "Yum Install Repo"
+  yum:
+    name: "{{ repo_url }}"
+    state: present
+  when: (ansible_os_family == 'RedHat')
+        and
+        (ansible_lsb.major_release|int >= 5 and
+         ansible_lsb.major_release|int <= 7)
+  register: yum_repo

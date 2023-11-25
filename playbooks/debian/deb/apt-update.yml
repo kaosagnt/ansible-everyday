@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,37 +19,37 @@
 
 # Execute APT update on Debian/Ubuntu hosts
 
-    - name: "Enable / Disable APT sources"
-      script: scripts/enable_disable_apt_sources -d="{{ disable_source }}" -e="{{ enable_source }}"
-      when: ansible_os_family == 'Debian'
-      register: apt_enable
-      changed_when: false
-      failed_when: apt_enable.rc > 0
+- name: "Enable / Disable APT sources"
+  script: scripts/enable_disable_apt_sources -d="{{ disable_source }}" -e="{{ enable_source }}"
+  when: ansible_os_family == 'Debian'
+  register: apt_enable
+  changed_when: false
+  failed_when: apt_enable.rc > 0
 
-    - name: "APT update"
-      script: scripts/check_apt_updates
-      when: ansible_os_family == 'Debian'
-      register: apt_info
-      changed_when: false
-      failed_when: apt_info.rc > 0
+- name: "APT update"
+  script: scripts/check_apt_updates
+  when: ansible_os_family == 'Debian'
+  register: apt_info
+  changed_when: false
+  failed_when: apt_info.rc > 0
 
-    - name: "Print APT updates found"
-      local_action: command printf "Approximately {{ (apt_info.stdout|from_json).update_count }} update(s) found - \n\n{{ (apt_info.stdout|from_json).update_list.replace('%%', '\n') }}\n\n"
-      when: apt_info is defined and (apt_info.stdout|from_json).found == true
-      changed_when: false
+- name: "Print APT updates found"
+  local_action: command printf "Approximately {{ (apt_info.stdout|from_json).update_count }} update(s) found - \n\n{{ (apt_info.stdout|from_json).update_list.replace('%%', '\n') }}\n\n"
+  when: apt_info is defined and (apt_info.stdout|from_json).found == true
+  changed_when: false
 
-    - name: "Print no APT updates found"
-      local_action: command printf "No updates found."
-      when: apt_info is defined and (apt_info.stdout|from_json).found == false
-      changed_when: false
+- name: "Print no APT updates found"
+  local_action: command printf "No updates found."
+  when: apt_info is defined and (apt_info.stdout|from_json).found == false
+  changed_when: false
 
-    - name: "Print APT error"
-      local_action: command printf "An error occurred\n{{ (apt_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
-      when: apt_info is defined and (apt_info.stdout|from_json).error_msg != ""
-      changed_when: false
-      failed_when:
-          ((apt_info.stdout|from_json).error_msg != ""
-          and
-          (apt_info.stdout|from_json).found == false
-          and 
-          (apt_info.stdout|from_json).update_count == 0)
+- name: "Print APT error"
+  local_action: command printf "An error occurred\n{{ (apt_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
+  when: apt_info is defined and (apt_info.stdout|from_json).error_msg != ""
+  changed_when: false
+  failed_when:
+    ((apt_info.stdout|from_json).error_msg != ""
+    and
+    (apt_info.stdout|from_json).found == false
+    and
+    (apt_info.stdout|from_json).update_count == 0)

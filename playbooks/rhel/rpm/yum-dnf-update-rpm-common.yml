@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,25 +20,25 @@
 # Update RPM package to the latest release on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Update RPM package(s) to the latest release on RHEL/CENTOS hosts"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "rpm_package"
       prompt: "\nEnter the RPM package name(s) \n(seperated by a comma for multiple or '*' to install all rpm updates)"
-      private: no
+      private: false
 
     - name: "disable_repo"
       prompt: "\nEnter the list of REPO ID(s) to disable\n(seperated by a comma for multiple, leave blank for none)"
-      private: no
+      private: false
 
     - name: "enable_repo"
       prompt: "\nEnter the list of REPO ID(s) to enable\n(seperated by a comma for multiple, leave blank for none)"
-      private: no
+      private: false
 
   vars:
-        print_yum_update: ""
-        print_dnf_update: ""
-#       print_information: true
+    print_yum_update: ""
+    print_dnf_update: ""
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -52,7 +52,7 @@
 
     - name: "Include Yum update RPM"
       import_tasks: yum-update-rpm.yml
-      when: (ansible_os_family == 'RedHat') 
+      when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5 and
             ansible_lsb.major_release|int <= 7)
@@ -60,7 +60,7 @@
 
     - name: "Include DNF update RPM"
       import_tasks: dnf-update-rpm.yml
-      when: ((ansible_os_family == 'RedHat') 
+      when: ((ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 8))
       changed_when: false

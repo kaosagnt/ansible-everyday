@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,15 +19,15 @@
 
 # Find out Deb information installed on Debian/Ubuntu hosts
 
-    - name: "Enable / Disable APT sources"
-      script: scripts/enable_disable_apt_sources -d="{{ disable_source }}" -e="{{ enable_source }}"
-      when: ansible_os_family == 'Debian'
-      register: apt_enable
-      changed_when: false
-      failed_when: apt_enable.rc > 0
+- name: "Enable / Disable APT sources"
+  script: scripts/enable_disable_apt_sources -d="{{ disable_source }}" -e="{{ enable_source }}"
+  when: ansible_os_family == 'Debian'
+  register: apt_enable
+  changed_when: false
+  failed_when: apt_enable.rc > 0
 
-    - name: "APT find Deb information"
-      script: scripts/deb_information -d="{{ deb_package }}" -s="{{ directive }}"
-      register: apt_deb_info
-      changed_when: false
-      failed_when: apt_deb_info.rc > 0
+- name: "APT find Deb information"
+  script: scripts/deb_information -d="{{ deb_package }}" -s="{{ directive }}"
+  register: apt_deb_info
+  changed_when: false
+  failed_when: apt_deb_info.rc > 0

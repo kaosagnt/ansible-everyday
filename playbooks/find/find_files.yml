@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,20 +20,20 @@
 # Find any files in the directory specified.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Find any files in the directory specified"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "directory_name"
       prompt: "Enter the directory name to find files in"
-      private: no
+      private: false
 
     - name: "regex_to_find"
       prompt: "Enter the file name to find (eg *.jpg, sys*.conf)"
-      private: no
+      private: false
 
   vars:
-        upload_dest_directory: "../../uploaded_files"
-#       print_information: true
+    upload_dest_directory: "../../uploaded_files"
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -50,16 +50,16 @@
 
     - name: "Find files in the directory specified"
       find:
-           paths: "{{ directory_name }}"
-           patterns: "{{ regex_to_find }}"
-           recurse: yes
-      #     use_regex: true
+        paths: "{{ directory_name }}"
+        patterns: "{{ regex_to_find }}"
+        recurse: true
+      #  use_regex: true
       register: file_info
       changed_when: false
 
     - name: "Files found < 100 - print list"
       local_action: command printf "{{ file_info | json_query('files[*].path') | to_nice_json }}\n"
-      #local_action: command printf "{{ file_info.matched }}\n"
+      # local_action: command printf "{{ file_info.matched }}\n"
       when: file_info.matched > 0
             and
             file_info.matched <= 100

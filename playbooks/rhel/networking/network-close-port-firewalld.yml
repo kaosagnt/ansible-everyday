@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,31 +21,31 @@
 
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Close a network port in firewalld"
-  become: yes
+  become: true
 
   vars:
-       source_ip_s: ""
-       protocol_s: "tcp"
-       rich_rule: ""
-       ip_ver: "ipv4"
-#       print_information: true
+    source_ip_s: ""
+    protocol_s: "tcp"
+    rich_rule: ""
+    ip_ver: "ipv4"
+#    print_information: true
 
   vars_prompt:
     - name: "port_numbers"
       prompt: "Enter the port number(s)\n(seperated by a comma for multiple ports)"
-      private: no
+      private: false
 
     - name: "protocol"
       prompt: "\nEnter the TCP/IP protocol for the port(s) (leave blank for default 'tcp')"
-      private: no
+      private: false
 
     - name: "source_ip"
       prompt: "\nEnter the source IP / network to restrict port access (leave blank for all network access)"
-      private: no
+      private: false
 
     - name: "zone_s"
       prompt: "\nEnter the zone to apply the rule to (leave blank for default 'public')"
-      private: no
+      private: false
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -56,11 +56,11 @@
 
     - name: "Remove firewalld rule for port(s) provided - ALL IP addresses"
       firewalld:
-                port: "{{ item }}/{{ protocol_s }}"
-                permanent: true
-                state: disabled
-                immediate: yes
-                zone: "{{ zone_s }}"
+        port: "{{ item }}/{{ protocol_s }}"
+        permanent: true
+        state: disabled
+        immediate: true
+        zone: "{{ zone_s }}"
       when: (
              (ansible_os_family == 'RedHat'
               and
@@ -81,11 +81,11 @@
 
     - name: "Remove firewalld rule for port(s) provided - Restrict IP addresses"
       firewalld:
-                rich_rule: 'rule family="{{ ip_ver }}" source address="{{ source_ip_s }}" port port="{{ item }}" protocol="{{ protocol_s }}" accept'
-                permanent: true
-                state: disabled
-                immediate: yes
-                zone: "{{ zone_s }}"
+        rich_rule: 'rule family="{{ ip_ver }}" source address="{{ source_ip_s }}" port port="{{ item }}" protocol="{{ protocol_s }}" accept'
+        permanent: true
+        state: disabled
+        immediate: true
+        zone: "{{ zone_s }}"
       when: (
              (ansible_os_family == 'RedHat'
               and
