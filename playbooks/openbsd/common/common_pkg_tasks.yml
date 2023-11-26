@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,10 +19,9 @@
 
 # Common OpenBSD pkg tasks
 
-    - name: "pkg_add print results"
-      local_action: command printf "{{ item.name }} {{ item.state }} {{ (item.changed == 'true')|ternary('updated','installed')}}\n"
-      when: item != ''
-      with_items:
-           - "{{ print_pkg_update.results|default('') }}"
-      changed_when: false
-
+- name: "pkg_add print results"
+  local_action: command printf "{{ item.name }} {{ item.state }} {{ (item.changed == 'true') | ternary('updated', 'installed') }}\n"
+  when: item != ''
+  with_items:
+    - "{{ print_pkg_update.results|default('') }}"
+  changed_when: false

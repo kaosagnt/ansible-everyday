@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,15 +20,15 @@
 # Remove an existing user on remote node.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Remove an existing user"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "existing_username"
       prompt: "Enter a username to remove"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -51,9 +51,9 @@
 
     - name: "Remove existing user on remote node."
       user:
-           name: "{{ existing_username }}"
-           state: absent
-           remove: yes
+        name: "{{ existing_username }}"
+        state: absent
+        remove: true
       register: existing_user
 
 #    - name: "Debug exisiting_user"

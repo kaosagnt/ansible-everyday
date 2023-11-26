@@ -23,7 +23,7 @@
   name: "Execute ubuntu-security-status / ubuntu-support-status on Ubuntu hosts"
 
   vars:
-       #print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml

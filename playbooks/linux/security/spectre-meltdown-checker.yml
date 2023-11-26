@@ -1,7 +1,6 @@
-
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -24,25 +23,25 @@
 # Generic checker that runs on all GNU/Linux hosts.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Are we vulnerable to CVE-2017-5754 CVE-2017-5753 CVE-2017-5715 on GNU/Linux hosts"
-  become: yes
+  become: true
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
 
     - name: "Fetch latest script from https://raw.githubusercontent.com/speed47/spectre-meltdown-checker/master/spectre-meltdown-checker.sh"
       get_url:
-          url: https://raw.githubusercontent.com/speed47/spectre-meltdown-checker/master/spectre-meltdown-checker.sh
-          dest: scripts/spectre-meltdown-checker.sh
-          mode: 0755
-          owner: "{{ ansible_env.SUDO_USER }}"
-          group: "{{ ansible_env.SUDO_GID }}"
-          force: yes
+        url: https://raw.githubusercontent.com/speed47/spectre-meltdown-checker/master/spectre-meltdown-checker.sh
+        dest: scripts/spectre-meltdown-checker.sh
+        mode: 0755
+        owner: "{{ ansible_env.SUDO_USER }}"
+        group: "{{ ansible_env.SUDO_GID }}"
+        force: true
       register: script_download
       delegate_to: localhost
-      run_once: yes
+      run_once: true
 
     - name: "Check for Linux Kernel Side-Channel Attacks - CVE-2017-5754 CVE-2017-5753 CVE-2017-5715 on GNU/Linux hosts"
       script: scripts/spectre-meltdown-checker.sh --no-color

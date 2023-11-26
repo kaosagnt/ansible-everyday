@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,23 +20,23 @@
 # Create a new user and setup .ssh authorized_keys file on remote node.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Create a new user and setup .ssh authorized_keys file"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "new_username"
       prompt: "Enter a username"
-      private: no
+      private: false
 
     - name: "full_username"
       prompt: "Enter the users full name"
-      private: no
+      private: false
 
     - name: "add_pub_ssh_key"
       prompt: "Enter a id_rsa.pub / id_ed25519.pub key to add to the users authorized keys file (leave blank to skip this step)"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -59,7 +59,7 @@
 
     - name: "Invalid Users full name"
       local_action: command printf "Invalid users full name."
-      when: full_username.find(':') >= 0 
+      when: full_username.find(':') >= 0
             or
             full_username == ""
       failed_when: true
@@ -68,7 +68,7 @@
     - name: "Invalid SSH Public Key"
       local_action: command printf "Invalid ssh id_rsa.pub / id_ed25519.pub key."
       when: add_pub_ssh_key.find('ssh-rsa') != 0
-            and 
+            and
             add_pub_ssh_key.find('ssh-ed25519') != 0
             and
             add_pub_ssh_key != ""
@@ -77,9 +77,9 @@
 
     - name: "Create new user on remote node"
       user:
-           name: "{{ new_username }}"
-           comment: "{{ full_username }}"
-           shell: /bin/bash
+        name: "{{ new_username }}"
+        comment: "{{ full_username }}"
+        shell: /bin/bash
       register: new_user
 
 #    - name: "Debug new_user"
@@ -88,10 +88,10 @@
 
     - name: "Adding public SSH key to new user account"
       authorized_key:
-                     user: "{{ new_username }}"
-                     key: "{{ add_pub_ssh_key }}"
-                     manage_dir: yes
-                     state: present
+        user: "{{ new_username }}"
+        key: "{{ add_pub_ssh_key }}"
+        manage_dir: true
+        state: present
       when: add_pub_ssh_key != ""
             and
             new_user.state == "present"

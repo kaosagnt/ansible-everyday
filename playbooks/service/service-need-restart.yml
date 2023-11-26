@@ -20,12 +20,12 @@
 # Check if services need restarting after updates on RHEL / debian hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Check if services need restarting after updates"
-  become: yes
+  become: true
 
   vars:
-       #print_information: true
-       package_name:
-           - "needrestart"
+#    print_information: true
+    package_name:
+      - "needrestart"
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -34,19 +34,16 @@
       ansible.builtin.command: apt list --installed "{{ item }}"
       register: package_check
       loop: "{{ package_name }}"
-      when:
-           ansible_facts['os_family'] == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
       failed_when:
-           package_check.stdout
-           is not search("needrestart")
+        package_check.stdout is not search("needrestart")
       changed_when: false
 
     - name: "Check package is installed on RHEL"
       ansible.builtin.command: rpm -q "{{ item }}"
       register: package_check
       loop: "{{ package_name }}"
-      when:
-           ansible_facts['os_family'] == "RedHat"
+      when: ansible_facts['os_family'] == "RedHat"
       changed_when: false
 
 #    - name: "debug"
@@ -56,8 +53,7 @@
     - name: "Check if services need restarting"
       ansible.builtin.command: needrestart -vlkr l
       register: need_restart
-      when:
-           package_check is succeeded
+      when: package_check is succeeded
       changed_when: false
 
 #    - name: "debug"

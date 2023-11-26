@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,19 +20,19 @@
 # Remove a users public ssh key from the authorized_keys file on a remote host.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Remove a users public ssh key from the authorized_keys file"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "user_name"
       prompt: "Enter the user name of the account to remove key from"
-      private: no
+      private: false
 
     - name: "user_key"
       prompt: "Paste the public SSH key (eg id_rsa.pub contents) to remove"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -49,11 +49,11 @@
 
     - name: "Removing public SSH key from user account"
       authorized_key:
-                     user: "{{ user_name }}"
-                     key: "{{ user_key }}"
-                     state: absent
+        user: "{{ user_name }}"
+        key: "{{ user_key }}"
+        state: absent
       register: authkey_result
 
-    #- name: "debug"
-    #  local_action: command printf "{{ authkey_result }}\n\n"
-    #  changed_when: false
+#    - name: "debug"
+#      local_action: command printf "{{ authkey_result }}\n\n"
+#      changed_when: false

@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,19 +20,19 @@
 # Add a users public ssh key to the authorized_keys file on a remote host.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Add a users public ssh key to the authorized_keys file"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "user_name"
       prompt: "Enter the user name of the account to add key to"
-      private: no
+      private: false
 
     - name: "user_key"
       prompt: "Paste the public SSH key (eg id_rsa.pub contents)"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -49,12 +49,12 @@
 
     - name: "Adding public SSH key to user account"
       authorized_key:
-                     user: "{{ user_name }}"
-                     key: "{{ user_key }}"
-                     manage_dir: yes
-                     state: present
+        user: "{{ user_name }}"
+        key: "{{ user_key }}"
+        manage_dir: true
+        state: present
       register: authkey_result
 
-    #- name: "debug"
-    #  local_action: command printf "{{ authkey_result }}\n\n"
-    #  changed_when: false
+#    - name: "debug"
+#      local_action: command printf "{{ authkey_result }}\n\n"
+#      changed_when: false

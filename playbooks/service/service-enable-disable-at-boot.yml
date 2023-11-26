@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,19 +20,19 @@
 # Enable / Disable services at boot time on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Enable / Disable services at boot time"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "service_name"
       prompt: 'Enter the name of the service (multiple seperated by a comma)'
-      private: no
+      private: false
 
     - name: "service_enable"
       prompt: "(E)nable or (D)isable the service (e / d)\nNOTE: this will appy to all services listed above"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -49,12 +49,12 @@
 
     - name: "Set Service enabled"
       set_fact:
-               service_enabled: "{{ (service_enable == 'e') | ternary('yes','no') }}"
+        service_enabled: "{{ (service_enable == 'e') | ternary('yes','no') }}"
       changed_when: false
 
     - name: "Service enable / disable at boot"
       service:
-              name: "{{ item }}"
-              enabled: "{{ service_enabled }}"
+        name: "{{ item }}"
+        enabled: "{{ service_enabled }}"
       with_items:
         - "{{ service_name.split(',') }}"

@@ -22,24 +22,24 @@
 # Scan a directory structure for CVE-2021-42574, CVE-2021-42694.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "RHSB-2021-007 Trojan source attacks (CVE-2021-42574,CVE-2021-42694)"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "chrs_to_find"
       prompt: "\nSearch for all non-printable unicode characters (all, bidi)"
-      private: no
+      private: false
 
     - name: "verbose_mode"
       prompt: "\nVerbose mode (y,n)"
-      private: no
+      private: false
 
     - name: "scan_directory"
       prompt: "\nEnter the path of the directory to scan"
-      private: no
+      private: false
 
   vars:
-        verbose_arg: ""
-#       print_information: true
+    verbose_arg: ""
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -61,13 +61,13 @@
 
     - name: "Set verbose mode"
       set_fact:
-               verbose_arg: "-v"
+        verbose_arg: "-v"
       when: verbose_mode in ('y', 'Y')
       changed_when: false
 
     - name: "Are we RHEL 6?"
       local_action: command printf "Requires RHEL > 6."
-      when: (ansible_os_family == 'RedHat') 
+      when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int < 7)
       failed_when: true

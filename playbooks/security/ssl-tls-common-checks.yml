@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -19,22 +19,22 @@
 
 # SSL /TLS common checks.
 
-    - name: "Invalid Certificate Name"
-      local_action: command printf "Invalid certificate name."
-      when:
-         - ssl_cert_name == ""
-      changed_when: false
-      failed_when: true
+- name: "Invalid Certificate Name"
+  local_action: command printf "Invalid certificate name."
+  when:
+    - ssl_cert_name == ""
+  changed_when: false
+  failed_when: true
 
-    - name: "Set SSL / TLS Certificate path"
-      set_fact:
-               ssl_cert_path: "/etc/ssl/certs"
-      when: ssl_cert_path is not defined
-            or
-            ssl_cert_path == ""
-      changed_when: false
+- name: "Set SSL / TLS Certificate path"
+  set_fact:
+    ssl_cert_path: "/etc/ssl/certs"
+  when: ssl_cert_path is not defined
+        or
+        ssl_cert_path == ""
+  changed_when: false
 
-#    - name: "Debug"
-#      local_action: command printf "Cert Name - {{ ssl_cert_name }}\n"
-#      local_action: command printf "Cert Path - {{ ssl_cert_path }}\n"
-#      changed_when: false
+# - name: "Debug"
+#   local_action: command printf "Cert Name - {{ ssl_cert_name }}\n"
+#   local_action: command printf "Cert Path - {{ ssl_cert_path }}\n"
+#   changed_when: false

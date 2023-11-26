@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,15 +21,15 @@
 # u*ix Operating systems that support it to disable all forms of login.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Disable an existing user login on remote node."
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "username"
       prompt: "Enter a username"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -54,10 +54,10 @@
     # from this figure so it is in the past.
     - name: "Disable user login on remote node"
       user:
-           name: "{{ username }}"
-           expires: "{{ (ansible_date_time.epoch|int - 31556926|int) }}"
+        name: "{{ username }}"
+        expires: "{{ (ansible_date_time.epoch|int - 31556926|int) }}"
       register: disable_user
 
-    #- name: "Debug disable_user"
-    #  local_action: command printf "{{ disable_user }}\n\n{{ ansible_date_time.epoch }}\n"
-    #  changed_when: false
+#    - name: "Debug disable_user"
+#      local_action: command printf "{{ disable_user }}\n\n{{ ansible_date_time.epoch }}\n"
+#      changed_when: false

@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,19 +20,19 @@
 # Start / Stop / Restart a service on RHEL/CENTOS hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Start / Stop / Restart a service"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "service_name"
       prompt: 'Enter the name of the service(s) (multiple seperated by a comma. NOTE: the same action will be applied to ALL services listed.)'
-      private: no
+      private: false
 
     - name: "service_action"
       prompt: 'Service action (start, stop, restart, reload)'
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -49,28 +49,28 @@
 
     - name: "Is service action start?"
       set_fact:
-          service_action: "started"
+        service_action: "started"
       when: service_action == "start"
       failed_when: false
       changed_when: false
 
     - name: "Is service action stop?"
       set_fact:
-          service_action: "stopped"
+        service_action: "stopped"
       when: service_action == "stop"
       failed_when: false
       changed_when: false
 
     - name: "Is service action restart?"
       set_fact:
-          service_action: "restarted"
+        service_action: "restarted"
       when: service_action == "restart"
       failed_when: false
       changed_when: false
 
     - name: "Is service action reload?"
       set_fact:
-          service_action: "reloaded"
+        service_action: "reloaded"
       when: service_action == "reload"
       failed_when: false
       changed_when: false

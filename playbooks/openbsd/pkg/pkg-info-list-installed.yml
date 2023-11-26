@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,7 +20,7 @@
 # Execute pkg_info on OpenBSD hosts to list installed packages.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Execute pkg_info on OpenBSD hosts to list installed packages"
-  become: yes
+  become: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -51,4 +51,4 @@
 
 #    - name: "debug"
 #      debug:
-#            var: pkg_info
+#        var: pkg_info

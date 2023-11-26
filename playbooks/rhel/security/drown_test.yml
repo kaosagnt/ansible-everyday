@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -22,7 +22,7 @@
   name: "Is OpenSSL is vulnerable to DROWN CVE-2016-0800 on RHEL/CENTOS hosts"
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml

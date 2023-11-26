@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,15 +21,15 @@
 # u*ix Operating systems that support it to enable all forms of login.
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Re-enable an existing user login on remote node."
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "username"
       prompt: "Enter a username"
-      private: no
+      private: false
 
 #  vars:
-#       print_information: true
+#    print_information: true
 
   tasks:
     - import_tasks: ../common/common_information.yml
@@ -55,6 +55,6 @@
       command: usermod --expiredate '' "{{ username }}"
       register: re_enable_user
 
-    #- name: "Debug re_enable_user"
-    #  local_action: command printf "{{ re_enable_user }}\n\n{{ ansible_date_time.epoch }}\n"
-    #  changed_when: false
+#    - name: "Debug re_enable_user"
+#      local_action: command printf "{{ re_enable_user }}\n\n{{ ansible_date_time.epoch }}\n"
+#      changed_when: false

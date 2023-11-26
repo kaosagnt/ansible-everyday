@@ -1,6 +1,6 @@
 ---
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2023 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -20,15 +20,15 @@
 # Update packages to the latest release on OpenBSD hosts
 - hosts: "{{ hosts | default('localhost') }}"
   name: "Update / Install packages to the latest release on OpenBSD hosts"
-  become: yes
+  become: true
 
   vars_prompt:
     - name: "package_name"
       prompt: "\nEnter the package name(s) \n(seperated by a comma for multiple or '*' to install all updates)"
-      private: no
+      private: false
 
   vars:
-       print_information: true
+    print_information: true
 
   tasks:
     - import_tasks: ../../common/common_information.yml
@@ -40,13 +40,13 @@
 
     - name: "Fix package name variable"
       set_fact:
-          package_name: "{{ package_name | replace(' ','') }}"
+        package_name: "{{ package_name | replace(' ','') }}"
       when: package_name is defined
 
     - name: "Update OpenBSD packages"
       openbsd_pkg:
-                  name: "{{ item }}"
-                  state: latest
+        name: "{{ item }}"
+        state: latest
       register: pkg_info
       with_items:
         - "{{ package_name.split(',') }}"
@@ -54,13 +54,13 @@
 
     - name: "Assign variables v1"
       set_fact:
-               print_pkg_update: "{{ pkg_info }}"
+        print_pkg_update: "{{ pkg_info }}"
       when: ansible_version.major|int == 1
       changed_when: false
 
     - name: "Assign variables v2"
       set_fact:
-               print_pkg_update: "{{ pkg_info.results[0] }}"
+        print_pkg_update: "{{ pkg_info.results[0] }}"
       when: ansible_version.major|int == 2
       changed_when: false
 
