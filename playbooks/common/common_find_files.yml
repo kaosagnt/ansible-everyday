@@ -21,13 +21,19 @@
 # of find(1).
 
 - name: "Print files found"
-  local_action: command printf "Found {{ (file_info.stdout|from_json).found_count }} files(s)\n{{ (file_info.stdout|from_json).found_list.replace('%%', '\n') }}"
-  when: (file_info.stdout|from_json).found == true
+  local_action:
+    command printf "%s\n{{ (file_info.stdout|from_json).found_list.replace('%%', '\n') }}" \
+    "Found {{ (file_info.stdout|from_json).found_count }} files(s)" \
+  when:
+    (file_info.stdout|from_json).found
   changed_when: false
 
 - name: "Print no files found"
-  local_action: command printf "No files found in the {{ directory_name }} directory."
-  when: (file_info.stdout|from_json).found == false
+  local_action:
+    command printf "%s" \
+    "No files found in the {{ directory_name }} directory."
+  when:
+    not (file_info.stdout|from_json).found
   changed_when: false
 
 - name: "Upload large file list"
@@ -36,17 +42,20 @@
     dest: "{{ upload_dest_directory }}"
     fail_on_missing: true
   register: fetch_info
-  when: (file_info.stdout|from_json).found == true
-        and
-        (file_info.stdout|from_json).found_file != ""
+  when:
+    (file_info.stdout|from_json).found
+    and
+    (file_info.stdout|from_json).found_file | length > 0
 
 - name: "Large file list uploaded"
-  local_action: command printf "{{ (file_info.stdout|from_json).found_file }} file uploaded."
-  when: fetch_info.changed == true
+  local_action:
+    command printf "%s" \
+    "{{ (file_info.stdout|from_json).found_file }} file uploaded."
+  when: fetch_info.changed
   changed_when: false
 
 - name: "Remove remote large file list"
   file:
     name: "{{ (file_info.stdout|from_json).found_file }}"
     state: absent
-  when: fetch_info.changed == true
+  when: fetch_info.changed

@@ -37,13 +37,24 @@
   tasks:
     - import_tasks: ../../common/common_information.yml
 
+    - name: "Redhat OS Family?"
+      local_action:
+        command printf "%s" \
+        "Not a RedHat OS Family"
+      failed_when: ansible_os_family != 'RedHat'
+      changed_when: false
+
     - name: "Invalid YUM repo name"
-      local_action: command printf "Invalid YUM repo name."
-      when: repo_name == ""
+      local_action:
+        command printf "%s" \
+        "Invalid YUM repo name."
+      when: repo_name | length == 0
       failed_when: true
 
     - name: "Invalid YUM repo action"
-      local_action: command printf "Invalid YUM repo action - {{ repo_action }}."
+      local_action:
+        command printf "%s" \
+        "Invalid YUM repo action - {{ repo_action }}."
       when: repo_action not in ['e', 'd']
       failed_when: true
 

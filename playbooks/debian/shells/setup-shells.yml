@@ -58,7 +58,7 @@
         owner: root
         group: root
         mode: 0644
-      when: cust_sh.stat.exists == false
+      when: not cust_sh.stat.exists
 
     # Install custom.csh file into /etc/csh/cshrc.d/
     - name: "Install custom.csh file into /etc/csh/cshrc.d/"
@@ -68,4 +68,4 @@
         owner: root
         group: root
         mode: 0644
-      when: cust_csh.stat.exists == false
+      when: not cust_csh.stat.exists

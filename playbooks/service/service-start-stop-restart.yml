@@ -38,12 +38,16 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid service name"
-      local_action: command printf "Invalid service name."
-      when: service_name == ""
+      local_action:
+        command printf "%s" \
+        "Invalid service name."
+      when: service_name | length == 0
       failed_when: true
 
     - name: "Invalid service action"
-      local_action: command printf "Invalid service action."
+      local_action:
+        command printf "%s" \
+        "Invalid service action."
       when: service_action not in ['start', 'stop', 'restart']
       failed_when: true
 

@@ -38,12 +38,16 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid user name"
-      local_action: command printf "Invalid user name."
-      when: user_name == ''
+      local_action:
+        command printf "%s" \
+        "Invalid user name."
+      when: user_name | length == 0
       failed_when: true
 
     - name: "Invalid user key"
-      local_action: command printf "Invalid user public key."
+      local_action:
+        command printf "%s" \
+        "Invalid user public key."
       when: user_key.find('ssh-') != 0
       failed_when: true
 

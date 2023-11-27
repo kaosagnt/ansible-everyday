@@ -39,12 +39,16 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid file / directory name"
-      local_action: command printf "Invalid file or directory name."
-      when: file_directory_name == ""
+      local_action:
+        command printf "%s" \
+        "Invalid file or directory name."
+      when: file_directory_name | length == 0
       failed_when: true
 
     - name: "Invalid symlinks directive"
-      local_action: command printf "Invalid file or directory name."
+      local_action:
+        command printf "%s" \
+        "Invalid file or directory name."
       when: follow_symlinks not in ('y', 'Y', 'n', 'N')
       failed_when: true
 
@@ -61,5 +65,7 @@
       register: stat_data
 
     - name: "Print stat data"
-      local_action: command printf "{{ stat_data.stat }}"
+      local_action:
+        command printf "%s" \
+        "{{ stat_data.stat }}"
       changed_when: false

@@ -45,7 +45,7 @@
 
     - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
-      when: rpm_package == ""
+      when: rpm_package | length == 0
       failed_when: true
 
     - import_tasks: ../common/common_rpm_fix_vars.yml

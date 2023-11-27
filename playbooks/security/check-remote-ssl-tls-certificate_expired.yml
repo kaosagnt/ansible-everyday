@@ -34,8 +34,10 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid remote host domain name / IP address"
-      local_action: command printf "Invalid remote host domain name / IP address."
-      when: remote_host == ""
+      local_action:
+        command printf "%s" \
+        "Invalid remote host domain name / IP address."
+      when: remote_host | length == 0
       changed_when: false
       failed_when: true
 

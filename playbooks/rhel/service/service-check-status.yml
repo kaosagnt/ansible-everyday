@@ -34,8 +34,10 @@
     - import_tasks: ../../common/common_information.yml
 
     - name: "Invalid service name"
-      local_action: command printf "Invalid service name."
-      when: service_name == ""
+      local_action:
+        command printf "%s" \
+        "Invalid service name."
+      when: service_name | length == 0
       failed_when: true
 
     - name: "Check service status"

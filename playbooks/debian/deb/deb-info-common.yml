@@ -51,8 +51,10 @@
       failed_when: true
 
     - name: "Invalid Deb package name"
-      local_action: command printf "Invalid Deb package name."
-      when: deb_package == ""
+      local_action:
+        command printf "%s" \
+        "Invalid Deb package name."
+      when: deb_package | length == 0
       failed_when: true
 
     - name: "Set directive search"

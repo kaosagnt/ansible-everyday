@@ -28,7 +28,9 @@
 - name: "Protocol"
   set_fact:
     protocol_s: "udp"
-  when: protocol != "" and protocol == "udp"
+  when:
+    protocol | length > 0
+    and protocol == "udp"
   changed_when: false
 
 - name: "Invalid Protocol"
@@ -41,38 +43,43 @@
 - name: "Source IP"
   set_fact:
     source_ip_s: "{{ source_ip }}"
-  when: source_ip != ""
+  when: source_ip | length > 0
   changed_when: false
 
 - name: "Invalid source address"
-  local_action: command printf "Invalid source address - {{ source_ip }}."
-  when: source_ip != ""
-        and
-        source_ip|ipaddr == False
+  local_action:
+    command printf "%s" \
+    "Invalid source address - {{ source_ip }}."
+  when:
+    source_ip | length > 0
+    and
+    source_ip | not ipaddr
   changed_when: false
   failed_when: true
 
 - name: "Set IP 6 version"
   set_fact:
     ip_ver: "ipv6"
-  when: source_ip|ipv6 == True
+  when: source_ip | ipv6
   changed_when: false
 
 - name: "Set IPTables 6 filename / service name"
   set_fact:
     iptables_file: "ip6tables"
     iptables_service: "ip6tables"
-  when: iptables_file is defined
-        and
-        ip_ver == "ipv6"
+  when:
+    iptables_file is defined
+    and
+    ip_ver == "ipv6"
   changed_when: false
 
 - name: "Firewalld Check zone"
   set_fact:
     zone_s: "public"
-  when: zone_s is defined
-        and
-        zone_s == ""
+  when:
+    zone_s is defined
+    and
+    zone_s | length == 0
   changed_when: false
 
 # - name: "Debug"
@@ -82,8 +89,12 @@
 #   changed_when: false
 
 - name: "Invalid port numbers"
-  local_action: command printf "Invalid port number - {{ item }}."
-  when: item == "" or item|int == 0
+  local_action:
+    command printf "%s" \
+    "Invalid port number - {{ item }}."
+  when:
+    item | length == 0
+    or item | int == 0
   failed_when: true
   with_items:
     - "{{ port_numbers.split(',') }}"

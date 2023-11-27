@@ -31,22 +31,35 @@
 
 # Yum reporting
 - name: "Print Yum updates found"
-  local_action: command printf "Approximately {{ (yum_info.stdout|from_json).update_count }} update(s) found - \n\n{{ (yum_info.stdout|from_json).update_list.replace('%%', '\n') }}\n\n"
-  when: yum_info is defined and (yum_info.stdout|from_json).found == true
+  local_action:
+    command printf "%s%s\n\n{{ (yum_info.stdout|from_json).update_list.replace('%%', '\n') }}\n\n" \
+    "Approximately " \
+    "{{ (yum_info.stdout|from_json).update_count }} update(s) found - "
+  when:
+    yum_info is defined
+    and (yum_info.stdout|from_json).found
   changed_when: false
 
 - name: "Print no Yum updates found"
-  local_action: command printf "No updates found."
-  when: yum_info is defined and (yum_info.stdout|from_json).found == false
+  local_action:
+    command printf "%s" \
+    "No updates found."
+  when:
+    yum_info is defined
+    and not (yum_info.stdout|from_json).found
   changed_when: false
 
 - name: "Print Yum error"
-  local_action: command printf "An error occurred\n{{ (yum_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n"
-  when: yum_info is defined and (yum_info.stdout|from_json).error_msg != ""
+  local_action:
+    command printf "%s\n{{ (yum_info.stdout|from_json).error_msg.replace('%%', '\n') }}\n" \
+    "An error occurred"
+  when:
+    yum_info is defined
+    and (yum_info.stdout|from_json).error_msg | length > 0
   changed_when: false
   failed_when:
-      ((yum_info.stdout|from_json).error_msg != ""
-       and
-       yum_info.stdout|from_json).found == false
-       and
-       yum_info.stdout|from_json).update_count == 0)
+    ((yum_info.stdout|from_json).error_msg | length > 0
+    and
+    not yum_info.stdout|from_json).found
+    and
+    yum_info.stdout|from_json).update_count == 0)

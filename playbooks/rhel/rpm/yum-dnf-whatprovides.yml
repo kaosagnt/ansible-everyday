@@ -36,7 +36,7 @@
 
     - name: "Valid filename / regex?"
       local_action: command printf "Invalid filename / regex."
-      when: file_regex == ""
+      when: file_regex | length == 0
       failed_when: true
 
     - name: "Should we use YUM as the package manager?"
@@ -55,6 +55,6 @@
       changed_when: false
 
     - name: "Find file in RPM"
-      shell: "{{ package_manager }} whatprovides {{ file_regex|quote }}"
+      ansible.builtin.command: "{{ package_manager }} whatprovides {{ file_regex|quote }}"
       when: ansible_os_family == 'RedHat'
       changed_when: false

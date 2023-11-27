@@ -38,14 +38,16 @@
 #      changed_when: false
 
     - name: "Invalid User name"
-      local_action: command printf "Invalid username."
+      local_action:
+        command printf "%s" \
+        "Invalid username."
       when: existing_username.find(':') >= 0
             or
             existing_username.find(' ') >= 0
             or
-            existing_username|length >= 32
+            existing_username | length >= 32
             or
-            existing_username == ""
+            existing_username | length == 0
       failed_when: true
       changed_when: false
 

@@ -35,7 +35,7 @@
 
     - name: "Invalid package name"
       local_action: command printf "Invalid package name."
-      when: package_name == ""
+      when: package_name | length == 0
       failed_when: true
 
     - name: "List files of installed package"

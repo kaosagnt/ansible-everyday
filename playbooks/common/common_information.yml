@@ -50,6 +50,13 @@
 
 # Print ansible fact information
 - name: "Ansible fact information"
-  local_action: command printf "\nansible_distribution - {{ ansible_distribution }}\nansible_os_family - {{ ansible_os_family }}\nansible_distribution_version - {{ ansible_distribution_version }}\nansible_distribution_version(int) - {{ ansible_distribution_version|int }}\nansible_lsb.major_release - {{ ansible_lsb.major_release }}\nansible_distribution_major_version - {{ ansible_distribution_major_version }}\nansible_distribution_release - {{ ansible_distribution_release }}\n\n"
+  local_action: command printf "\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n" \
+                "ansible_distribution - {{ ansible_distribution }}" \
+                "ansible_os_family - {{ ansible_os_family }}" \
+                "ansible_distribution_version - {{ ansible_distribution_version }}" \
+                "ansible_distribution_version(int) - {{ ansible_distribution_version|int }}" \
+                "ansible_lsb.major_release - {{ ansible_lsb.major_release }}" \
+                "ansible_distribution_major_version - {{ ansible_distribution_major_version }}" \
+                "ansible_distribution_release - {{ ansible_distribution_release }}"
   when: print_information is defined
   changed_when: false

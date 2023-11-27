@@ -26,11 +26,15 @@
   failed_when: yum_rpm_info.rc > 0
 
 - name: "YUM print RPM information found"
-  local_action: command printf "{{ rpm_package }} information found\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
-  when: (yum_rpm_info.stdout|from_json).found == true
+  local_action:
+    command printf "%s\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}" \
+    "{{ rpm_package }} information found"
+  when: (yum_rpm_info.stdout|from_json).found
   changed_when: false
 
 - name: "YUM print no RPM information found"
-  local_action: command printf "{{ rpm_package }} information could not be found.\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}"
-  when: (yum_rpm_info.stdout|from_json).found == false
+  local_action:
+    command printf "%s\n\n{{ (yum_rpm_info.stdout|from_json).rpm_information.replace('%%', '\n').replace('%', '') }}" \
+    "{{ rpm_package }} information could not be found."
+  when: not (yum_rpm_info.stdout|from_json).found
   changed_when: false

@@ -40,12 +40,12 @@
 
     - name: "Invalid directory name"
       local_action: command printf "Invalid directory name."
-      when: directory_name == ""
+      when: directory_name | length == 0
       failed_when: true
 
     - name: "Invalid search expression"
       local_action: command printf "Invalid file name."
-      when: regex_to_find == ""
+      when: regex_to_find | length == 0
       failed_when: true
 
     - name: "Find files in the directory specified"
@@ -58,7 +58,9 @@
       changed_when: false
 
     - name: "Files found < 100 - print list"
-      local_action: command printf "{{ file_info | json_query('files[*].path') | to_nice_json }}\n"
+      local_action:
+        command printf "%s\n" \
+        "{{ file_info | json_query('files[*].path') | to_nice_json }}"
       # local_action: command printf "{{ file_info.matched }}\n"
       when: file_info.matched > 0
             and
@@ -66,11 +68,17 @@
       changed_when: false
 
     - name: "Files found > 100 - save list"
-      local_action: copy content="{{ file_info | json_query('files[*].path') | to_nice_json }}" dest="{{ upload_dest_directory }}/ansible_find_files_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}.txt"
+      local_action:
+        copy content="{{ file_info | json_query('files[*].path') | to_nice_json }}"
+        dest="{{ upload_dest_directory }}/ansible_find_files_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}.txt"
+        mode="0644"
       when: file_info.matched > 100
       changed_when: false
 
     - name: "No Files found"
-      local_action: command printf "No files were found in the directory {{ directory_name }} using {{ regex_to_find }}\n"
+      local_action:
+        command printf "%s%s\n"
+        "No files were found in the directory "
+        "{{ directory_name }} using {{ regex_to_find }}"
       when: file_info.matched == 0
       changed_when: false

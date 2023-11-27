@@ -44,7 +44,7 @@
 
     - name: "Invalid Deb package name"
       local_action: command printf "Invalid Deb package name."
-      when: deb_package == ""
+      when: deb_package | length == 0
       failed_when: true
 
     - import_tasks: ../common/common_apt_fix_vars.yml

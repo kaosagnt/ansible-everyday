@@ -34,8 +34,10 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid file / directory name"
-      local_action: command printf "Invalid file or directory name."
-      when: file_directory_name == ""
+      local_action:
+        command printf "%s" \
+        "Invalid file or directory name."
+      when: file_directory_name | length == 0
       failed_when: true
 
     - name: "Get the ACL"
@@ -46,5 +48,7 @@
 #      changed_when: false
 
     - name: "Print ACL data"
-      local_action: command printf "{{ acl_data.acl }}"
+      local_action:
+        command printf "%s" \
+        "{{ acl_data.acl }}"
       changed_when: false

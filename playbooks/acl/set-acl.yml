@@ -46,17 +46,23 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid file / directory name"
-      local_action: command printf "Invalid file or directory name."
-      when: file_directory_name == ""
+      local_action:
+        command printf "%s" \
+        "Invalid file or directory name."
+      when: file_directory_name | length == 0
       failed_when: true
 
     - name: "Invalid entity type"
-      local_action: command printf "Invalid entity type - {{ user_group_other }}."
+      local_action:
+        command printf "%s" \
+        "Invalid entity type - {{ user_group_other }}."
       when: user_group_other not in ['u', 'g', 'o']
       failed_when: true
 
     - name: "Invalid permissions"
-      local_action: command printf "Invalid permissions - {{ permissions }}."
+      local_action:
+        command printf "%s" \
+        "Invalid permissions - {{ permissions }}."
       when: permissions not in ['r', 'rw', 'rwx', 'rx', 'x', 'wx']
       failed_when: true
 
@@ -93,5 +99,7 @@
       register: acl_data
 
     - name: "Print ACL data"
-      local_action: command printf "{{ acl_data.acl }}"
+      local_action:
+        command printf "%s" \
+        "{{ acl_data.acl }}"
       changed_when: false

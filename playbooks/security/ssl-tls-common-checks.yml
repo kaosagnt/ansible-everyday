@@ -20,9 +20,11 @@
 # SSL /TLS common checks.
 
 - name: "Invalid Certificate Name"
-  local_action: command printf "Invalid certificate name."
+  local_action:
+    command printf "%s" \
+    "Invalid certificate name."
   when:
-    - ssl_cert_name == ""
+    ssl_cert_name | length == 0
   changed_when: false
   failed_when: true
 
@@ -31,7 +33,7 @@
     ssl_cert_path: "/etc/ssl/certs"
   when: ssl_cert_path is not defined
         or
-        ssl_cert_path == ""
+        ssl_cert_path | length == 0
   changed_when: false
 
 # - name: "Debug"

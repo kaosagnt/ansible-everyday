@@ -39,16 +39,18 @@
       changed_when: false
 
     - name: "Valid filename / regex?"
-      local_action: command printf "Invalid filename / regex."
-      when: file_regex == ""
+      local_action:
+        command printf "%s" \
+        "Invalid filename / regex."
+      when: file_regex | length == 0
       failed_when: true
 
     - name: "Update the apt-file cache"
-      shell: "apt-file update"
+      ansible.builtin.command: "apt-file update"
       when: ansible_os_family == 'Debian'
       changed_when: false
 
     - name: "Find file in Deb packages"
-      shell: "apt-file search {{ file_regex|quote }}"
+      ansible.builtin.command: "apt-file search {{ file_regex|quote }}"
       when: ansible_os_family == 'Debian'
       changed_when: false

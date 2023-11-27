@@ -70,11 +70,11 @@
              (
               hostvars[inventory_hostname]['use_iptables'] is defined
               and
-              hostvars[inventory_hostname]['use_iptables'] | bool == False
+              not hostvars[inventory_hostname]['use_iptables'] | bool
              )
             )
             and
-            (source_ip_s == "")
+            (source_ip_s | length == 0)
       register: close_port_firewalld
       with_items:
         - "{{ port_numbers.split(',') }}"
@@ -95,11 +95,11 @@
              (
               hostvars[inventory_hostname]['use_iptables'] is defined
               and
-              hostvars[inventory_hostname]['use_iptables'] | bool == False
+              not hostvars[inventory_hostname]['use_iptables'] | bool
              )
             )
             and
-            (source_ip_s != "")
+            (source_ip_s | length > 0)
       register: close_port_firewalld
       with_items:
         - "{{ port_numbers.split(',') }}"

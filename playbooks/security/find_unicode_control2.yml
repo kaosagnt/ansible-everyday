@@ -45,18 +45,24 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid choice"
-      local_action: command printf "Invalid choice for non-printable unicode characters."
+      local_action:
+        command printf "%s" \
+        "Invalid choice for non-printable unicode characters."
       when: (chrs_to_find not in ('all', 'bidi'))
       failed_when: true
 
     - name: "Invalid choice"
-      local_action: command printf "Invalid choice for verbose mode."
+      local_action:
+        command printf "%s" \
+        "Invalid choice for verbose mode."
       when: (verbose_mode not in ('y', 'Y', 'n', 'N'))
       failed_when: true
 
     - name: "Invalid directory"
-      local_action: command printf "Invalid directory path."
-      when: (scan_directory == "")
+      local_action:
+        command printf "%s" \
+        "Invalid directory path."
+      when: scan_directory | length == 0
       failed_when: true
 
     - name: "Set verbose mode"
@@ -66,7 +72,9 @@
       changed_when: false
 
     - name: "Are we RHEL 6?"
-      local_action: command printf "Requires RHEL > 6."
+      local_action:
+        command printf "%s" \
+        "Requires RHEL > 6."
       when: (ansible_os_family == 'RedHat')
             and
             (ansible_lsb.major_release|int < 7)

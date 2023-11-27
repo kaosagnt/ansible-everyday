@@ -52,7 +52,7 @@
 
     - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
-      when: rpm_package == ""
+      when: rpm_package | length == 0
       failed_when: true
 
     - name: "Set directive search"

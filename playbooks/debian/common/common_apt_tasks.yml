@@ -20,8 +20,10 @@
 # Common APT tasks
 
 - name: "APT print results"
-  local_action: command printf "{{ item }}"
-  when: item != ''
+  local_action:
+    command printf "%s" \
+    "{{ item }}"
+  when: item | length > 0
   with_items:
     - "{{ print_apt_update.results|default('') }}"
   changed_when: false

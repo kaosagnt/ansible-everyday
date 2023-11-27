@@ -34,8 +34,10 @@
     - import_tasks: ../common/common_information.yml
 
     - name: "Invalid file / directory name"
-      local_action: command printf "Invalid file or directory name."
-      when: file_directory_name == ""
+      local_action:
+        command printf "%s" \
+        "Invalid file or directory name."
+      when: file_directory_name | length == 0
       failed_when: true
 
     - name: "Get the xattr(s)"
@@ -45,5 +47,7 @@
 #      changed_when: false
 
     - name: "Print xattr data"
-      local_action: command printf "{{ xattr_data.xattr }}"
+      local_action:
+        command printf "%s" \
+        "{{ xattr_data.xattr }}"
       changed_when: false

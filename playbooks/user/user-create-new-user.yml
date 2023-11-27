@@ -46,32 +46,38 @@
 #      changed_when: false
 
     - name: "Invalid User name"
-      local_action: command printf "Invalid username."
+      local_action:
+        command printf "%s" \
+        "Invalid username."
       when: new_username.find(':') >= 0
             or
             new_username.find(' ') >= 0
             or
-            new_username|length >= 32
+            new_username | length >= 32
             or
-            new_username == ""
+            new_username | length == 0
       failed_when: true
       changed_when: false
 
     - name: "Invalid Users full name"
-      local_action: command printf "Invalid users full name."
+      local_action:
+        command printf "%s" \
+        "Invalid users full name."
       when: full_username.find(':') >= 0
             or
-            full_username == ""
+            full_username | length == 0
       failed_when: true
       changed_when: false
 
     - name: "Invalid SSH Public Key"
-      local_action: command printf "Invalid ssh id_rsa.pub / id_ed25519.pub key."
+      local_action:
+        command printf "%s" \
+        "Invalid ssh id_rsa.pub / id_ed25519.pub key."
       when: add_pub_ssh_key.find('ssh-rsa') != 0
             and
             add_pub_ssh_key.find('ssh-ed25519') != 0
             and
-            add_pub_ssh_key != ""
+            add_pub_ssh_key | length > 0
       failed_when: true
       changed_when: false
 
@@ -92,7 +98,7 @@
         key: "{{ add_pub_ssh_key }}"
         manage_dir: true
         state: present
-      when: add_pub_ssh_key != ""
+      when: add_pub_ssh_key | length > 0
             and
             new_user.state == "present"
       register: authkey_result

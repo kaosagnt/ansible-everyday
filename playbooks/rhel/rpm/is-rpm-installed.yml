@@ -34,7 +34,7 @@
 
     - name: "Invalid RPM package name"
       local_action: command printf "Invalid RPM package name."
-      when: rpm_package == ""
+      when: rpm_package | length == 0
       failed_when: true
 
     - name: "Check if RPM is installed"
@@ -44,11 +44,15 @@
       failed_when: rpm_info.rc > 0
 
     - name: "Print RPMs found"
-      local_action: command printf "{{ rpm_package | trim }} search term found {{ (rpm_info.stdout|from_json).rpm_count }} package(s)\n{{ (rpm_info.stdout|from_json).rpm_names.replace('%%', '\n') }}"
-      when: (rpm_info.stdout|from_json).found == true
+      local_action:
+        command printf "%s%s%s\n{{ (rpm_info.stdout|from_json).rpm_names.replace('%%', '\n') }}" \
+        "{{ rpm_package | trim }} " \
+        "search term found " \
+        "{{ (rpm_info.stdout|from_json).rpm_count }} package(s)" \
+      when: (rpm_info.stdout|from_json).found
       changed_when: false
 
     - name: "Print no RPMs found"
       local_action: command printf "{{ rpm_package | trim }} is not installed."
-      when: (rpm_info.stdout|from_json).found == false
+      when: not (rpm_info.stdout|from_json).found
       changed_when: false

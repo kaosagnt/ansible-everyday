@@ -80,11 +80,11 @@
              (
               hostvars[inventory_hostname]['use_iptables'] is defined
               and
-              hostvars[inventory_hostname]['use_iptables'] | bool == True
+              hostvars[inventory_hostname]['use_iptables'] | bool
              )
             )
             and
-            (source_ip_s == "")
+            (source_ip_s | length == 0)
       register: close_port_iptables
       notify:
         - "Backup iptables"
@@ -113,11 +113,11 @@
              (
               hostvars[inventory_hostname]['use_iptables'] is defined
               and
-              hostvars[inventory_hostname]['use_iptables'] | bool == True
+              hostvars[inventory_hostname]['use_iptables'] | bool
              )
             )
             and
-            (source_ip_s != "")
+            (source_ip_s | length > 0)
       register: close_port_iptables
 
       notify:

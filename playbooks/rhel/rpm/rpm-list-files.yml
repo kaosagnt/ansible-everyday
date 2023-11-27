@@ -33,15 +33,24 @@
   tasks:
     - import_tasks: ../../common/common_information.yml
 
+    - name: "Redhat OS Family?"
+      local_action:
+        command printf "%s" \
+        "Not a RedHat OS Family"
+      failed_when: ansible_os_family != 'RedHat'
+
     - name: "Invalid RPM package name"
-      local_action: command printf "Invalid RPM package name."
-      when: rpm_package == ""
+      local_action:
+        command printf "%s" \
+        "Invalid RPM package name."
+      when: rpm_package | length == 0
       failed_when: true
 
     - name: "List files of installed RPMs"
       script: scripts/rpm_list_files  "{{ rpm_package }}"
       register: file_info
       changed_when: false
+      when: ansible_os_family == 'RedHat'
       failed_when: file_info.rc > 0
 
     - import_tasks: ../../common/common_find_files.yml

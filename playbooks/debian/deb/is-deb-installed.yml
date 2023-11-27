@@ -34,7 +34,7 @@
 
     - name: "Invalid Deb package name"
       local_action: command printf "Invalid Deb package name."
-      when: deb_package == ""
+      when: deb_package | length == 0
       failed_when: true
 
     - name: "Check if Deb is installed"
@@ -44,11 +44,15 @@
       failed_when: deb_info.rc > 0
 
     - name: "Print Debs found"
-      local_action: command printf "{{ deb_package | trim }} search term found {{ (deb_info.stdout|from_json).deb_count }} package(s)\n{{ (deb_info.stdout|from_json).deb_names.replace('%%', '\n') }}"
-      when: (deb_info.stdout|from_json).found == true
+      local_action:
+        command printf "%s%s%s\n{{ (deb_info.stdout|from_json).deb_names.replace('%%', '\n') }}" \
+        "{{ deb_package | trim }} " \
+        "search term found " \
+        "{{ (deb_info.stdout|from_json).deb_count }} package(s)"
+      when: (deb_info.stdout|from_json).found
       changed_when: false
 
     - name: "Print no Debs found"
       local_action: command printf "{{ deb_package | trim }} is not installed."
-      when: (deb_info.stdout|from_json).found == false
+      when: not (deb_info.stdout|from_json).found
       changed_when: false
