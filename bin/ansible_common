@@ -21,21 +21,21 @@ DEBUG=${DEBUG-0}
 ANSIBLE_BASE_PATH=${SCRIPT_DIR%/bin*}
 
 # Include user definable config.
-if [ -f ${SCRIPT_DIR}/ansible_config ]; then
+if [ -f "${SCRIPT_DIR}/ansible_config" ]; then
 
-	. ${SCRIPT_DIR}/ansible_config
+	. "${SCRIPT_DIR}/ansible_config"
 
 else
 
-	ANSIBLE_CONF_PATH=${ANSIBLE_BASE_PATH}/conf
-	ANSIBLE_HOSTS_PATH=${ANSIBLE_CONF_PATH}
+	ANSIBLE_CONF_PATH="${ANSIBLE_BASE_PATH}/conf"
+	ANSIBLE_HOSTS_PATH="${ANSIBLE_CONF_PATH}"
 	ANSIBLE_VERSION_OVERIDE=no
 fi
 
-ANSIBLE_CONFIG_FILE=ansible.cfg
+ANSIBLE_CONFIG_FILE="ansible.cfg"
 
-ANSIBLE_PLAYBOOKS_PATH=${ANSIBLE_BASE_PATH}/playbooks
-ANSIBLE_FACTS_PATH=${ANSIBLE_BASE_PATH}/facts
+ANSIBLE_PLAYBOOKS_PATH="${ANSIBLE_BASE_PATH}/playbooks"
+ANSIBLE_FACTS_PATH="${ANSIBLE_BASE_PATH}/facts"
 
 # Debug
 print_debug() {
@@ -73,7 +73,7 @@ version_compare() {
 	# 0) <
 	# 1) >=
 
-	if version_gte $VERSION $VERSION2; then
+	if version_gte "${VERSION}" "${VERSION2}"; then
 		return 1
 	else
 		return 0
@@ -86,41 +86,42 @@ playbook_version () {
 							| grep -E -o "([0-9]{1,}\.)+[0-9]{1,}" \
 							| awk '{printf("%s", $1)}')
 
-	printf ${_playbook_version}
+	printf "%s" \
+		"${_playbook_version}"
 }
 
 if [ X"${ANSIBLE_VERSION_OVERIDE}" = X"yes" ]; then
 
-	ANSIBLE_CONFIG_FILE=ansible.2.cfg
+	ANSIBLE_CONFIG_FILE="ansible.2.cfg"
 	ANSIBLE_PLAYBOOK_VERSION=$(playbook_version)
 	#ANSIBLE_PLAYBOOK_VERSION="2.9.21"
 	#ANSIBLE_PLAYBOOK_VERSION="2.9.213.93.9.511.1.111.1.1"
 
-	$(version_compare ${ANSIBLE_PLAYBOOK_VERSION} "3.0.0")
+	$(version_compare "${ANSIBLE_PLAYBOOK_VERSION}" "3.0.0")
 	ANSIBLE_VERSION_COMPARE=$?
 
 	# Debug
-	if [ ${DEBUG} -eq 1 ]; then
+	if [ "${DEBUG}" -eq 1 ]; then
 		printf "Version: %s\nANSIBLE_VERSION_COMPARE: %s\n\n" \
 				"${ANSIBLE_PLAYBOOK_VERSION}" \
 				"${ANSIBLE_VERSION_COMPARE}"
 	fi
 
-	if [ ${ANSIBLE_VERSION_COMPARE} -ne 1 ]; then
+	if [ "${ANSIBLE_VERSION_COMPARE}" -ne 1 ]; then
 		# >= 3.0
 		ANSIBLE_CONFIG_FILE=ansible.3.cfg
 	fi
 
-	$(version_compare ${ANSIBLE_PLAYBOOK_VERSION} "4.0.0")
+	$(version_compare "${ANSIBLE_PLAYBOOK_VERSION}" "4.0.0")
 	ANSIBLE_VERSION_COMPARE=$?
 
 	# Debug
-	if [ ${DEBUG} -eq 1 ]; then
+	if [ "${DEBUG}" -eq 1 ]; then
 		printf "ANSIBLE_VERSION_COMPARE: %s\n\n" \
 				"${ANSIBLE_VERSION_COMPARE}"
 	fi
 
-	if [ ${ANSIBLE_VERSION_COMPARE} -ne 1 ]; then
+	if [ "${ANSIBLE_VERSION_COMPARE}" -ne 1 ]; then
 		# >= 4.0
 		ANSIBLE_CONFIG_FILE=ansible.4.cfg
 	fi
@@ -129,7 +130,7 @@ fi
 ANSIBLE_CONFIG="${ANSIBLE_CONF_PATH}/${ANSIBLE_CONFIG_FILE}"
 export ANSIBLE_CONFIG
 
-[ ${DEBUG} -eq 1 ] && print_debug
+[ "${DEBUG}" -eq 1 ] && print_debug
 
 printf "Playbook Version: %s\nConfig File: %s\n\n" \
 		"${ANSIBLE_PLAYBOOK_VERSION}" \

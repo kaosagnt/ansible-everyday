@@ -21,14 +21,14 @@
 # Add the command line arg  -e hosts=ianm to override the default
 # playbook hosts setting
 
-SCRIPT_DIR=$(dirname `which $0`)
+SCRIPT_DIR="$(dirname "$(readlink -f "${0}")")"
 
 # Include our default settings
-. ${SCRIPT_DIR}/ansible_common
+. "${SCRIPT_DIR}/ansible_common"
 
 # Debug
 #printf "path = ${ANSIBLE_PLAYBOOKS_PATH}\n\n"
 
 ansible-playbook ${MUNGED_ARGS} \
-	--inventory=${ANSIBLE_HOSTS_PATH}/hosts \
-	${ANSIBLE_PLAYBOOKS_PATH}/ubuntu/security/ubuntu-security-status.yml
+	--inventory="${ANSIBLE_HOSTS_PATH}/hosts" \
+	"${ANSIBLE_PLAYBOOKS_PATH}"/ubuntu/security/ubuntu-security-status.yml
