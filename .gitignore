@@ -6,4 +6,4 @@
 .settings/
 .settings/**/*
 x-code-project/**/*
-
+bin/ansible_config
