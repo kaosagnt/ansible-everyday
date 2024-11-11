@@ -57,7 +57,7 @@ for ARGUMENT in "$@"; do
 	esac
 done
 
-if [ ! -z ${DISABLE_TEMP} ]; then
+if [ ! -z "${DISABLE_TEMP}" ]; then
 	# Use a 'here string <<<' for the while loop so we can modify the
 	# DISABLE_REPO variable otherwise the while loop will execute in a
 	# sub shell and we will loose all DISABLE_REPO changes.
@@ -69,7 +69,7 @@ fi
 # Debug
 #printf "\nDISABLE_REPO=${DISABLE_REPO}\n\n"
 
-if [ ! -z ${ENABLE_TEMP} ]; then
+if [ ! -z "${ENABLE_TEMP}" ]; then
     # Use a 'here string <<<' for the while loop so we can modify the
     # ENABLE_REPO variable otherwise the while loop will execute in a
     # sub shell and we will loose all ENABLE_REPO changes.
@@ -87,7 +87,7 @@ TEMP_FILE=$(mktemp --tmpdir ansible_yum_dnf_tmp.XXXXXXXXX)
 #printf "Temp Filename = ${TEMP_FILE}\n\n"
 
 # Clean the yum / dnf caches
-${PACKAGE_MANAGER} -q clean all
+${PACKAGE_MANAGER} -q clean all >/dev/null
 
 # Check for updates.
 
