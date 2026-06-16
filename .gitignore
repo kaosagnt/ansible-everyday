@@ -5,5 +5,6 @@
 .project
 .settings/
 .settings/**/*
+.theia/**/*
 x-code-project/**/*
 bin/ansible_config
