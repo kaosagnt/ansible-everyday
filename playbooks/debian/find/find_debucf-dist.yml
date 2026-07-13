@@ -1,0 +1,48 @@
+---
+# %BEGIN_COPYRIGHT%
+#
+# Copyright 2015-2026 Ian McWilliam (kaosagnt@gmail.com).
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# %END_COPYRIGHT%
+
+# Find any ucf-dist files in the /etc/ directories.
+# Usually found on Debian style hosts after deb package updates created by the
+# ucf utility.
+- hosts: "{{ hosts | default('localhost') }}"
+  name: "Find any .ucf-dist files in the /etc/ directory"
+  become: true
+
+# vars:
+#   print_information: true
+
+  tasks:
+    - import_tasks: ../../common/common_information.yml
+
+    - name: "Find .ucf-dist files in the /etc/ directory"
+      find:
+        paths: "{{ item }}"
+        patterns: "^.*.(?:dpkg-dist|dpkg-old|ucf-dist|ucf-old)$"
+        use_regex: true
+        recurse: true
+      register: file_info
+      changed_when: false
+      with_items:
+        - "/etc/"
+
+    # - debug: var=file_info
+
+    - name: "Files found /etc/ directory"
+      local_action: command printf "{{ file_info | json_query('results[*].files[*].path') | to_nice_json }}\n"
+      changed_when: false

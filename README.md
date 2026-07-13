@@ -95,6 +95,7 @@ other Operating Systems.
     
     ansible_editors-setup-nano - set up the nano editor and config file
     
+    ansible_find-etc-deb-ucf-dist-files - find leftover dpkg / ucf config files in the /etc directory
     ansible_find-etc-opt-rmpnew-files - find leftover rpmnew / rpmsave files in the /etc and /opt directories
     ansible_find-files - find files or directories. If the list of files are large then the list of files are uploaded instead of being displayed
     
