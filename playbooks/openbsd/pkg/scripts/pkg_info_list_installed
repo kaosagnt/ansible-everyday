@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2026 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,7 +21,7 @@
 # Ansible script to list installed OpenBSD packages via pkg_info.
 #
 # Returns: JSON string:
-# { 
+# {
 #	"found": true/false ,
 #	"pkg_count": "Count of number of packages" ,
 #	"pkg_list": "String of package filenames" ,
@@ -78,7 +78,7 @@ else
 	if [ ${PKG_COUNT} -gt 0 ]; then
 
 		FOUND="true"
-	fi 
+	fi
 
 	printf '{ %s %s , %s "%s" , %s "%s" , "error_msg": "" }' \
 		'"found":' \
