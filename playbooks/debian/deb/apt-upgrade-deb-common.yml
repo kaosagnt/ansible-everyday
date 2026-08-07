@@ -51,5 +51,5 @@
 
     - name: "Include APT upgrade Deb"
       import_tasks: apt-upgrade-deb.yml
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
       changed_when: false

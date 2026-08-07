@@ -21,7 +21,7 @@
 
 - name: "DNF check-update"
   script: scripts/check_yum_dnf_updates dnf -d="{{ disable_repo }}" -e="{{ enable_repo }}"
-  when: ((ansible_os_family == 'RedHat')
+  when: ((ansible_facts['os_family'] == 'RedHat')
         and
         (ansible_lsb.major_release|int >= 8))
   register: dnf_info

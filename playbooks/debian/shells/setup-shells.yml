@@ -33,7 +33,7 @@
 
     - name: "Include APT installer"
       import_tasks: apt-setup-shells.yml
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
       changed_when: false
 
     # Does /etc/profile.d/custom.sh exist?

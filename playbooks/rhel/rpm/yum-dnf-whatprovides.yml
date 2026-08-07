@@ -42,7 +42,7 @@
     - name: "Should we use YUM as the package manager?"
       set_fact:
         package_manager: "yum"
-      when: (ansible_os_family == 'RedHat')
+      when: (ansible_facts['os_family'] == 'RedHat')
             and
             (
              (ansible_lsb.major_release|int >= 5
@@ -56,5 +56,5 @@
 
     - name: "Find file in RPM"
       ansible.builtin.command: "{{ package_manager }} whatprovides {{ file_regex|quote }}"
-      when: ansible_os_family == 'RedHat'
+      when: ansible_facts['os_family'] == 'RedHat'
       changed_when: false

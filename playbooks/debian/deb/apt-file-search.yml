@@ -47,10 +47,10 @@
 
     - name: "Update the apt-file cache"
       ansible.builtin.command: "apt-file update"
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
       changed_when: false
 
     - name: "Find file in Deb packages"
       ansible.builtin.command: "apt-file search {{ file_regex|quote }}"
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
       changed_when: false

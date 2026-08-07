@@ -52,7 +52,7 @@
       register: pkg_info
       with_items:
         - "{{ package_name.split(',') }}"
-      when: ansible_os_family == 'OpenBSD'
+      when: ansible_facts['os_family'] == 'OpenBSD'
 
     - name: "Assign variables v1"
       set_fact:

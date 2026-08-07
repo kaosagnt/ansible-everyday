@@ -27,7 +27,7 @@
 
     - name: "pkg_info fetch installed packages"
       script: scripts/pkg_info_list_installed
-      when: ansible_os_family == 'OpenBSD'
+      when: ansible_facts['os_family'] == 'OpenBSD'
       register: pkg_info
       changed_when: false
       failed_when: pkg_info.rc > 0

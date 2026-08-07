@@ -30,14 +30,14 @@
 
     - name: "Run ubuntu-support-status"
       shell: "ubuntu-support-status --show-supported --list"
-      when: ansible_distribution == 'Ubuntu'
+      when: ansible_facts['distribution'] == 'Ubuntu'
             and
             ansible_distribution_major_version|int < 20
       changed_when: false
 
     - name: "Run ubuntu-security-status"
       shell: printf "ubuntu-security-status %s\n" "{{ item }}" && ubuntu-security-status {{ item }} && echo
-      when: ansible_distribution == 'Ubuntu'
+      when: ansible_facts['distribution'] == 'Ubuntu'
             and
             ansible_distribution_major_version|int >= 20
       with_items:

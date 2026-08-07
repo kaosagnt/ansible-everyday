@@ -41,5 +41,5 @@
 
     - name: "Include APT update"
       import_tasks: apt-update.yml
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
       changed_when: false

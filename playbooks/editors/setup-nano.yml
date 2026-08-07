@@ -32,7 +32,7 @@
 
     - name: "Include Yum installer"
       import_tasks: ../rhel/editors/yum-setup-nano.yml
-      when: (ansible_os_family == 'RedHat')
+      when: (ansible_facts['os_family'] == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5 and
              ansible_lsb.major_release|int <= 7)
@@ -40,14 +40,14 @@
 
     - name: "Include DNF installer"
       import_tasks: ../rhel/editors/dnf-setup-nano.yml
-      when: ((ansible_os_family == 'RedHat')
+      when: ((ansible_facts['os_family'] == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 8))
       changed_when: false
 
     - name: "Include APT installer"
       import_tasks: ../debian/editors/apt-setup-nano.yml
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
       changed_when: false
 
     # Does /etc/nanorc exist?

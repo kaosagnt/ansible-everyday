@@ -33,7 +33,7 @@
 
     - name: "DNSpooq on RHEL/CENTOS hosts"
       script: scripts/cve-2020-25681--2021-01-19-0942.sh -n
-      when: (ansible_os_family == 'RedHat')
+      when: (ansible_facts['os_family'] == 'RedHat')
             and
             (ansible_lsb.major_release|int >= 5)
       register: vulnerable_info

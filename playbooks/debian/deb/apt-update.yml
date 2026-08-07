@@ -21,14 +21,14 @@
 
 - name: "Enable / Disable APT sources"
   script: scripts/enable_disable_apt_sources -d="{{ disable_source }}" -e="{{ enable_source }}"
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
   register: apt_enable
   changed_when: false
   failed_when: apt_enable.rc > 0
 
 - name: "APT update"
   script: scripts/check_apt_updates
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
   register: apt_info
   changed_when: false
   failed_when: apt_info.rc > 0

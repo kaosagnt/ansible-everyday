@@ -26,14 +26,14 @@
 - name: "Dummy up Amazon Linux OS family version numbering if needed"
   set_fact:
     ansible_lsb:
-      major_release: "{{ ansible_distribution_major_version|int + 5 }}"
+      major_release: "{{ ansible_facts['distribution_major_version']|int + 5 }}"
   when:
     - ansible_distribution == "Amazon"
 
 # Set ansible_distribution_major_version if undefined
 - name: "Set undefined ansible_distribution_major_version information"
   set_fact:
-    ansible_distribution_major_version: "{{ ansible_distribution_version }}"
+    ansible_distribution_major_version: "{{ ansible_facts['distribution_version'] }}"
   when:
     - ansible_distribution_major_version is not defined
 
@@ -41,9 +41,9 @@
 - name: "Set undefined ansible_lsb information"
   set_fact:
     ansible_lsb:
-      major_release: "{{ ansible_distribution_major_version }}"
-      release: "{{ ansible_distribution_version }}"
-      description: "{{ ansible_distribution_release }}"
+      major_release: "{{ ansible_facts['distribution_major_version'] }}"
+      release: "{{ ansible_facts['distribution_version'] }}"
+      description: "{{ ansible_facts['distribution_release'] }}"
   when: (ansible_lsb is not defined
         or
         ansible_lsb.major_release is not defined)
@@ -51,12 +51,12 @@
 # Print ansible fact information
 - name: "Ansible fact information"
   local_action: command printf "\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n" \
-                "ansible_distribution - {{ ansible_distribution }}" \
-                "ansible_os_family - {{ ansible_os_family }}" \
-                "ansible_distribution_version - {{ ansible_distribution_version }}" \
-                "ansible_distribution_version(int) - {{ ansible_distribution_version|int }}" \
+                "ansible_distribution - {{ ansible_facts['distribution'] }}" \
+                "ansible_os_family - {{ ansible_facts['os_family'] }}" \
+                "ansible_distribution_version - {{ ansible_facts['distribution_version'] }}" \
+                "ansible_distribution_version(int) - {{ ansible_facts['distribution_version']|int }}" \
                 "ansible_lsb.major_release - {{ ansible_lsb.major_release }}" \
-                "ansible_distribution_major_version - {{ ansible_distribution_major_version }}" \
-                "ansible_distribution_release - {{ ansible_distribution_release }}"
+                "ansible_distribution_major_version - {{ ansible_facts['distribution_major_version'] }}" \
+                "ansible_distribution_release - {{ ansible_facts['distribution_release'] }}"
   when: print_information is defined
   changed_when: false

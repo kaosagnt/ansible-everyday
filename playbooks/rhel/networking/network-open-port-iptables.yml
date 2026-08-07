@@ -72,7 +72,7 @@
         ctstate: NEW
         ip_version: "{{ ip_ver }}"
       when: (
-             (ansible_os_family == 'RedHat'
+             (ansible_facts['os_family'] == 'RedHat'
               and
               ansible_lsb.major_release|int <= 6
              )
@@ -105,7 +105,7 @@
         ctstate: NEW
         ip_version: "{{ ip_ver }}"
       when: (
-             (ansible_os_family == 'RedHat'
+             (ansible_facts['os_family'] == 'RedHat'
               and
               ansible_lsb.major_release|int <= 6
              )

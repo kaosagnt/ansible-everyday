@@ -66,5 +66,5 @@
 
     - name: "Include APT deb-info"
       import_tasks: apt-deb-info.yml
-      when: (ansible_os_family == 'Debian')
+      when: (ansible_facts['os_family'] == 'Debian')
       changed_when: false

@@ -33,7 +33,7 @@
     - name: "APT remove unused dependency packages"
       ansible.builtin.apt:
         autoremove: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
       # register: apt_deb_autoremove
 
 #    - name: "debug"
