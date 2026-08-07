@@ -22,7 +22,7 @@
 # search for an RPM package.
 #
 # Returns: JSON string:
-# { 
+# {
 #	"found": true/false ,
 #	"rpm_information": "String of RPM information"
 # }

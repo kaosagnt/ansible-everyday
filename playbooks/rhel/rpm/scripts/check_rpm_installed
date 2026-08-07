@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # %BEGIN_COPYRIGHT%
-# 
+#
 # Copyright 2015-2026 Ian McWilliam (kaosagnt@gmail.com).
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -21,7 +21,7 @@
 # Ansible script to query the existance of a RPM package.
 #
 # Returns: JSON string:
-# { 
+# {
 #	"found": true/false ,
 #	"rpm_count": "Count of number of RPM packages" ,
 #	"rpm_names": "String of RPM package names"

@@ -151,7 +151,7 @@ else
 	if [ ${UPDATE_COUNT} -gt 0 ]; then
 
 		FOUND="true"
-	fi 
+	fi
 
 	printf '{ %s %s , %s "%s" , %s "%s" , %s "%s" }' \
 		'"found":' \
