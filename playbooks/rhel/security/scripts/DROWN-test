@@ -6,7 +6,7 @@
 # https://access.redhat.com/labs/drown/DROWN-test.sh
 # Version: 1.1
 
-# Modified to work with Ansible Ian McWilliam <kaosagnt@gmail.com> 
+# Modified to work with Ansible Ian McWilliam <kaosagnt@gmail.com>
 
 # Returns: JSON string:
 # {
