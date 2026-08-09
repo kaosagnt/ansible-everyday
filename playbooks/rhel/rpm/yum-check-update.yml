@@ -23,8 +23,8 @@
   script: scripts/check_yum_dnf_updates yum -d="{{ disable_repo }}" -e="{{ enable_repo }}"
   when: (ansible_facts['os_family'] == 'RedHat')
         and
-        (ansible_lsb.major_release|int >= 5 and
-         ansible_lsb.major_release|int <= 7)
+        (lsb_facts['major_release']|int >= 5 and
+         lsb_facts['major_release']|int <= 7)
   register: yum_info
   changed_when: false
   failed_when: yum_info.rc > 0

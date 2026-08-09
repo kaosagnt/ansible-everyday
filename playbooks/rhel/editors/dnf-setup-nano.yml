@@ -27,5 +27,5 @@
     state: latest
   when: ((ansible_facts['os_family'] == 'RedHat')
         and
-        (ansible_lsb.major_release|int >= 8))
+        (lsb_facts['major_release']|int >= 8))
   register: dnf_install

@@ -47,7 +47,7 @@
 - name: "Are we REMI?"
   set_fact:
     repo_url:
-      "http://rpms.famillecollet.com/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
+      "http://rpms.famillecollet.com/enterprise/remi-release-{{ ansible_facts['distribution_major_version'] }}.rpm"
   when: repo_name == 'remi'
   changed_when: false
 
@@ -55,9 +55,9 @@
   set_fact:
     repo_url:
       "http://repository.it4i.cz/mirrors/repoforge/redhat/el\
-           {{ ansible_distribution_major_version }}/en/\
-           {{ ansible_architecture }}/rpmforge/RPMS/\
-           rpmforge-release-0.5.3-1.el{{ ansible_distribution_major_version }}.rf.{{ ansible_architecture }}.rpm"
+           {{ ansible_facts['distribution_major_version' }}/en/\
+           {{ ansible_facts['architecture'] }}/rpmforge/RPMS/\
+           rpmforge-release-0.5.3-1.el{{ ansible_facts['distribution_major_version'] }}.rf.{{ ansible_facts['architecture'] }}.rpm"
   when: repo_name == 'repoforge'
   changed_when: false
 
@@ -72,13 +72,13 @@
   set_fact:
     repo_url:
       "https://forensics.cert.org/cert-forensics-tools-release-el{{ ansible_distribution_major_version }}.rpm"
-  when: repo_name == 'cert' and ansible_distribution != 'Fedora'
+  when: repo_name == 'cert' and ansible_facts['distribution'] != 'Fedora'
   changed_when: false
 
 - name: "Are we Cert Forensics Fedora release?"
   set_fact:
     repo_url: "https://forensics.cert.org/cert-forensics-tools-release-{{ ansible_distribution_major_version }}.rpm"
-  when: repo_name == 'cert' and ansible_distribution == 'Fedora'
+  when: repo_name == 'cert' and ansible_facts['distribution'] == 'Fedora'
   changed_when: false
 
 - name: "Print repository URL we are installing"

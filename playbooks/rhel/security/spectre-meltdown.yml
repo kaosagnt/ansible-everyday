@@ -33,7 +33,7 @@
       script: scripts/spectre-meltdown--2019-06-10-1156.sh -n
       when: (ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 5)
+            (lsb_facts['major_release']|int >= 5)
       register: vulnerable_info
       changed_when: false
       failed_when: vulnerable_info.rc > 0

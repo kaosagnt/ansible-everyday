@@ -54,13 +54,13 @@
       include: yum-update-rpm-26.yml
       when: (ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 5 and
-            ansible_lsb.major_release|int <= 7)
+            (lsb_facts['major_release']|int >= 5 and
+            lsb_facts['major_release']|int <= 7)
       changed_when: false
 
     - name: "Include DNF update RPM - ansible < 2.7"
       include: dnf-update-rpm-26.yml
       when: ((ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 8))
+            (lsb_facts['major_release']|int >= 8))
       changed_when: false

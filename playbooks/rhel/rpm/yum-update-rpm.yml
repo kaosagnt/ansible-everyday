@@ -28,8 +28,8 @@
     state: latest
   when: (ansible_facts['os_family'] == 'RedHat')
         and
-        (ansible_lsb.major_release|int >= 5 and
-         ansible_lsb.major_release|int <= 7)
+        (lsb_facts['major_release']|int >= 5 and
+         lsb_facts['major_release']|int <= 7)
         and
         (ansible_version.full is version('2.7', '>='))
   # register: yum_rpm_update

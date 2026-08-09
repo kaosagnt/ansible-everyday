@@ -45,7 +45,7 @@
       register: service_info
       when: (ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int <= 6)
+            (lsb_facts['major_release']|int <= 6)
       changed_when: false
       failed_when: service_info.rc > 0
 
@@ -54,7 +54,7 @@
       register: service_info_systemd
       when: (ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 7)
+            (lsb_facts['major_release']|int >= 7)
       changed_when: false
       failed_when: service_info_systemd.rc > 0
 
@@ -64,7 +64,7 @@
             and
             (ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int <= 6)
+            (lsb_facts['major_release']|int <= 6)
       changed_when: false
 
     - name: "Print systemd results"
@@ -73,5 +73,5 @@
             and
             (ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 7)
+            (lsb_facts['major_release']|int >= 7)
       changed_when: false

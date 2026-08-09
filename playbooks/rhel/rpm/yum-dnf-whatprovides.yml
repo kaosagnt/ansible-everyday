@@ -45,12 +45,12 @@
       when: (ansible_facts['os_family'] == 'RedHat')
             and
             (
-             (ansible_lsb.major_release|int >= 5
+             (lsb_facts['major_release']|int >= 5
               and
-              ansible_lsb.major_release|int <= 7
+              lsb_facts['major_release']|int <= 7
              )
              or
-             ansible_distribution_version|int == 2018
+             ansible_facts['distribution_version']|int == 2018
            )
       changed_when: false
 

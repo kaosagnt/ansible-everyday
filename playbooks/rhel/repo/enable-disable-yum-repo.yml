@@ -77,5 +77,5 @@
 
       when: (ansible_facts['os_family'] == 'RedHat')
             and
-            (ansible_lsb.major_release|int >= 5 and
-             ansible_lsb.major_release|int <= 7)
+            (lsb_facts['major_release']|int >= 5 and
+             lsb_facts['major_release']|int <= 7)
